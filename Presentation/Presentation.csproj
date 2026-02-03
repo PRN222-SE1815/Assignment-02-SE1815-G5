@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BusinessLogic\BusinessLogic.csproj" />
+    <ProjectReference Include="..\BusinessObject\BusinessObject.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Admin\CourseManagement\" />
+    <Folder Include="Areas\Admin\ClassManagement\" />
+    <Folder Include="Areas\Admin\ScheduleManagement\" />
+    <Folder Include="Areas\Admin\UserManagement\" />
+    <Folder Include="Areas\Student\CourseRegistration\" />
+    <Folder Include="Areas\Student\Wallet\" />
+    <Folder Include="Areas\Student\StudentGrade\" />
+    <Folder Include="Areas\Student\StudentQuiz\" />
+    <Folder Include="Areas\Student\StudentSchedule\" />
+    <Folder Include="Areas\Teacher\TeacherSchedule\" />
+    <Folder Include="Areas\Teacher\TeacherQuiz\" />
+    <Folder Include="Areas\Teacher\TeacherGrade\" />
+    <Folder Include="Hubs\" />
+    <Folder Include="Pages\Chat\" />
+    <Folder Include="Services\" />
+    <Folder Include="Pages\AI\" />
+    <Folder Include="wwwroot\css\Admin\" />
+    <Folder Include="wwwroot\css\Shared\" />
+    <Folder Include="wwwroot\css\Teacher\" />
+    <Folder Include="wwwroot\css\Student\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.23">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.23">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>
