@@ -1,5 +1,15 @@
+using BusinessLogic.Services.Implements;
+using BusinessLogic.Services.Interfaces;
+using DataAccess;
+using DataAccess.Repositories.Implements;
+using DataAccess.Repositories.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddDbContext<SchoolManagementDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
 // DI for services
@@ -10,7 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages().AddRazorPagesOptions(options =>
 {
-    options.Conventions.AddPageRoute("/Login", "");
+    options.Conventions.AddPageRoute("/Account/Login", "");
 }); ;
 
 var app = builder.Build();
@@ -28,8 +38,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorPages();
 
