@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using DataAccess.Entities;
+using BusinessObject.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess;

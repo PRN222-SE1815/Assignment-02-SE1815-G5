@@ -13,8 +13,11 @@ builder.Services.AddDbContext<SchoolManagementDbContext>(options =>
 
 
 // DI for services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // DI for repositories
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 
 // Add services to the container.
@@ -22,6 +25,18 @@ builder.Services.AddRazorPages().AddRazorPagesOptions(options =>
 {
     options.Conventions.AddPageRoute("/Account/Login", "");
 }); ;
+
+// Cookie Authentication
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.Cookie.Name = "SchoolManagement.Auth";
+        options.SlidingExpiration = true;
+    });
+
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
