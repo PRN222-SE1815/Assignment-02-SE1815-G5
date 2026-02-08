@@ -13,7 +13,7 @@ public class QuizRepository : IQuizRepository
         _context = context;
     }
 
-    // ==================== Query Methods ====================
+    // ==================== ClassSection Queries ====================
 
     public async Task<int?> GetClassSectionTeacherIdAsync(int classSectionId)
     {
@@ -23,6 +23,8 @@ public class QuizRepository : IQuizRepository
             .Select(cs => (int?)cs.TeacherId)
             .FirstOrDefaultAsync();
     }
+
+    // ==================== Quiz Queries ====================
 
     public async Task<Quiz?> GetQuizWithClassSectionAsync(int quizId)
     {
@@ -57,15 +59,7 @@ public class QuizRepository : IQuizRepository
             .ToListAsync();
     }
 
-    public async Task<bool> IsQuizOwnedByTeacherAsync(int quizId, int teacherUserId)
-    {
-        // TeacherId in ClassSections = UserId in Users for teachers
-        return await _context.Quizzes
-            .AsNoTracking()
-            .AnyAsync(q => q.QuizId == quizId && q.ClassSection.TeacherId == teacherUserId);
-    }
-
-    public async Task<int> GetQuizQuestionCountAsync(int quizId)
+    public async Task<int> GetQuestionCountAsync(int quizId)
     {
         return await _context.QuizQuestions
             .AsNoTracking()
@@ -106,7 +100,7 @@ public class QuizRepository : IQuizRepository
             .ToDictionary(g => g.Key, g => g.Select(x => x.AnswerId).ToHashSet());
     }
 
-    public async Task<Dictionary<int, int>> GetCorrectAnswerIdsForQuestionsAsync(IEnumerable<int> questionIds)
+    public async Task<Dictionary<int, int>> GetCorrectAnswerIdsAsync(IEnumerable<int> questionIds)
     {
         var questionIdList = questionIds.ToList();
         var correctAnswers = await _context.QuizAnswers
@@ -115,7 +109,6 @@ public class QuizRepository : IQuizRepository
             .Select(a => new { a.QuestionId, a.AnswerId })
             .ToListAsync();
 
-        // Each question should have exactly one correct answer
         return correctAnswers.ToDictionary(a => a.QuestionId, a => a.AnswerId);
     }
 
@@ -128,7 +121,7 @@ public class QuizRepository : IQuizRepository
             .ToDictionaryAsync(q => q.QuestionId, q => q.Points);
     }
 
-    // ==================== Quiz Attempt Methods ====================
+    // ==================== Attempt Queries ====================
 
     public async Task<QuizAttempt?> GetAttemptWithEnrollmentAsync(int attemptId)
     {
@@ -137,7 +130,7 @@ public class QuizRepository : IQuizRepository
             .FirstOrDefaultAsync(a => a.AttemptId == attemptId);
     }
 
-    public async Task<QuizAttempt?> GetAttemptWithQuizAsync(int attemptId)
+    public async Task<QuizAttempt?> GetAttemptWithQuizAndEnrollmentAsync(int attemptId)
     {
         return await _context.QuizAttempts
             .Include(a => a.Quiz)
@@ -145,14 +138,14 @@ public class QuizRepository : IQuizRepository
             .FirstOrDefaultAsync(a => a.AttemptId == attemptId);
     }
 
-    public async Task<bool> HasAttemptForQuizAsync(int quizId, int enrollmentId)
+    public async Task<bool> HasAttemptAsync(int quizId, int enrollmentId)
     {
         return await _context.QuizAttempts
             .AsNoTracking()
             .AnyAsync(a => a.QuizId == quizId && a.EnrollmentId == enrollmentId);
     }
 
-    // ==================== Create/Update Methods ====================
+    // ==================== Create/Update ====================
 
     public async Task<Quiz> CreateQuizAsync(Quiz quiz)
     {
@@ -190,5 +183,12 @@ public class QuizRepository : IQuizRepository
     public async Task CreateAttemptAnswersAsync(IEnumerable<QuizAttemptAnswer> answers)
     {
         await _context.QuizAttemptAnswers.AddRangeAsync(answers);
+    }
+
+    // ==================== Persistence ====================
+
+    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        return await _context.SaveChangesAsync(cancellationToken);
     }
 }
