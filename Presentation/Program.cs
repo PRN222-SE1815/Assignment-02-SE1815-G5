@@ -15,9 +15,13 @@ builder.Services.AddDbContext<SchoolManagementDbContext>(options =>
 // DI for services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IQuizService, QuizService>();
 
 // DI for repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IQuizRepository, QuizRepository>();
+builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 
 // Add services to the container.
