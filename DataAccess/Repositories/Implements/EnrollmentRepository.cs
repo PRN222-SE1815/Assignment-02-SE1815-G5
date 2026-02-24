@@ -42,4 +42,22 @@ public class EnrollmentRepository : IEnrollmentRepository
             .Select(e => (int?)e.StudentId)
             .FirstOrDefaultAsync();
     }
+
+    public async Task<Enrollment?> GetEnrollmentBySectionAsync(int studentUserId, int classSectionId)
+    {
+        return await _context.Enrollments
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.StudentId == studentUserId
+                                      && e.ClassSectionId == classSectionId
+                                      && e.Status == "ENROLLED");
+    }
+
+    public async Task<bool> IsStudentEnrolledInCourseAsync(int studentUserId, int courseId)
+    {
+        return await _context.Enrollments
+            .AsNoTracking()
+            .AnyAsync(e => e.StudentId == studentUserId
+                           && e.CourseId == courseId
+                           && e.Status == "ENROLLED");
+    }
 }

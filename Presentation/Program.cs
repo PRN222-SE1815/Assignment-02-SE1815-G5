@@ -16,11 +16,18 @@ builder.Services.AddDbContext<SchoolManagementDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IQuizRepository, QuizRepository>();
 builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+builder.Services.AddScoped<IChatRoomRepository, ChatRoomRepository>();
+builder.Services.AddScoped<IChatRoomMemberRepository, ChatRoomMemberRepository>();
+builder.Services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
+builder.Services.AddScoped<IChatMessageAttachmentRepository, ChatMessageAttachmentRepository>();
+builder.Services.AddScoped<IChatModerationLogRepository, ChatModerationLogRepository>();
+builder.Services.AddScoped<IClassSectionRepository, ClassSectionRepository>();
 
 // ==================== Services (Scoped) ====================
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IQuizService, QuizService>();
+builder.Services.AddScoped<IChatService, ChatService>();
 
 // ==================== Razor Pages ====================
 builder.Services.AddRazorPages().AddRazorPagesOptions(options =>
