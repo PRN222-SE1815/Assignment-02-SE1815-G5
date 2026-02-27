@@ -24,15 +24,11 @@
     <Folder Include="Areas\Teacher\Pages\TeacherSchedule\" />
     <Folder Include="Areas\Teacher\Pages\TeacherQuiz\" />
     <Folder Include="Areas\Teacher\Pages\TeacherGrade\" />
-    <Folder Include="Hubs\" />
-    <Folder Include="Pages\Chat\" />
-    <Folder Include="Services\" />
     <Folder Include="Pages\AI\" />
     <Folder Include="wwwroot\css\Admin\ClassManagement\" />
     <Folder Include="wwwroot\css\Admin\CourseManagement\" />
     <Folder Include="wwwroot\css\Admin\ScheduleManagement\" />
     <Folder Include="wwwroot\css\Admin\UserManagement\" />
-    <Folder Include="wwwroot\css\Chat\" />
     <Folder Include="wwwroot\css\Student\CourseRegistration\" />
     <Folder Include="wwwroot\css\Student\StudentGrade\" />
     <Folder Include="wwwroot\css\Student\StudentQuiz\" />
@@ -44,7 +40,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="8.0.23" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.23">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
