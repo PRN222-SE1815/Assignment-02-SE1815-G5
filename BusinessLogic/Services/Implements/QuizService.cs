@@ -348,7 +348,33 @@ public class QuizService : IQuizService
             StartAt = q.StartAt,
             EndAt = q.EndAt,
             Status = q.Status,
-            CreatedAt = q.CreatedAt
+            CreatedAt = q.CreatedAt,
+            ClassSectionCode = q.ClassSection?.SectionCode ?? ""
+        }).ToList();
+    }
+
+    public async Task<List<QuizSummaryResponse>> ListAllPublishedQuizzesForStudentAsync(
+        int studentUserId,
+        string actorRole)
+    {
+        // 1. Authorize
+        EnsureStudentRole(actorRole);
+
+        // 2. Get published quizzes across all active enrollments
+        var quizzes = await _quizRepo.GetPublishedQuizzesForStudentAsync(studentUserId);
+
+        return quizzes.Select(q => new QuizSummaryResponse
+        {
+            QuizId = q.QuizId,
+            QuizTitle = q.QuizTitle,
+            Description = q.Description,
+            TotalQuestions = q.TotalQuestions,
+            TimeLimitMin = q.TimeLimitMin,
+            StartAt = q.StartAt,
+            EndAt = q.EndAt,
+            Status = q.Status,
+            CreatedAt = q.CreatedAt,
+            ClassSectionCode = q.ClassSection?.SectionCode ?? ""
         }).ToList();
     }
 

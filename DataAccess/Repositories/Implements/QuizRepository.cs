@@ -59,6 +59,22 @@ public class QuizRepository : IQuizRepository
             .ToListAsync();
     }
 
+    public async Task<List<Quiz>> GetPublishedQuizzesForStudentAsync(int studentUserId)
+    {
+        var enrolledClassSectionIds = await _context.Enrollments
+            .AsNoTracking()
+            .Where(e => e.StudentId == studentUserId && e.Status == "ACTIVE")
+            .Select(e => e.ClassSectionId)
+            .ToListAsync();
+
+        return await _context.Quizzes
+            .AsNoTracking()
+            .Include(q => q.ClassSection)
+            .Where(q => enrolledClassSectionIds.Contains(q.ClassSectionId) && q.Status == "PUBLISHED")
+            .OrderByDescending(q => q.CreatedAt)
+            .ToListAsync();
+    }
+
     public async Task<List<Quiz>> GetQuizzesByTeacherIdAsync(int teacherUserId)
     {
         return await _context.Quizzes

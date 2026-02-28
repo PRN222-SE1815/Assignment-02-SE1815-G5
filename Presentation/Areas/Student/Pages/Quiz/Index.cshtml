@@ -24,19 +24,12 @@
         </div>
     }
 
-    @if (Model.ClassSectionId <= 0)
-    {
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i> Please select a class section to view available quizzes.
-            <p class="mt-2">Navigate here with: <code>/Student/Quiz?classSectionId=YOUR_ID</code></p>
-        </div>
-    }
-    else if (Model.Quizzes.Count == 0 && string.IsNullOrEmpty(Model.ErrorMessage))
+    @if (Model.Quizzes.Count == 0 && string.IsNullOrEmpty(Model.ErrorMessage))
     {
         <div class="empty-state">
             <i class="fas fa-clipboard-check fa-3x"></i>
             <h3>No Quizzes Available</h3>
-            <p>There are no published quizzes for this class section yet.</p>
+            <p>There are no published quizzes available for you at this time.</p>
         </div>
     }
     else
@@ -64,6 +57,10 @@
                     }
 
                     <div class="quiz-meta">
+                        @if (!string.IsNullOrEmpty(quiz.ClassSectionCode))
+                        {
+                            <span><i class="fas fa-bookmark"></i> @quiz.ClassSectionCode</span>
+                        }
                         <span><i class="fas fa-question-circle"></i> @quiz.TotalQuestions questions</span>
                         @if (quiz.TimeLimitMin.HasValue)
                         {

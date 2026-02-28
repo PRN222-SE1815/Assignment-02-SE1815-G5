@@ -60,6 +60,11 @@ public interface IQuizService
     Task<List<QuizSummaryResponse>> ListPublishedQuizzesForClassAsync(int studentUserId, string actorRole, int classSectionId);
 
     /// <summary>
+    /// List all published quizzes across all active enrollments for a student.
+    /// </summary>
+    Task<List<QuizSummaryResponse>> ListAllPublishedQuizzesForStudentAsync(int studentUserId, string actorRole);
+
+    /// <summary>
     /// Start a quiz attempt.
     /// </summary>
     /// <exception cref="Exceptions.ForbiddenException">Not enrolled</exception>

@@ -34,6 +34,11 @@ public interface IQuizRepository
     Task<List<Quiz>> GetPublishedQuizzesForClassAsync(int classSectionId);
 
     /// <summary>
+    /// Get published quizzes across all active enrollments for a student.
+    /// </summary>
+    Task<List<Quiz>> GetPublishedQuizzesForStudentAsync(int studentUserId);
+
+    /// <summary>
     /// Get all quizzes created by a specific teacher (all statuses).
     /// </summary>
     Task<List<Quiz>> GetQuizzesByTeacherIdAsync(int teacherUserId);
