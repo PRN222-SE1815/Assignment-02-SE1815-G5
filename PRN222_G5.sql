@@ -972,7 +972,19 @@ INSERT INTO dbo.Programs (ProgramCode, ProgramName) VALUES
 ('GD', N'Thiết kế đồ họa');
 GO
 
--- (Semesters and Courses seeding moved to line 1315+)
+-- 2. Tạo dữ liệu Học kỳ (Semesters)
+INSERT INTO dbo.Semesters (SemesterCode, SemesterName, StartDate, EndDate, IsActive, RegistrationEndDate, AddDropDeadline) VALUES
+('SP26', N'Spring 2026', '2026-01-05', '2026-04-30', 1, '2025-12-31', '2026-01-15'),
+('SU26', N'Summer 2026', '2026-05-10', '2026-08-30', 0, '2026-05-01', '2026-05-20');
+GO
+
+-- 3. Tạo dữ liệu Môn học (Courses)
+INSERT INTO dbo.Courses (CourseCode, CourseName, Credits, Description) VALUES
+('PRN211', N'Basic Cross-Platform App Programming', 3, N'C# basic and WinForms'),
+('PRN222', N'Advanced Cross-Platform App Programming', 3, N'ASP.NET Core, EF Core, SignalR'),
+('PRN231', N'Building Cross-Platform Web APIs', 3, N'RESTful API, OData, JWT'),
+('SWP391', N'Software Development Project', 4, N'Capstone project for juniors');
+GO
 
 -- =============================================================
 -- 4. TẠO USERS (1 Admin, 5 Teachers, 14 Students)
@@ -1312,7 +1324,7 @@ INSERT INTO dbo.Semesters (SemesterCode, SemesterName, StartDate, EndDate, IsAct
 ('SP25', N'Spring 2025', '2025-01-05', '2025-04-30', 0, '2024-12-25', '2025-01-15', '2025-02-01', 20, 8),
 ('SU25', N'Summer 2025', '2025-05-10', '2025-08-10', 0, '2025-05-01', '2025-05-20', '2025-06-01', 12, 6),
 ('FA25', N'Fall 2025',   '2025-08-15', '2025-12-15', 0, '2025-08-01', '2025-08-25', '2025-09-15', 20, 8),
-('SU26', N'Summer 2026', '2026-05-10', '2026-08-30', 0, '2026-05-01', '2026-05-20', '2026-06-10', 12, 6),
+-- SU26 đã insert ở dòng 977, bỏ qua để tránh duplicate
 ('FA26', N'Fall 2026',   '2026-08-15', '2026-12-15', 0, '2026-08-01', '2026-08-25', '2026-09-15', 20, 8),
 ('SP27', N'Spring 2027', '2027-01-05', '2027-04-30', 0, '2026-12-25', '2027-01-15', '2027-02-01', 20, 8),
 ('SU27', N'Summer 2027', '2027-05-10', '2027-08-10', 0, '2027-05-01', '2027-05-20', '2027-06-01', 12, 6),
@@ -1510,8 +1522,8 @@ INSERT INTO dbo.ClassSections (SemesterId, CourseId, TeacherId, SectionCode, IsO
 SELECT TOP 500
     CASE WHEN rn % 4 = 1 THEN (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE SemesterCode = 'SP26')
          WHEN rn % 4 = 2 THEN (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE SemesterCode = 'SU26')
-         WHEN rn % 4 = 3 THEN (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE SemesterCode = 'FA26')
-         ELSE (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE SemesterCode = 'SP27') END,
+         WHEN rn % 4 = 3 THEN (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE SemesterCode = 'FA25')
+         ELSE (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE SemesterCode = 'SP26') END,
     CourseId,
     TeacherId,
     CourseCode + '-S' + RIGHT('00' + CAST(sec_num AS VARCHAR(3)), 2),
@@ -1966,98 +1978,195 @@ ORDER BY sw.WalletId;
 GO
 
 -- =====================================================
--- SEED: Quizzes (500 rows)
+-- SEED: Gán tất cả Students vào lớp SE1801 và SE1802
+-- để test Quiz cho role Student
 -- =====================================================
-INSERT INTO dbo.Quizzes (ClassSectionId, CreatedBy, QuizTitle, Description, TotalQuestions, TimeLimitMin, ShuffleQuestions, ShuffleAnswers, StartAt, EndAt, Status, CreatedAt)
-SELECT TOP 500
-    cs.ClassSectionId,
-    cs.TeacherId,
-    N'Quiz ' + c.CourseCode + ' - Bài số ' + CAST(ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId, c.CourseCode) AS NVARCHAR(10)),
-    N'Bài kiểm tra tổng hợp kiến thức môn ' + c.CourseName,
-    CASE WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 3 = 0 THEN 20
-         WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 3 = 1 THEN 30
-         ELSE 10 END,
-    CASE WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 3 = 0 THEN 15
-         WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 3 = 1 THEN 45
-         ELSE 60 END,
-    1, 1,
-    SYSUTCDATETIME(),
-    DATEADD(DAY, 7, SYSUTCDATETIME()),
-    CASE WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 4 = 0 THEN 'DRAFT'
-         WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 4 = 1 THEN 'CLOSED'
-         ELSE 'PUBLISHED' END,
-    SYSUTCDATETIME()
-FROM dbo.ClassSections cs
-JOIN dbo.Courses c ON c.CourseId = cs.CourseId
-CROSS JOIN (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3) x
-ORDER BY cs.ClassSectionId;
+DECLARE @CS1 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1801');
+DECLARE @CS2 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1802');
+DECLARE @SemQ INT = (SELECT TOP 1 SemesterId FROM dbo.ClassSections WHERE ClassSectionId = @CS1);
+DECLARE @CourseQ INT = (SELECT TOP 1 CourseId FROM dbo.ClassSections WHERE ClassSectionId = @CS1);
+DECLARE @CourseQ2 INT = (SELECT TOP 1 CourseId FROM dbo.ClassSections WHERE ClassSectionId = @CS2);
+
+-- Enroll nửa đầu students vào SE1801, nửa sau vào SE1802
+INSERT INTO dbo.Enrollments (StudentId, ClassSectionId, SemesterId, CourseId, CreditsSnapshot, Status)
+SELECT s.StudentId, @CS1, @SemQ, @CourseQ, 3, 'ENROLLED'
+FROM dbo.Students s
+WHERE s.StudentId NOT IN (SELECT e.StudentId FROM dbo.Enrollments e WHERE e.ClassSectionId = @CS1)
+  AND s.StudentId % 2 = 1
+  AND NOT EXISTS (SELECT 1 FROM dbo.Enrollments ex WHERE ex.StudentId = s.StudentId AND ex.CourseId = @CourseQ AND ex.SemesterId = @SemQ);
+
+INSERT INTO dbo.Enrollments (StudentId, ClassSectionId, SemesterId, CourseId, CreditsSnapshot, Status)
+SELECT s.StudentId, @CS2, @SemQ, @CourseQ2, 3, 'ENROLLED'
+FROM dbo.Students s
+WHERE s.StudentId NOT IN (SELECT e.StudentId FROM dbo.Enrollments e WHERE e.ClassSectionId = @CS2)
+  AND s.StudentId % 2 = 0
+  AND NOT EXISTS (SELECT 1 FROM dbo.Enrollments ex WHERE ex.StudentId = s.StudentId AND ex.CourseId = @CourseQ2 AND ex.SemesterId = @SemQ);
 GO
 
 -- =====================================================
--- SEED: QuizQuestions (1500 rows, 3 docs per quiz)
+-- SEED: Quizzes cho cả 2 lớp (Teacher quản lý, Student làm bài)
+-- =====================================================
+DECLARE @CS1Q INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1801');
+DECLARE @CS2Q INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1802');
+DECLARE @TeacherQ INT = (SELECT TOP 1 TeacherId FROM dbo.ClassSections WHERE ClassSectionId = @CS1Q);
+
+-- 10 Quizzes cho SE1801 (teacher quản lý)
+INSERT INTO dbo.Quizzes (ClassSectionId, CreatedBy, QuizTitle, Description, TotalQuestions, TimeLimitMin, ShuffleQuestions, ShuffleAnswers, StartAt, EndAt, Status) VALUES
+(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 1: C# Basics',        N'Bài kiểm tra kiến thức C# cơ bản',         10, 15, 1, 1, '2026-01-10', '2026-04-30', 'PUBLISHED'),
+(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 2: OOP',              N'Bài kiểm tra lập trình hướng đối tượng',   10, 20, 1, 1, '2026-01-15', '2026-04-30', 'PUBLISHED'),
+(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 3: LINQ',             N'Bài kiểm tra LINQ và lambda expressions',  10, 20, 1, 1, '2026-01-20', '2026-04-30', 'PUBLISHED'),
+(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 4: Entity Framework', N'Bài kiểm tra EF Core và migrations',       10, 30, 1, 1, '2026-02-01', '2026-04-30', 'PUBLISHED'),
+(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 5: ASP.NET Core MVC', N'Bài kiểm tra MVC pattern',                 10, 30, 1, 1, '2026-02-10', '2026-04-30', 'PUBLISHED'),
+(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 6: Razor Pages',      N'Bài kiểm tra Razor Pages',                 10, 25, 1, 1, '2026-02-15', '2026-04-30', 'DRAFT'),
+(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 7: SignalR',          N'Bài kiểm tra SignalR real-time',            10, 20, 1, 1, '2026-02-20', '2026-04-30', 'DRAFT'),
+(@CS1Q, @TeacherQ, N'PRN222 - Giữa kỳ',                             N'Bài kiểm tra giữa kỳ tổng hợp',           30, 60, 1, 1, '2026-03-01', '2026-04-30', 'PUBLISHED'),
+(@CS1Q, @TeacherQ, N'PRN222 - Quiz nhanh: Dependency Injection',     N'Quiz nhanh về DI container',               10, 10, 1, 1, '2026-03-10', '2026-04-30', 'CLOSED'),
+(@CS1Q, @TeacherQ, N'PRN222 - Cuối kỳ',                              N'Bài kiểm tra cuối kỳ',                    30, 90, 1, 1, '2026-04-01', '2026-04-30', 'DRAFT');
+
+-- 10 Quizzes cho SE1802
+INSERT INTO dbo.Quizzes (ClassSectionId, CreatedBy, QuizTitle, Description, TotalQuestions, TimeLimitMin, ShuffleQuestions, ShuffleAnswers, StartAt, EndAt, Status) VALUES
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz 1: Biến và kiểu dữ liệu',       N'Kiến thức cơ bản về biến',                 10, 15, 1, 1, '2026-01-10', '2026-04-30', 'PUBLISHED'),
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz 2: Mảng và Collections',         N'Bài kiểm tra về Array, List, Dictionary',  10, 20, 1, 1, '2026-01-15', '2026-04-30', 'PUBLISHED'),
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz 3: Exception Handling',          N'Bài kiểm tra xử lý ngoại lệ',             10, 15, 1, 1, '2026-01-20', '2026-04-30', 'PUBLISHED'),
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz 4: Async/Await',                 N'Bài kiểm tra lập trình bất đồng bộ',      10, 25, 1, 1, '2026-02-01', '2026-04-30', 'PUBLISHED'),
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz 5: Web API',                     N'Bài kiểm tra RESTful API',                 10, 30, 1, 1, '2026-02-10', '2026-04-30', 'PUBLISHED'),
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz 6: Authentication',              N'Bài kiểm tra JWT và Identity',             10, 20, 1, 1, '2026-02-15', '2026-04-30', 'DRAFT'),
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz 7: Unit Testing',                N'Bài kiểm tra xUnit và Moq',               10, 20, 1, 1, '2026-02-20', '2026-04-30', 'DRAFT'),
+(@CS2Q, @TeacherQ, N'PRN222 - Giữa kỳ lớp SE1802',                 N'Bài thi giữa kỳ',                         20, 45, 1, 1, '2026-03-01', '2026-04-30', 'PUBLISHED'),
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz nhanh: Design Patterns',         N'Quiz nhanh về các design patterns',        10, 10, 1, 1, '2026-03-10', '2026-04-30', 'CLOSED'),
+(@CS2Q, @TeacherQ, N'PRN222 - Cuối kỳ lớp SE1802',                  N'Bài thi cuối kỳ',                         30, 90, 1, 1, '2026-04-01', '2026-04-30', 'DRAFT');
+GO
+
+-- =====================================================
+-- SEED: QuizQuestions (10 câu hỏi cho mỗi Quiz)
 -- =====================================================
 INSERT INTO dbo.QuizQuestions (QuizId, QuestionText, QuestionType, Points, SortOrder)
-SELECT TOP 1500
+SELECT 
     q.QuizId,
-    N'Câu hỏi số ' + CAST(ROW_NUMBER() OVER (ORDER BY q.QuizId) AS NVARCHAR(10)) + N' thuộc về ' + q.QuizTitle,
-    CASE WHEN ROW_NUMBER() OVER (ORDER BY q.QuizId) % 2 = 0 THEN 'MCQ' ELSE 'TRUE_FALSE' END,
+    N'[' + q.QuizTitle + N'] Câu ' + CAST(nums.n AS NVARCHAR(5)) + N': ' +
+    CASE nums.n
+        WHEN 1 THEN N'Đâu là cách khai báo biến đúng trong C#?'
+        WHEN 2 THEN N'Phương thức nào dùng để chuyển đổi kiểu dữ liệu?'
+        WHEN 3 THEN N'Từ khóa nào dùng để kế thừa class?'
+        WHEN 4 THEN N'Interface khác abstract class ở điểm nào?'
+        WHEN 5 THEN N'LINQ query syntax tương đương method syntax nào?'
+        WHEN 6 THEN N'DbContext trong EF Core có vai trò gì?'
+        WHEN 7 THEN N'Middleware trong ASP.NET Core hoạt động thế nào?'
+        WHEN 8 THEN N'Razor Pages khác MVC Controller ở đâu?'
+        WHEN 9 THEN N'SignalR sử dụng transport protocol nào?'
+        ELSE N'Dependency Injection giải quyết vấn đề gì?'
+    END,
+    CASE WHEN nums.n % 3 = 0 THEN 'TRUE_FALSE' ELSE 'MCQ' END,
     1.00,
-    ROW_NUMBER() OVER (PARTITION BY q.QuizId ORDER BY (SELECT NULL))
+    nums.n
 FROM dbo.Quizzes q
-CROSS JOIN (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3) x
-ORDER BY q.QuizId;
+CROSS JOIN (
+    SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
+    UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10
+) nums;
 GO
 
 -- =====================================================
--- SEED: QuizAnswers (6000 rows, 4 per question)
+-- SEED: QuizAnswers (4 đáp án cho mỗi câu hỏi, đáp án 1 = đúng)
 -- =====================================================
 INSERT INTO dbo.QuizAnswers (QuestionId, AnswerText, IsCorrect)
-SELECT TOP 6000
+SELECT 
     qq.QuestionId,
-    N'Đáp án lựa chọn ' + CAST(ROW_NUMBER() OVER (PARTITION BY qq.QuestionId ORDER BY (SELECT NULL)) AS NVARCHAR(10)),
-    CASE WHEN ROW_NUMBER() OVER (PARTITION BY qq.QuestionId ORDER BY (SELECT NULL)) = 1 THEN 1 ELSE 0 END
+    CASE ans.n
+        WHEN 1 THEN N'Đáp án A (Đúng): ' + LEFT(qq.QuestionText, 30)
+        WHEN 2 THEN N'Đáp án B: Không phải đáp án này'
+        WHEN 3 THEN N'Đáp án C: Câu trả lời sai'
+        ELSE N'Đáp án D: Lựa chọn không chính xác'
+    END,
+    CASE WHEN ans.n = 1 THEN 1 ELSE 0 END
 FROM dbo.QuizQuestions qq
-CROSS JOIN (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4) x
-ORDER BY qq.QuestionId;
+CROSS JOIN (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4) ans;
 GO
 
 -- =====================================================
--- SEED: QuizAttempts (Cho tất cả học sinh đang học lớp có Quiz PUBLISHED hoặc CLOSED)
+-- SEED: QuizAttempts (Tất cả students enrolled làm Quiz PUBLISHED/CLOSED)
 -- =====================================================
 INSERT INTO dbo.QuizAttempts (QuizId, EnrollmentId, ClassSectionId, StartedAt, SubmittedAt, Score, Status)
 SELECT 
     q.QuizId,
     e.EnrollmentId,
     q.ClassSectionId,
-    SYSUTCDATETIME(),
-    CASE WHEN q.Status = 'CLOSED' THEN DATEADD(MINUTE, q.TimeLimitMin, SYSUTCDATETIME()) ELSE NULL END,
-    CASE WHEN q.Status = 'CLOSED' THEN CAST(RAND(CHECKSUM(NEWID())) * 10 AS DECIMAL(5,2)) ELSE NULL END, -- Điểm random từ 0-10 nếu đã nộp
+    DATEADD(HOUR, -2, SYSUTCDATETIME()),
+    CASE WHEN q.Status = 'CLOSED' THEN DATEADD(HOUR, -1, SYSUTCDATETIME()) ELSE NULL END,
+    CASE WHEN q.Status = 'CLOSED' THEN CAST(ABS(CHECKSUM(NEWID())) % 10 + 1 AS DECIMAL(5,2)) ELSE NULL END,
     CASE WHEN q.Status = 'CLOSED' THEN 'GRADED' ELSE 'IN_PROGRESS' END
 FROM dbo.Quizzes q
 JOIN dbo.Enrollments e ON e.ClassSectionId = q.ClassSectionId
-WHERE q.Status IN ('PUBLISHED', 'CLOSED') AND e.Status IN ('ACTIVE', 'ENROLLED', 'COMPLETED');
+WHERE q.Status = 'CLOSED'
+  AND e.Status = 'ENROLLED';
 GO
 
 -- =====================================================
--- SEED: QuizAttemptAnswers (Tạo dữ liệu Submit cho các Attempt đã GRADED)
+-- SEED: QuizAttemptAnswers (Submit cho các attempts GRADED)
 -- =====================================================
-;WITH AttemptQuestionPairs AS (
-    SELECT 
-        qa.AttemptId,
-        qq.QuestionId,
-        (SELECT TOP 1 AnswerId FROM dbo.QuizAnswers WHERE QuestionId = qq.QuestionId ORDER BY NEWID()) AS RandomSelectedAnswerId,
-        (SELECT TOP 1 AnswerId FROM dbo.QuizAnswers WHERE QuestionId = qq.QuestionId AND IsCorrect = 1) AS CorrectAnswerId
-    FROM dbo.QuizAttempts qa
-    JOIN dbo.QuizQuestions qq ON qq.QuizId = qa.QuizId
-    WHERE qa.Status = 'GRADED'
-)
 INSERT INTO dbo.QuizAttemptAnswers (AttemptId, QuestionId, SelectedAnswerId, IsCorrect)
 SELECT 
-    AttemptId,
-    QuestionId,
-    RandomSelectedAnswerId,
-    CASE WHEN RandomSelectedAnswerId = CorrectAnswerId THEN 1 ELSE 0 END
-FROM AttemptQuestionPairs;
+    qa.AttemptId,
+    qq.QuestionId,
+    (SELECT TOP 1 AnswerId FROM dbo.QuizAnswers a WHERE a.QuestionId = qq.QuestionId ORDER BY NEWID()),
+    CASE WHEN ABS(CHECKSUM(NEWID())) % 4 = 0 THEN 1 ELSE 0 END
+FROM dbo.QuizAttempts qa
+JOIN dbo.QuizQuestions qq ON qq.QuizId = qa.QuizId
+WHERE qa.Status = 'GRADED';
+GO
+
+-- =====================================================
+-- SEED: Chat (Tạo phòng chat cho lớp SE1801 và SE1802)
+-- =====================================================
+DECLARE @Class1 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1801');
+DECLARE @Class2 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1802');
+DECLARE @TchrId INT = (SELECT TOP 1 TeacherId FROM dbo.ClassSections WHERE ClassSectionId = @Class1);
+DECLARE @TchrUserId INT = (SELECT TOP 1 UserId FROM dbo.Users WHERE Role = 'TEACHER');
+
+-- Tạo 2 phòng chat cho 2 lớp
+INSERT INTO dbo.ChatRooms (RoomType, ClassSectionId, RoomName, Status, CreatedBy, CreatedAt) VALUES
+('CLASS_SECTION', @Class1, N'Phòng học SE1801', 'ACTIVE', @TchrUserId, DATEADD(DAY, -10, SYSUTCDATETIME())),
+('CLASS_SECTION', @Class2, N'Phòng học SE1802', 'ACTIVE', @TchrUserId, DATEADD(DAY, -10, SYSUTCDATETIME()));
+
+DECLARE @Room1 INT = (SELECT TOP 1 RoomId FROM dbo.ChatRooms WHERE ClassSectionId = @Class1);
+DECLARE @Room2 INT = (SELECT TOP 1 RoomId FROM dbo.ChatRooms WHERE ClassSectionId = @Class2);
+
+-- Thêm Teacher vào 2 phòng
+INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus, JoinedAt) VALUES
+(@Room1, @TchrUserId, 'OWNER', 'ACTIVE', DATEADD(DAY, -10, SYSUTCDATETIME())),
+(@Room2, @TchrUserId, 'OWNER', 'ACTIVE', DATEADD(DAY, -10, SYSUTCDATETIME()));
+
+-- Thêm Sinh viên vào phòng SE1801
+INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus, JoinedAt)
+SELECT @Room1, u.UserId, 'MEMBER', 'ACTIVE', DATEADD(DAY, -9, SYSUTCDATETIME())
+FROM dbo.Enrollments e
+JOIN dbo.Students s ON e.StudentId = s.StudentId
+JOIN dbo.Users u ON s.UserId = u.UserId
+WHERE e.ClassSectionId = @Class1;
+
+-- Thêm Sinh viên vào phòng SE1802
+INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus, JoinedAt)
+SELECT @Room2, u.UserId, 'MEMBER', 'ACTIVE', DATEADD(DAY, -9, SYSUTCDATETIME())
+FROM dbo.Enrollments e
+JOIN dbo.Students s ON e.StudentId = s.StudentId
+JOIN dbo.Users u ON s.UserId = u.UserId
+WHERE e.ClassSectionId = @Class2;
+GO
+
+-- =====================================================
+-- SEED: Messages (Tự động chat mẫu cho SE1801)
+-- =====================================================
+DECLARE @Class1 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1801');
+DECLARE @Room1 INT = (SELECT TOP 1 RoomId FROM dbo.ChatRooms WHERE ClassSectionId = @Class1);
+DECLARE @TchrUserId INT = (SELECT TOP 1 UserId FROM dbo.Users WHERE Role = 'TEACHER');
+DECLARE @StdUserId INT = (SELECT TOP 1 u.UserId FROM dbo.Enrollments e JOIN dbo.Students s ON e.StudentId = s.StudentId JOIN dbo.Users u ON s.UserId = u.UserId WHERE e.ClassSectionId = @Class1);
+
+INSERT INTO dbo.ChatMessages (RoomId, SenderId, MessageType, Content, CreatedAt) VALUES
+(@Room1, @TchrUserId, 'TEXT', N'Chào các em, thầy đã upload quiz chương 1. Các em vào làm nhé.', DATEADD(DAY, -2, SYSUTCDATETIME())),
+(@Room1, @StdUserId,  'TEXT', N'Dạ vâng ạ.', DATEADD(MINUTE, 5, DATEADD(DAY, -2, SYSUTCDATETIME()))),
+(@Room1, @TchrUserId, 'TEXT', N'Hạn chót là cuối tháng nên đừng để quên nhen.', DATEADD(MINUTE, 10, DATEADD(DAY, -2, SYSUTCDATETIME()))),
+(@Room1, @StdUserId,  'TEXT', N'Đề quiz năm nay có ra thi cuối kỳ không thầy?', DATEADD(HOUR, 2,  DATEADD(DAY, -2, SYSUTCDATETIME()))),
+(@Room1, @TchrUserId, 'TEXT', N'Tất nhiên là có! Ôn tập kỹ nhé.', DATEADD(HOUR, 5,  DATEADD(DAY, -2, SYSUTCDATETIME())));
 GO
 
 PRINT 'Seed data inserted successfully!';

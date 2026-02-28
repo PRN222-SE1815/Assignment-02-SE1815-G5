@@ -296,6 +296,94 @@ public class QuizService : IQuizService
         _logger.LogInformation("Teacher {TeacherId} closed quiz {QuizId}", teacherUserId, request.QuizId);
     }
 
+    public async Task DeleteQuizAsync(int teacherUserId, string actorRole, int quizId)
+    {
+        EnsureTeacherRole(actorRole);
+
+        var quiz = await _quizRepo.GetQuizWithClassSectionAsync(quizId);
+        if (quiz == null) throw new NotFoundException("Quiz", quizId);
+        if (quiz.ClassSection.TeacherId != teacherUserId)
+            throw new ForbiddenException("You are not the teacher of this quiz's class section.");
+        if (quiz.Status != STATUS_DRAFT)
+            throw new BusinessException($"Cannot delete quiz with status '{quiz.Status}'. Only DRAFT quizzes can be deleted.", "INVALID_QUIZ_STATUS");
+
+        await _quizRepo.DeleteQuizAsync(quizId);
+        await _quizRepo.SaveChangesAsync();
+
+        _logger.LogInformation("Teacher {TeacherId} deleted quiz {QuizId}", teacherUserId, quizId);
+    }
+
+    public async Task UpdateQuestionAsync(int teacherUserId, string actorRole, int questionId, AddQuestionRequest request)
+    {
+        EnsureTeacherRole(actorRole);
+
+        var question = await _quizRepo.GetQuestionByIdAsync(questionId);
+        if (question == null) throw new NotFoundException("QuizQuestion", questionId);
+
+        var quiz = await _quizRepo.GetQuizWithClassSectionAsync(question.QuizId);
+        if (quiz == null) throw new NotFoundException("Quiz", question.QuizId);
+        if (quiz.ClassSection.TeacherId != teacherUserId)
+            throw new ForbiddenException("You are not the teacher of this quiz's class section.");
+        if (quiz.Status != STATUS_DRAFT)
+            throw new BusinessException($"Cannot edit questions in quiz with status '{quiz.Status}'. Quiz must be DRAFT.", "INVALID_QUIZ_STATUS");
+
+        // Validate
+        if (request.QuestionType != QTYPE_MCQ && request.QuestionType != QTYPE_TRUE_FALSE)
+            throw new BusinessException($"QuestionType must be '{QTYPE_MCQ}' or '{QTYPE_TRUE_FALSE}'.", "INVALID_QUESTION_TYPE");
+        ValidateAnswers(request.Answers);
+
+        // Update question fields
+        question.QuestionText = request.QuestionText;
+        question.QuestionType = request.QuestionType;
+        question.Points = request.Points;
+        _quizRepo.UpdateQuestion(question);
+
+        // Replace answers: delete old, create new
+        _dbContext.QuizAnswers.RemoveRange(question.QuizAnswers);
+        var newAnswers = request.Answers.Select(a => new QuizAnswer
+        {
+            QuestionId = questionId,
+            AnswerText = a.AnswerText,
+            IsCorrect = a.IsCorrect
+        });
+        await _quizRepo.CreateAnswersAsync(newAnswers);
+        await _quizRepo.SaveChangesAsync();
+
+        _logger.LogInformation("Teacher {TeacherId} updated question {QuestionId} in quiz {QuizId}", teacherUserId, questionId, question.QuizId);
+    }
+
+    public async Task DeleteQuestionAsync(int teacherUserId, string actorRole, int questionId)
+    {
+        EnsureTeacherRole(actorRole);
+
+        var question = await _quizRepo.GetQuestionByIdAsync(questionId);
+        if (question == null) throw new NotFoundException("QuizQuestion", questionId);
+
+        var quiz = await _quizRepo.GetQuizWithClassSectionAsync(question.QuizId);
+        if (quiz == null) throw new NotFoundException("Quiz", question.QuizId);
+        if (quiz.ClassSection.TeacherId != teacherUserId)
+            throw new ForbiddenException("You are not the teacher of this quiz's class section.");
+        if (quiz.Status != STATUS_DRAFT)
+            throw new BusinessException($"Cannot delete questions from quiz with status '{quiz.Status}'. Quiz must be DRAFT.", "INVALID_QUIZ_STATUS");
+
+        await _quizRepo.DeleteQuestionAsync(questionId);
+        await _quizRepo.SaveChangesAsync();
+
+        _logger.LogInformation("Teacher {TeacherId} deleted question {QuestionId} from quiz {QuizId}", teacherUserId, questionId, question.QuizId);
+    }
+
+    public async Task<List<QuizQuestion>> GetQuizQuestionsAsync(int teacherUserId, string actorRole, int quizId)
+    {
+        EnsureTeacherRole(actorRole);
+
+        var quiz = await _quizRepo.GetQuizWithClassSectionAsync(quizId);
+        if (quiz == null) throw new NotFoundException("Quiz", quizId);
+        if (quiz.ClassSection.TeacherId != teacherUserId)
+            throw new ForbiddenException("You are not the teacher of this quiz's class section.");
+
+        return await _quizRepo.GetQuestionsWithAnswersAsync(quizId);
+    }
+
     // ==================== STUDENT Operations ====================
 
     public async Task<List<QuizSummaryResponse>> ListQuizzesForTeacherAsync(

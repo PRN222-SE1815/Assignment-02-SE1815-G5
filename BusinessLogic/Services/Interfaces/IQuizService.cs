@@ -1,5 +1,6 @@
 ﻿using BusinessLogic.DTOs.Requests.Quiz;
 using BusinessLogic.DTOs.Responses.Quiz;
+using BusinessObject.Entities;
 
 namespace BusinessLogic.Services.Interfaces;
 
@@ -49,6 +50,28 @@ public interface IQuizService
     /// List all quizzes created by the teacher (all statuses).
     /// </summary>
     Task<List<QuizSummaryResponse>> ListQuizzesForTeacherAsync(int teacherUserId, string actorRole);
+
+    /// <summary>
+    /// Delete a quiz and all associated data. Only DRAFT quizzes can be deleted.
+    /// </summary>
+    Task DeleteQuizAsync(int teacherUserId, string actorRole, int quizId);
+
+    /// <summary>
+    /// Update a question's text, type, points, and answers.
+    /// Only questions in DRAFT quizzes can be updated.
+    /// </summary>
+    Task UpdateQuestionAsync(int teacherUserId, string actorRole, int questionId, AddQuestionRequest request);
+
+    /// <summary>
+    /// Delete a question and its answers from a quiz.
+    /// Only questions in DRAFT quizzes can be deleted.
+    /// </summary>
+    Task DeleteQuestionAsync(int teacherUserId, string actorRole, int questionId);
+
+    /// <summary>
+    /// Get all questions with answers for a quiz (teacher view).
+    /// </summary>
+    Task<List<QuizQuestion>> GetQuizQuestionsAsync(int teacherUserId, string actorRole, int quizId);
 
     // ==================== STUDENT Operations ====================
 

@@ -96,6 +96,10 @@ public interface IQuizRepository
     Task<QuizQuestion> CreateQuestionAsync(QuizQuestion question);
     Task CreateAnswersAsync(IEnumerable<QuizAnswer> answers);
     void UpdateQuiz(Quiz quiz);
+    Task DeleteQuizAsync(int quizId);
+    Task<QuizQuestion?> GetQuestionByIdAsync(int questionId);
+    void UpdateQuestion(QuizQuestion question);
+    Task DeleteQuestionAsync(int questionId);
     Task<QuizAttempt> CreateAttemptAsync(QuizAttempt attempt);
     void UpdateAttempt(QuizAttempt attempt);
     Task CreateAttemptAnswersAsync(IEnumerable<QuizAttemptAnswer> answers);
