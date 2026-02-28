@@ -1,0 +1,118 @@
+﻿@page
+@model Presentation.Areas.Teacher.Pages.Quiz.IndexModel
+@{
+    ViewBag.Title = "Create Quiz";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Teacher/quiz.css" asp-append-version="true" />
+}
+
+<div class="quiz-container">
+    <div class="quiz-header">
+        <h1><i class="fas fa-plus-circle"></i> Create New Quiz</h1>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> @Model.SuccessMessage
+            @if (Model.CreatedQuiz != null)
+            {
+                <div class="mt-2">
+                    <a asp-area="Teacher" asp-page="/Quiz/Questions" asp-route-quizId="@Model.CreatedQuiz.QuizId"
+                       class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Add Questions
+                    </a>
+                    <a asp-area="Teacher" asp-page="/Quiz/Manage" asp-route-quizId="@Model.CreatedQuiz.QuizId"
+                       class="btn btn-secondary btn-sm">
+                        <i class="fas fa-cog"></i> Manage Quiz
+                    </a>
+                </div>
+            }
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage
+        </div>
+    }
+
+    <div class="form-card">
+        <form method="post" asp-page-handler="Create">
+            <div class="form-group">
+                <label asp-for="CreateRequest.ClassSectionId" class="form-label">Class Section ID *</label>
+                <input asp-for="CreateRequest.ClassSectionId" class="form-input" type="number" min="1"
+                       value="@(Model.ClassSectionId ?? 0)" required />
+                <span asp-validation-for="CreateRequest.ClassSectionId" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CreateRequest.QuizTitle" class="form-label">Quiz Title *</label>
+                <input asp-for="CreateRequest.QuizTitle" class="form-input" maxlength="200"
+                       placeholder="e.g. Midterm Quiz - Chapter 1-5" required />
+                <span asp-validation-for="CreateRequest.QuizTitle" class="field-validation-error"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="CreateRequest.Description" class="form-label">Description</label>
+                <textarea asp-for="CreateRequest.Description" class="form-input" rows="3"
+                          placeholder="Optional description..."></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="CreateRequest.TotalQuestions" class="form-label">Total Questions *</label>
+                    <select asp-for="CreateRequest.TotalQuestions" class="form-input" required>
+                        <option value="10">10 Questions</option>
+                        <option value="20">20 Questions</option>
+                        <option value="30">30 Questions</option>
+                    </select>
+                    <span asp-validation-for="CreateRequest.TotalQuestions" class="field-validation-error"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CreateRequest.TimeLimitMin" class="form-label">Time Limit (minutes)</label>
+                    <input asp-for="CreateRequest.TimeLimitMin" class="form-input" type="number" min="1" max="480"
+                           placeholder="Optional" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="CreateRequest.StartAt" class="form-label">Start At (UTC)</label>
+                    <input asp-for="CreateRequest.StartAt" class="form-input" type="datetime-local" />
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CreateRequest.EndAt" class="form-label">End At (UTC)</label>
+                    <input asp-for="CreateRequest.EndAt" class="form-input" type="datetime-local" />
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group form-check-group">
+                    <label class="form-check-label">
+                        <input asp-for="CreateRequest.ShuffleQuestions" type="checkbox" class="form-check-input" />
+                        Shuffle Questions
+                    </label>
+                </div>
+
+                <div class="form-group form-check-group">
+                    <label class="form-check-label">
+                        <input asp-for="CreateRequest.ShuffleAnswers" type="checkbox" class="form-check-input" />
+                        Shuffle Answers
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Create Draft Quiz
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
