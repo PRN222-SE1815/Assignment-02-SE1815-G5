@@ -2125,31 +2125,27 @@ DECLARE @TchrUserId INT = (SELECT TOP 1 UserId FROM dbo.Users WHERE Role = 'TEAC
 
 -- Tạo 2 phòng chat cho 2 lớp
 INSERT INTO dbo.ChatRooms (RoomType, ClassSectionId, RoomName, Status, CreatedBy, CreatedAt) VALUES
-('CLASS_SECTION', @Class1, N'Phòng học SE1801', 'ACTIVE', @TchrUserId, DATEADD(DAY, -10, SYSUTCDATETIME())),
-('CLASS_SECTION', @Class2, N'Phòng học SE1802', 'ACTIVE', @TchrUserId, DATEADD(DAY, -10, SYSUTCDATETIME()));
+('CLASS', @Class1, N'Phòng học SE1801', 'ACTIVE', @TchrUserId, DATEADD(DAY, -10, SYSUTCDATETIME())),
+('CLASS', @Class2, N'Phòng học SE1802', 'ACTIVE', @TchrUserId, DATEADD(DAY, -10, SYSUTCDATETIME()));
 
 DECLARE @Room1 INT = (SELECT TOP 1 RoomId FROM dbo.ChatRooms WHERE ClassSectionId = @Class1);
 DECLARE @Room2 INT = (SELECT TOP 1 RoomId FROM dbo.ChatRooms WHERE ClassSectionId = @Class2);
 
 -- Thêm Teacher vào 2 phòng
 INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus, JoinedAt) VALUES
-(@Room1, @TchrUserId, 'OWNER', 'ACTIVE', DATEADD(DAY, -10, SYSUTCDATETIME())),
-(@Room2, @TchrUserId, 'OWNER', 'ACTIVE', DATEADD(DAY, -10, SYSUTCDATETIME()));
+(@Room1, @TchrUserId, 'OWNER', 'JOINED', DATEADD(DAY, -10, SYSUTCDATETIME())),
+(@Room2, @TchrUserId, 'OWNER', 'JOINED', DATEADD(DAY, -10, SYSUTCDATETIME()));
 
 -- Thêm Sinh viên vào phòng SE1801
 INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus, JoinedAt)
-SELECT @Room1, u.UserId, 'MEMBER', 'ACTIVE', DATEADD(DAY, -9, SYSUTCDATETIME())
+SELECT @Room1, e.StudentId, 'MEMBER', 'JOINED', DATEADD(DAY, -9, SYSUTCDATETIME())
 FROM dbo.Enrollments e
-JOIN dbo.Students s ON e.StudentId = s.StudentId
-JOIN dbo.Users u ON s.UserId = u.UserId
 WHERE e.ClassSectionId = @Class1;
 
 -- Thêm Sinh viên vào phòng SE1802
 INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus, JoinedAt)
-SELECT @Room2, u.UserId, 'MEMBER', 'ACTIVE', DATEADD(DAY, -9, SYSUTCDATETIME())
+SELECT @Room2, e.StudentId, 'MEMBER', 'JOINED', DATEADD(DAY, -9, SYSUTCDATETIME())
 FROM dbo.Enrollments e
-JOIN dbo.Students s ON e.StudentId = s.StudentId
-JOIN dbo.Users u ON s.UserId = u.UserId
 WHERE e.ClassSectionId = @Class2;
 GO
 
@@ -2159,7 +2155,7 @@ GO
 DECLARE @Class1 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1801');
 DECLARE @Room1 INT = (SELECT TOP 1 RoomId FROM dbo.ChatRooms WHERE ClassSectionId = @Class1);
 DECLARE @TchrUserId INT = (SELECT TOP 1 UserId FROM dbo.Users WHERE Role = 'TEACHER');
-DECLARE @StdUserId INT = (SELECT TOP 1 u.UserId FROM dbo.Enrollments e JOIN dbo.Students s ON e.StudentId = s.StudentId JOIN dbo.Users u ON s.UserId = u.UserId WHERE e.ClassSectionId = @Class1);
+DECLARE @StdUserId INT = (SELECT TOP 1 e.StudentId FROM dbo.Enrollments e WHERE e.ClassSectionId = @Class1);
 
 INSERT INTO dbo.ChatMessages (RoomId, SenderId, MessageType, Content, CreatedAt) VALUES
 (@Room1, @TchrUserId, 'TEXT', N'Chào các em, thầy đã upload quiz chương 1. Các em vào làm nhé.', DATEADD(DAY, -2, SYSUTCDATETIME())),
