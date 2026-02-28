@@ -10,4 +10,6 @@ public class ChatRoomDto
     public string Status { get; set; } = null!;
     public int CreatedBy { get; set; }
     public DateTime CreatedAt { get; set; }
+    public string? CurrentUserRole { get; set; }
+    public string? CurrentMemberStatus { get; set; }
 }

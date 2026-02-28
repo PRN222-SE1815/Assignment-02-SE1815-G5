@@ -5,6 +5,7 @@ public class ChatMessageDto
     public long MessageId { get; set; }
     public int RoomId { get; set; }
     public int SenderId { get; set; }
+    public string SenderName { get; set; } = null!;
     public string MessageType { get; set; } = null!;
     public string? Content { get; set; }
     public DateTime CreatedAt { get; set; }
