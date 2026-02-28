@@ -298,6 +298,28 @@ public class QuizService : IQuizService
 
     // ==================== STUDENT Operations ====================
 
+    public async Task<List<QuizSummaryResponse>> ListQuizzesForTeacherAsync(
+        int teacherUserId, string actorRole)
+    {
+        EnsureTeacherRole(actorRole);
+
+        var quizzes = await _quizRepo.GetQuizzesByTeacherIdAsync(teacherUserId);
+
+        return quizzes.Select(q => new QuizSummaryResponse
+        {
+            QuizId = q.QuizId,
+            QuizTitle = q.QuizTitle,
+            Description = q.Description,
+            TotalQuestions = q.TotalQuestions,
+            TimeLimitMin = q.TimeLimitMin,
+            StartAt = q.StartAt,
+            EndAt = q.EndAt,
+            Status = q.Status,
+            CreatedAt = q.CreatedAt,
+            ClassSectionCode = q.ClassSection?.SectionCode ?? ""
+        }).ToList();
+    }
+
     public async Task<List<QuizSummaryResponse>> ListPublishedQuizzesForClassAsync(
         int studentUserId,
         string actorRole,

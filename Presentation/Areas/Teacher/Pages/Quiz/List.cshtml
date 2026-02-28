@@ -1,0 +1,188 @@
+@page
+@model Presentation.Areas.Teacher.Pages.Quiz.ListModel
+@{
+    ViewBag.Title = "Quiz Management";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Teacher/quiz.css" asp-append-version="true" />
+}
+
+<div class="quiz-container quiz-list-page">
+    <div class="quiz-header">
+        <div>
+            <h1><i class="fas fa-clipboard-list"></i> Quiz Management</h1>
+            <p class="text-muted">Manage all your quizzes across class sections</p>
+        </div>
+        <div class="header-actions">
+            <a asp-area="Teacher" asp-page="/Quiz/Index" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> Create New Quiz
+            </a>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage
+        </div>
+    }
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <a asp-area="Teacher" asp-page="/Quiz/List"
+           class="filter-chip @(string.IsNullOrEmpty(Model.StatusFilter) ? "active" : "")">
+            All
+        </a>
+        <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="DRAFT"
+           class="filter-chip @(Model.StatusFilter == "DRAFT" ? "active" : "")">
+            <i class="fas fa-pencil-alt"></i> Draft
+        </a>
+        <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="PUBLISHED"
+           class="filter-chip @(Model.StatusFilter == "PUBLISHED" ? "active" : "")">
+            <i class="fas fa-rocket"></i> Published
+        </a>
+        <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="CLOSED"
+           class="filter-chip @(Model.StatusFilter == "CLOSED" ? "active" : "")">
+            <i class="fas fa-lock"></i> Closed
+        </a>
+    </div>
+
+    <!-- Quiz Stats -->
+    @{
+        var allQuizzes = Model.Quizzes;
+    }
+    <div class="quiz-stats">
+        <div class="stat-card">
+            <div class="stat-number">@allQuizzes.Count</div>
+            <div class="stat-label">Total Quizzes</div>
+        </div>
+        <div class="stat-card stat-draft">
+            <div class="stat-number">@allQuizzes.Count(q => q.Status == "DRAFT")</div>
+            <div class="stat-label">Draft</div>
+        </div>
+        <div class="stat-card stat-published">
+            <div class="stat-number">@allQuizzes.Count(q => q.Status == "PUBLISHED")</div>
+            <div class="stat-label">Published</div>
+        </div>
+        <div class="stat-card stat-closed">
+            <div class="stat-number">@allQuizzes.Count(q => q.Status == "CLOSED")</div>
+            <div class="stat-label">Closed</div>
+        </div>
+    </div>
+
+    <!-- Quiz List -->
+    @if (Model.Quizzes.Count == 0)
+    {
+        <div class="empty-state">
+            <i class="fas fa-clipboard fa-3x"></i>
+            <h3>No quizzes found</h3>
+            <p>
+                @if (!string.IsNullOrEmpty(Model.StatusFilter))
+                {
+                    <span>No quizzes with status "@Model.StatusFilter". </span>
+                    <a asp-area="Teacher" asp-page="/Quiz/List">View all quizzes</a>
+                }
+                else
+                {
+                    <span>You haven't created any quizzes yet.</span>
+                }
+            </p>
+            <a asp-area="Teacher" asp-page="/Quiz/Index" class="btn btn-primary" style="margin-top: 1rem;">
+                <i class="fas fa-plus-circle"></i> Create Your First Quiz
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="quiz-table-wrapper">
+            <table class="quiz-table">
+                <thead>
+                    <tr>
+                        <th>Quiz Title</th>
+                        <th>Class Section</th>
+                        <th>Questions</th>
+                        <th>Time Limit</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var quiz in Model.Quizzes)
+                    {
+                        <tr>
+                            <td>
+                                <div class="quiz-title-cell">
+                                    <strong>@quiz.QuizTitle</strong>
+                                    @if (!string.IsNullOrEmpty(quiz.Description))
+                                    {
+                                        <small class="text-muted">@(quiz.Description.Length > 60 ? quiz.Description[..60] + "..." : quiz.Description)</small>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <span class="section-badge">@quiz.ClassSectionCode</span>
+                            </td>
+                            <td class="text-center">@quiz.TotalQuestions</td>
+                            <td class="text-center">
+                                @if (quiz.TimeLimitMin.HasValue)
+                                {
+                                    <span>@quiz.TimeLimitMin min</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="status-badge status-@quiz.Status.ToLower()">
+                                    @if (quiz.Status == "DRAFT")
+                                    {
+                                        <i class="fas fa-pencil-alt"></i>
+                                    }
+                                    else if (quiz.Status == "PUBLISHED")
+                                    {
+                                        <i class="fas fa-rocket"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-lock"></i>
+                                    }
+                                    @quiz.Status
+                                </span>
+                            </td>
+                            <td>@quiz.CreatedAt.ToString("MMM dd, yyyy")</td>
+                            <td>
+                                <div class="action-btns">
+                                    @if (quiz.Status == "DRAFT")
+                                    {
+                                        <a asp-area="Teacher" asp-page="/Quiz/Questions" asp-route-quizId="@quiz.QuizId"
+                                           class="btn btn-sm btn-primary" title="Add Questions">
+                                            <i class="fas fa-plus"></i>
+                                        </a>
+                                        <a asp-area="Teacher" asp-page="/Quiz/Manage" asp-route-quizId="@quiz.QuizId"
+                                           class="btn btn-sm btn-success" title="Publish">
+                                            <i class="fas fa-rocket"></i>
+                                        </a>
+                                    }
+                                    else if (quiz.Status == "PUBLISHED")
+                                    {
+                                        <a asp-area="Teacher" asp-page="/Quiz/Manage" asp-route-quizId="@quiz.QuizId"
+                                           class="btn btn-sm btn-danger" title="Close Quiz">
+                                            <i class="fas fa-lock"></i>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted"><i class="fas fa-ban"></i></span>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

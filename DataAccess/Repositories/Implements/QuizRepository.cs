@@ -59,6 +59,16 @@ public class QuizRepository : IQuizRepository
             .ToListAsync();
     }
 
+    public async Task<List<Quiz>> GetQuizzesByTeacherIdAsync(int teacherUserId)
+    {
+        return await _context.Quizzes
+            .AsNoTracking()
+            .Include(q => q.ClassSection)
+            .Where(q => q.CreatedBy == teacherUserId)
+            .OrderByDescending(q => q.CreatedAt)
+            .ToListAsync();
+    }
+
     public async Task<int> GetQuestionCountAsync(int quizId)
     {
         return await _context.QuizQuestions

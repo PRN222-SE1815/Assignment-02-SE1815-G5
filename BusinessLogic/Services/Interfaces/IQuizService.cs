@@ -45,6 +45,11 @@ public interface IQuizService
     /// <exception cref="Exceptions.BusinessException">Quiz not in PUBLISHED status</exception>
     Task CloseQuizAsync(int teacherUserId, string actorRole, CloseQuizRequest request);
 
+    /// <summary>
+    /// List all quizzes created by the teacher (all statuses).
+    /// </summary>
+    Task<List<QuizSummaryResponse>> ListQuizzesForTeacherAsync(int teacherUserId, string actorRole);
+
     // ==================== STUDENT Operations ====================
 
     /// <summary>

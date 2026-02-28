@@ -1537,25 +1537,34 @@ GO
 -- SEED: Enrollments (100 rows)
 -- Dùng SELECT dynamic từ Students x ClassSections
 -- =====================================================
+-- Dùng CTE để đảm bảo mỗi (StudentId, CourseId, SemesterId) chỉ xuất hiện 1 lần
+;WITH UniqueEnrollments AS (
+    SELECT
+        s.StudentId,
+        cs.ClassSectionId,
+        cs.SemesterId,
+        cs.CourseId,
+        CASE WHEN c.Credits > 4 THEN 4 ELSE c.Credits END AS CreditsSnapshot,
+        ROW_NUMBER() OVER (PARTITION BY s.StudentId, cs.CourseId, cs.SemesterId ORDER BY cs.ClassSectionId) AS dup_rn,
+        ROW_NUMBER() OVER (ORDER BY s.StudentId, cs.ClassSectionId) AS global_rn
+    FROM dbo.Students s
+    CROSS JOIN dbo.ClassSections cs
+    JOIN dbo.Courses c ON c.CourseId = cs.CourseId
+    WHERE cs.IsOpen = 1
+      AND c.Credits <= 4
+)
 INSERT INTO dbo.Enrollments (StudentId, ClassSectionId, SemesterId, CourseId, CreditsSnapshot, Status)
 SELECT TOP 100
-    s.StudentId,
-    cs.ClassSectionId,
-    cs.SemesterId,
-    cs.CourseId,
-    CASE WHEN c.Credits > 4 THEN 4 ELSE c.Credits END,
-    CASE WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId, cs.ClassSectionId) % 6 = 0 THEN 'COMPLETED'
-         WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId, cs.ClassSectionId) % 6 = 1 THEN 'ENROLLED'
-         WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId, cs.ClassSectionId) % 6 = 2 THEN 'ENROLLED'
-         WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId, cs.ClassSectionId) % 6 = 3 THEN 'ENROLLED'
-         WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId, cs.ClassSectionId) % 6 = 4 THEN 'DROPPED'
+    StudentId, ClassSectionId, SemesterId, CourseId, CreditsSnapshot,
+    CASE WHEN global_rn % 6 = 0 THEN 'COMPLETED'
+         WHEN global_rn % 6 = 1 THEN 'ENROLLED'
+         WHEN global_rn % 6 = 2 THEN 'ENROLLED'
+         WHEN global_rn % 6 = 3 THEN 'ENROLLED'
+         WHEN global_rn % 6 = 4 THEN 'DROPPED'
          ELSE 'COMPLETED' END
-FROM dbo.Students s
-CROSS JOIN dbo.ClassSections cs
-JOIN dbo.Courses c ON c.CourseId = cs.CourseId
-WHERE cs.IsOpen = 1
-  AND c.Credits <= 4
-ORDER BY s.StudentId, cs.ClassSectionId;
+FROM UniqueEnrollments
+WHERE dup_rn = 1  -- chỉ lấy 1 section per Student-Course-Semester
+ORDER BY StudentId, ClassSectionId;
 GO
 
 -- Update CurrentEnrollment counts
@@ -1737,28 +1746,35 @@ GO
 -- =====================================================
 -- SEED: TuitionFees (100 rows)
 -- =====================================================
+;WITH TuitionCTE AS (
+    SELECT
+        s.StudentId,
+        sem.SemesterId,
+        sem.StartDate,
+        ROW_NUMBER() OVER (ORDER BY s.StudentId, sem.SemesterId) AS rn
+    FROM dbo.Students s
+    CROSS JOIN (SELECT TOP 5 SemesterId, StartDate FROM dbo.Semesters ORDER BY SemesterId) sem
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.TuitionFees tf WHERE tf.StudentId = s.StudentId AND tf.SemesterId = sem.SemesterId
+    )
+)
 INSERT INTO dbo.TuitionFees (StudentId, SemesterId, TotalCredits, AmountPerCredit, TotalAmount, PaidAmount, Status, DueDate)
 SELECT TOP 100
-    s.StudentId,
-    sem.SemesterId,
-    tc.totalCr,
+    StudentId,
+    SemesterId,
+    CASE WHEN rn % 4 = 0 THEN 12 WHEN rn % 4 = 1 THEN 15 WHEN rn % 4 = 2 THEN 16 ELSE 9 END,
     500000,
-    tc.totalCr * 500000,
-    CASE WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId, sem.SemesterId) % 4 = 0 THEN tc.totalCr * 500000
-         WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId, sem.SemesterId) % 4 = 1 THEN 0
-         ELSE tc.totalCr * 250000 END,
-    CASE WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId, sem.SemesterId) % 4 = 0 THEN 'PAID'
-         WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId, sem.SemesterId) % 4 = 1 THEN 'UNPAID'
-         WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId, sem.SemesterId) % 4 = 2 THEN 'PARTIAL'
+    CASE WHEN rn % 4 = 0 THEN 12 WHEN rn % 4 = 1 THEN 15 WHEN rn % 4 = 2 THEN 16 ELSE 9 END * 500000,
+    CASE WHEN rn % 4 = 0 THEN (CASE WHEN rn % 4 = 0 THEN 12 WHEN rn % 4 = 1 THEN 15 WHEN rn % 4 = 2 THEN 16 ELSE 9 END) * 500000
+         WHEN rn % 4 = 1 THEN 0
+         ELSE (CASE WHEN rn % 4 = 0 THEN 12 WHEN rn % 4 = 1 THEN 15 WHEN rn % 4 = 2 THEN 16 ELSE 9 END) * 250000 END,
+    CASE WHEN rn % 4 = 0 THEN 'PAID'
+         WHEN rn % 4 = 1 THEN 'UNPAID'
+         WHEN rn % 4 = 2 THEN 'PARTIAL'
          ELSE 'OVERDUE' END,
-    DATEADD(DAY, 30, sem.StartDate)
-FROM dbo.Students s
-CROSS JOIN (SELECT TOP 3 SemesterId, StartDate FROM dbo.Semesters ORDER BY SemesterId) sem
-CROSS JOIN (SELECT 12 AS totalCr UNION ALL SELECT 15 UNION ALL SELECT 16 UNION ALL SELECT 9) tc
-WHERE NOT EXISTS (
-    SELECT 1 FROM dbo.TuitionFees tf WHERE tf.StudentId = s.StudentId AND tf.SemesterId = sem.SemesterId
-)
-ORDER BY s.StudentId, sem.SemesterId;
+    DATEADD(DAY, 30, StartDate)
+FROM TuitionCTE
+ORDER BY StudentId, SemesterId;
 GO
 
 -- =====================================================
