@@ -237,7 +237,7 @@ function buildMessageElement(msg) {
         bubbleHtml = `<span class="message-deleted-text"><i class="fas fa-ban"></i> This message was deleted</span>`;
     } else {
         if (!isMine) {
-            bubbleHtml += `<span class="message-sender">User #${msg.senderId}</span>`;
+            bubbleHtml += `<span class="message-sender">${escapeHtml(msg.senderName || "Unknown")}</span>`;
         }
         bubbleHtml += `<span class="message-content">${escapeHtml(msg.content || "")}</span>`;
         if (msg.attachments && msg.attachments.length > 0) {
@@ -258,11 +258,19 @@ function buildMessageElement(msg) {
     bubbleHtml += `<span class="message-time">${timeStr}</span>`;
 
     let actionsHtml = "";
-    if (isMine && !isDeleted) {
-        actionsHtml = `<div class="message-actions">
-            <button type="button" class="btn-msg-action" title="Edit" onclick="startEditMessage(${msg.messageId})"><i class="fas fa-pen"></i></button>
-            <button type="button" class="btn-msg-action btn-danger" title="Delete" onclick="deleteMessage(${msg.messageId})"><i class="fas fa-trash"></i></button>
-        </div>`;
+    
+    const canEdit = !isDeleted && isMine;
+    const canDelete = !isDeleted && isMine;
+
+    if (canEdit || canDelete) {
+        actionsHtml = `<div class="message-actions">`;
+        if (canEdit) {
+            actionsHtml += `<button type="button" class="btn-msg-action" title="Edit" onclick="startEditMessage(${msg.messageId})"><i class="fas fa-pen"></i></button>`;
+        }
+        if (canDelete) {
+            actionsHtml += `<button type="button" class="btn-msg-action btn-danger" title="Delete" onclick="deleteMessage(${msg.messageId})"><i class="fas fa-trash"></i></button>`;
+        }
+        actionsHtml += `</div>`;
     }
 
     row.innerHTML = `<div class="message-bubble">${bubbleHtml}</div>${actionsHtml}`;

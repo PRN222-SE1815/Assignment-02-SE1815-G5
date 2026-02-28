@@ -30,20 +30,23 @@ public class IndexModel : PageModel
     public async Task<IActionResult> OnGetAsync(int classSectionId)
     {
         ClassSectionId = classSectionId;
-
-        if (classSectionId <= 0)
-        {
-            ErrorMessage = "Please provide a valid class section.";
-            return Page();
-        }
-
         var userId = GetUserId();
         if (userId == 0) return RedirectToPage("/Account/Login");
 
         try
         {
-            Quizzes = await _quizService.ListPublishedQuizzesForClassAsync(
-                userId, nameof(UserRole.STUDENT), classSectionId);
+            if (classSectionId <= 0)
+            {
+                // Fetch all quizzes across all enrolled class sections
+                Quizzes = await _quizService.ListAllPublishedQuizzesForStudentAsync(
+                    userId, nameof(UserRole.STUDENT));
+            }
+            else
+            {
+                // Fetch quizzes for a specific class section
+                Quizzes = await _quizService.ListPublishedQuizzesForClassAsync(
+                    userId, nameof(UserRole.STUDENT), classSectionId);
+            }
         }
         catch (BusinessLogic.Exceptions.ForbiddenException ex)
         {

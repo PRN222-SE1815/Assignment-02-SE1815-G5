@@ -16,6 +16,9 @@
                class="btn btn-secondary btn-sm">
                 <i class="fas fa-plus"></i> Add More Questions
             </a>
+            <a asp-area="Teacher" asp-page="/Quiz/List" class="btn btn-outline btn-sm">
+                <i class="fas fa-arrow-left"></i> Back to List
+            </a>
         </div>
     </div>
 
@@ -32,6 +35,57 @@
             <i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage
         </div>
     }
+
+    @* ===== QUESTIONS LIST ===== *@
+    <div class="form-card">
+        <h2 class="form-card-title"><i class="fas fa-list-ol"></i> Questions (@Model.Questions.Count)</h2>
+
+        @if (Model.Questions.Any())
+        {
+            <div class="questions-list">
+                @foreach (var q in Model.Questions)
+                {
+                    <div class="question-item">
+                        <div class="question-info">
+                            <span class="question-number">Q@(q.SortOrder)</span>
+                            <span class="question-type-badge @(q.QuestionType == "MCQ" ? "badge-mcq" : "badge-tf")">
+                                @q.QuestionType
+                            </span>
+                            <span class="question-text">@q.QuestionText</span>
+                            <span class="question-points">(@q.Points pts)</span>
+                        </div>
+                        <div class="question-answers">
+                            @foreach (var a in q.QuizAnswers)
+                            {
+                                <span class="answer-chip @(a.IsCorrect ? "answer-correct" : "")">
+                                    @(a.IsCorrect ? "✓" : "✗") @a.AnswerText
+                                </span>
+                            }
+                        </div>
+                        <div class="question-actions">
+                            <a asp-area="Teacher" asp-page="/Quiz/EditQuestion"
+                               asp-route-questionId="@q.QuestionId" asp-route-quizId="@Model.QuizId"
+                               class="btn btn-sm btn-info">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <form method="post" asp-page-handler="DeleteQuestion" style="display:inline;">
+                                <input type="hidden" name="questionId" value="@q.QuestionId" />
+                                <input type="hidden" asp-for="QuizId" />
+                                <button type="submit" class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Are you sure you want to delete this question?');">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">No questions added yet. Click "Add More Questions" to start.</p>
+        }
+    </div>
 
     <div class="manage-actions">
         @* ===== PUBLISH SECTION ===== *@
@@ -63,15 +117,77 @@
         @* ===== CLOSE SECTION ===== *@
         <div class="form-card">
             <h2 class="form-card-title"><i class="fas fa-lock"></i> Close Quiz</h2>
-            <p class="text-muted">Closing a published quiz prevents any new attempts. Existing in-progress attempts may still be submitted.</p>
+            <p class="text-muted">Closing a published quiz prevents any new attempts.</p>
 
             <form method="post" asp-page-handler="Close">
                 <input type="hidden" asp-for="QuizId" />
-                <button type="submit" class="btn btn-danger"
-                        onclick="return confirm('Are you sure you want to close this quiz? No new attempts will be allowed.');">
+                <button type="submit" class="btn btn-warning"
+                        onclick="return confirm('Are you sure you want to close this quiz?');">
                     <i class="fas fa-lock"></i> Close Quiz
+                </button>
+            </form>
+        </div>
+
+        @* ===== DELETE SECTION ===== *@
+        <div class="form-card" style="border-left: 4px solid var(--danger-color, #e74c3c);">
+            <h2 class="form-card-title" style="color: var(--danger-color, #e74c3c);">
+                <i class="fas fa-trash-alt"></i> Delete Quiz
+            </h2>
+            <p class="text-muted">
+                <strong>Warning:</strong> This will permanently delete the quiz and all its questions, answers, and attempts.
+                Only DRAFT quizzes can be deleted.
+            </p>
+
+            <form method="post" asp-page-handler="DeleteQuiz">
+                <input type="hidden" asp-for="QuizId" />
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('⚠️ DANGER: This will permanently delete this quiz and ALL associated data. Are you absolutely sure?');">
+                    <i class="fas fa-trash-alt"></i> Delete Quiz Permanently
                 </button>
             </form>
         </div>
     </div>
 </div>
+
+<style>
+    .questions-list { display: flex; flex-direction: column; gap: 12px; }
+    .question-item {
+        background: var(--bg-secondary, #f8f9fa);
+        border: 1px solid var(--border-color, #e0e0e0);
+        border-radius: 8px;
+        padding: 16px;
+    }
+    .question-info { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+    .question-number { font-weight: 700; color: var(--primary-color, #6c5ce7); min-width: 30px; }
+    .question-type-badge {
+        font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; font-weight: 600; text-transform: uppercase;
+    }
+    .badge-mcq { background: #dfe6e9; color: #2d3436; }
+    .badge-tf { background: #ffeaa7; color: #636e72; }
+    .question-text { flex: 1; }
+    .question-points { color: #636e72; font-size: 0.85rem; }
+    .question-answers { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .answer-chip {
+        font-size: 0.8rem; padding: 4px 10px; border-radius: 16px;
+        background: #dfe6e9; color: #2d3436;
+    }
+    .answer-chip.answer-correct { background: #00b894; color: white; font-weight: 600; }
+    .question-actions { display: flex; gap: 8px; }
+    .btn-info {
+        background: var(--info-color, #0984e3); color: white; border: none;
+        padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem;
+        text-decoration: none; display: inline-flex; align-items: center; gap: 4px;
+    }
+    .btn-info:hover { opacity: 0.9; }
+    .btn-outline {
+        background: transparent; border: 1px solid var(--border-color, #ccc);
+        color: var(--text-primary, #333); padding: 6px 14px; border-radius: 6px;
+        text-decoration: none; font-size: 0.85rem;
+    }
+    .btn-outline:hover { background: var(--bg-secondary, #f5f5f5); }
+    .btn-warning {
+        background: #fdcb6e; color: #2d3436; border: none;
+        padding: 8px 20px; border-radius: 8px; cursor: pointer; font-weight: 600;
+    }
+    .btn-warning:hover { background: #feca57; }
+</style>

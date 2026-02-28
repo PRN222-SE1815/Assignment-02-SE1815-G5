@@ -1,16 +1,120 @@
 ﻿<!DOCTYPE html>
-
 <html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <title>@ViewBag.Title</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TPF University</title>
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Global CSS -->
     <link rel="stylesheet" href="~/css/Shared/Layout/_Layout.css" asp-append-version="true" />
     @RenderSection("Styles", required: false)
 </head>
 <body>
-    <div>
-        @RenderBody()
+    <div class="app-layout">
+        <!-- Sidebar -->
+        <aside class="app-sidebar" id="appSidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-graduation-cap logo-icon"></i>
+                <span class="logo-text">TPF University</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    @if (User.IsInRole("ADMIN"))
+                    {
+                        <li class="nav-item">
+                            <a href="/Admin/Index" class="nav-link @(Context.Request.Path.StartsWithSegments("/Admin/Index") || Context.Request.Path.Value == "/Admin" ? "active" : "")">
+                                <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+                            </a>
+                        </li>
+                    }
+                    else if (User.IsInRole("TEACHER"))
+                    {
+                        <li class="nav-item">
+                            <a href="/Teacher/Index" class="nav-link @(Context.Request.Path.StartsWithSegments("/Teacher/Index") || Context.Request.Path.Value == "/Teacher" ? "active" : "")">
+                                <i class="fas fa-home"></i> <span>Home</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/Teacher/Quiz/List" class="nav-link @(Context.Request.Path.StartsWithSegments("/Teacher/Quiz") ? "active" : "")">
+                                <i class="fas fa-clipboard-list"></i> <span>Quizzes</span>
+                            </a>
+                        </li>
+                    }
+                    else if (User.IsInRole("STUDENT"))
+                    {
+                        <li class="nav-item">
+                            <a href="/Student/Index" class="nav-link @(Context.Request.Path.StartsWithSegments("/Student/Index") || Context.Request.Path.Value == "/Student" ? "active" : "")">
+                                <i class="fas fa-home"></i> <span>Home</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/Student/Quiz/Index" class="nav-link @(Context.Request.Path.StartsWithSegments("/Student/Quiz") ? "active" : "")">
+                                <i class="fas fa-clipboard-list"></i> <span>Quizzes</span>
+                            </a>
+                        </li>
+                    }
+
+                    <!-- Common Features -->
+                    <li class="nav-item" style="margin-top: 20px;">
+                        <span class="nav-group-title">COMMUNICATION</span>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/Chat/Index" class="nav-link @(Context.Request.Path.StartsWithSegments("/Chat") ? "active" : "")">
+                            <i class="fas fa-comments"></i> <span>Messages</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="app-main">
+            <!-- Top Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <button id="sidebarToggle" class="btn-sidebar-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h2 class="page-title">@ViewData["Title"]</h2>
+                </div>
+                <div class="header-right">
+                    <div class="user-profile">
+                        <div class="user-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="user-info">
+                            <span class="user-name">@User.Identity?.Name</span>
+                            @{
+                                var role = User.IsInRole("ADMIN") ? "Admin" :
+                                           User.IsInRole("TEACHER") ? "Teacher" : "Student";
+                            }
+                            <span class="user-role">@role</span>
+                        </div>
+                    </div>
+                    <form method="post" action="/Account/Logout" class="logout-form">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn-logout" title="Sign Out">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </form>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <main class="app-content">
+                @RenderBody()
+            </main>
+        </div>
     </div>
+
+    <!-- Layout Scripts -->
+    <script>
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            document.getElementById('appSidebar').classList.toggle('collapsed');
+        });
+    </script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

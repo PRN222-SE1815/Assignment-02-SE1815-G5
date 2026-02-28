@@ -1,0 +1,132 @@
+@page
+@model Presentation.Areas.Teacher.Pages.Quiz.EditQuestionModel
+@{
+    ViewBag.Title = "Edit Question";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Teacher/quiz.css" asp-append-version="true" />
+}
+
+<div class="quiz-container">
+    <div class="quiz-header">
+        <h1><i class="fas fa-edit"></i> Edit Question #@Model.QuestionId</h1>
+        <div class="header-actions">
+            <a asp-area="Teacher" asp-page="/Quiz/Manage" asp-route-quizId="@Model.QuizId"
+               class="btn btn-secondary btn-sm">
+                <i class="fas fa-arrow-left"></i> Back to Manage Quiz
+            </a>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> @Model.SuccessMessage
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage
+        </div>
+    }
+
+    <div class="form-card">
+        <h2 class="form-card-title">Edit Question</h2>
+        <form method="post">
+            <input type="hidden" asp-for="QuestionId" />
+            <input type="hidden" asp-for="QuizId" />
+
+            <div class="form-group">
+                <label asp-for="QuestionText" class="form-label">Question Text *</label>
+                <textarea asp-for="QuestionText" class="form-input" rows="3"
+                          placeholder="Enter the question..." required></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="QuestionType" class="form-label">Question Type *</label>
+                    <select asp-for="QuestionType" class="form-input" required id="questionType">
+                        <option value="MCQ">Multiple Choice (MCQ)</option>
+                        <option value="TRUE_FALSE">True / False</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Points" class="form-label">Points *</label>
+                    <input asp-for="Points" class="form-input" type="number"
+                           step="0.01" min="0.01" max="100" required />
+                </div>
+            </div>
+
+            <div class="answers-section" id="answersSection">
+                <h3>Answer Options <small class="text-muted">(mark exactly one as correct)</small></h3>
+
+                @for (var i = 0; i < Model.AnswerInputs.Count; i++)
+                {
+                    <div class="answer-row" data-index="@i">
+                        <div class="answer-correct">
+                            <input type="radio"
+                                   name="correctAnswer"
+                                   value="@i"
+                                   id="correct_@i"
+                                   @(Model.AnswerInputs[i].IsCorrect ? "checked" : "")
+                                   onchange="updateCorrectFlag(this)" />
+                            <label for="correct_@i" title="Mark as correct">
+                                <i class="fas fa-check-circle"></i>
+                            </label>
+                        </div>
+                        <input type="text"
+                               name="AnswerInputs[@i].AnswerText"
+                               value="@Model.AnswerInputs[i].AnswerText"
+                               class="form-input answer-text-input"
+                               placeholder="Answer option @(i + 1)..."
+                               maxlength="1000" />
+                        <input type="hidden"
+                               name="AnswerInputs[@i].IsCorrect"
+                               value="@Model.AnswerInputs[i].IsCorrect.ToString().ToLower()"
+                               class="is-correct-hidden" />
+                    </div>
+                }
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <a asp-area="Teacher" asp-page="/Quiz/Manage" asp-route-quizId="@Model.QuizId"
+                   class="btn btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateCorrectFlag(radio) {
+            document.querySelectorAll('.is-correct-hidden').forEach(h => h.value = 'false');
+            const idx = radio.value;
+            const row = document.querySelector('.answer-row[data-index="' + idx + '"]');
+            if (row) {
+                row.querySelector('.is-correct-hidden').value = 'true';
+            }
+        }
+
+        document.getElementById('questionType')?.addEventListener('change', function () {
+            if (this.value === 'TRUE_FALSE') {
+                const inputs = document.querySelectorAll('.answer-text-input');
+                if (inputs.length >= 2) {
+                    inputs[0].value = 'True';
+                    inputs[1].value = 'False';
+                    for (let i = 2; i < inputs.length; i++) {
+                        inputs[i].value = '';
+                    }
+                }
+            }
+        });
+    </script>
+}

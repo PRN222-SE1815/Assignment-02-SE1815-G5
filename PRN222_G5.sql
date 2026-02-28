@@ -1067,3 +1067,1102 @@ INSERT INTO dbo.ClassSections (SemesterId, CourseId, TeacherId, SectionCode, Roo
 (@SemId, @CourseId, @TeacherId, 'SE1801', 'BE-301', 30),
 (@SemId, @CourseId, @TeacherId, 'SE1802', 'BE-302', 30);
 GO
+
+/* =====================================================
+   SEED DATA - 100 rows per table
+   ===================================================== */
+
+-- =====================================================
+-- SEED: Users (100 rows total: 1 existing admin + 5 existing teachers + 14 existing students = 20 already inserted)
+-- We add 19 more teachers (total 24) + 56 more students (total 70) + some admins = 80 new rows
+-- Actually we insert fresh 100 additional seed users here (teachers + students)
+-- =====================================================
+
+-- 19 more Teachers (user rows)
+INSERT INTO dbo.Users (Username, PasswordHash, Email, FullName, Role, IsActive) VALUES
+('teacher6',  '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher6@fpt.edu.vn',  N'Võ Thị Thu', 'TEACHER', 1),
+('teacher7',  '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher7@fpt.edu.vn',  N'Đinh Quang Minh', 'TEACHER', 1),
+('teacher8',  '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher8@fpt.edu.vn',  N'Lưu Thị Hoa', 'TEACHER', 1),
+('teacher9',  '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher9@fpt.edu.vn',  N'Phan Văn Đức', 'TEACHER', 1),
+('teacher10', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher10@fpt.edu.vn', N'Bùi Thị Nga', 'TEACHER', 1),
+('teacher11', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher11@fpt.edu.vn', N'Trịnh Văn Long', 'TEACHER', 1),
+('teacher12', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher12@fpt.edu.vn', N'Ngô Thị Bích', 'TEACHER', 1),
+('teacher13', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher13@fpt.edu.vn', N'Hồ Văn Phong', 'TEACHER', 1),
+('teacher14', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher14@fpt.edu.vn', N'Đặng Thị Loan', 'TEACHER', 1),
+('teacher15', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher15@fpt.edu.vn', N'Vũ Quốc Hùng', 'TEACHER', 1),
+('teacher16', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher16@fpt.edu.vn', N'Lê Thị Kim Anh', 'TEACHER', 1),
+('teacher17', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher17@fpt.edu.vn', N'Nguyễn Hữu Trung', 'TEACHER', 1),
+('teacher18', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher18@fpt.edu.vn', N'Phạm Thị Yến', 'TEACHER', 1),
+('teacher19', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher19@fpt.edu.vn', N'Cao Văn Tài', 'TEACHER', 1),
+('teacher20', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher20@fpt.edu.vn', N'Trần Thị Mai', 'TEACHER', 1),
+('teacher21', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher21@fpt.edu.vn', N'Lý Văn Sang', 'TEACHER', 1),
+('teacher22', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher22@fpt.edu.vn', N'Dương Thị Hà', 'TEACHER', 1),
+('teacher23', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher23@fpt.edu.vn', N'Mai Văn Khải', 'TEACHER', 1),
+('teacher24', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher24@fpt.edu.vn', N'Hoàng Thị Nga', 'TEACHER', 1),
+('teacher25', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher25@fpt.edu.vn', N'Nguyễn Quang Thuấn', 'TEACHER', 1),
+('teacher26', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher26@fpt.edu.vn', N'Đỗ Thái An', 'TEACHER', 1),
+('teacher27', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher27@fpt.edu.vn', N'Trần Đại Nam', 'TEACHER', 1),
+('teacher28', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher28@fpt.edu.vn', N'Ngô Hữu Kiên', 'TEACHER', 1),
+('teacher29', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher29@fpt.edu.vn', N'Hà Minh Tú', 'TEACHER', 1),
+('teacher30', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 'teacher30@fpt.edu.vn', N'Vũ Gia Bách', 'TEACHER', 1);
+GO
+
+-- 81 more Students (user rows) to reach 100 total new rows in this seed block
+INSERT INTO dbo.Users (Username, PasswordHash, Email, FullName, Role, IsActive) VALUES
+('student15', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's15@he18.vn', N'Phùng Thị Lan', 'STUDENT', 1),
+('student16', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's16@he18.vn', N'Tô Văn Bình', 'STUDENT', 1),
+('student17', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's17@he18.vn', N'Đỗ Thị Hằng', 'STUDENT', 1),
+('student18', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's18@he18.vn', N'Lê Văn Cường', 'STUDENT', 1),
+('student19', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's19@he18.vn', N'Vũ Thị Hoa', 'STUDENT', 1),
+('student20', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's20@he18.vn', N'Trần Văn Đạt', 'STUDENT', 1),
+('student21', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's21@he18.vn', N'Nguyễn Thị Thảo', 'STUDENT', 1),
+('student22', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's22@he18.vn', N'Phạm Văn Kiên', 'STUDENT', 1),
+('student23', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's23@he18.vn', N'Hoàng Thị Nhung', 'STUDENT', 1),
+('student24', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's24@he18.vn', N'Bùi Văn Tú', 'STUDENT', 1),
+('student25', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's25@he18.vn', N'Lê Thị Phương', 'STUDENT', 1),
+('student26', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's26@he18.vn', N'Đinh Văn Tùng', 'STUDENT', 1),
+('student27', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's27@he18.vn', N'Trịnh Thị Huyền', 'STUDENT', 1),
+('student28', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's28@he18.vn', N'Võ Văn Hải', 'STUDENT', 1),
+('student29', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's29@he18.vn', N'Ngô Thị Bảo', 'STUDENT', 1),
+('student30', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's30@he18.vn', N'Phan Văn Lộc', 'STUDENT', 1),
+('student31', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's31@he18.vn', N'Lưu Thị Diểm', 'STUDENT', 1),
+('student32', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's32@he18.vn', N'Hà Văn Quý', 'STUDENT', 1),
+('student33', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's33@he18.vn', N'Đặng Thị Thu', 'STUDENT', 1),
+('student34', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's34@he18.vn', N'Vương Văn Duy', 'STUDENT', 1),
+('student35', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's35@he18.vn', N'Cao Thị Xuân', 'STUDENT', 1),
+('student36', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's36@he18.vn', N'Lý Văn Hiếu', 'STUDENT', 1),
+('student37', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's37@he18.vn', N'Dương Thị Ngân', 'STUDENT', 1),
+('student38', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's38@he18.vn', N'Mai Văn Thắng', 'STUDENT', 1),
+('student39', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's39@he18.vn', N'Hồ Thị Liên', 'STUDENT', 1),
+('student40', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's40@he18.vn', N'Tống Văn Khoa', 'STUDENT', 1),
+('student41', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's41@he18.vn', N'Trương Thị Minh', 'STUDENT', 1),
+('student42', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's42@he18.vn', N'Đoàn Văn Phú', 'STUDENT', 1),
+('student43', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's43@he18.vn', N'Lê Thị Oanh', 'STUDENT', 1),
+('student44', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's44@he18.vn', N'Nguyễn Văn Quyết', 'STUDENT', 1),
+('student45', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's45@he18.vn', N'Phạm Thị Hồng', 'STUDENT', 1),
+('student46', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's46@he18.vn', N'Bùi Văn Tân', 'STUDENT', 1),
+('student47', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's47@he18.vn', N'Hoàng Văn Sơn', 'STUDENT', 1),
+('student48', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's48@he18.vn', N'Trần Thị Diệu', 'STUDENT', 1),
+('student49', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's49@he18.vn', N'Đinh Văn Hải', 'STUDENT', 1),
+('student50', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's50@he18.vn', N'Võ Thị Hạnh', 'STUDENT', 1),
+('student51', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's51@he18.vn', N'Lưu Văn Cảnh', 'STUDENT', 1),
+('student52', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's52@he18.vn', N'Ngô Thị Lan', 'STUDENT', 1),
+('student53', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's53@he18.vn', N'Phan Văn Tài', 'STUDENT', 1),
+('student54', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's54@he18.vn', N'Hà Thị Thúy', 'STUDENT', 1),
+('student55', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's55@he18.vn', N'Lý Văn Dũng', 'STUDENT', 1),
+('student56', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's56@he18.vn', N'Dương Thị Quỳnh', 'STUDENT', 1),
+('student57', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's57@he18.vn', N'Cao Văn Nghĩa', 'STUDENT', 1),
+('student58', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's58@he18.vn', N'Trịnh Thị Vân', 'STUDENT', 1),
+('student59', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's59@he18.vn', N'Đặng Văn Thành', 'STUDENT', 1),
+('student60', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's60@he18.vn', N'Vương Thị Bích', 'STUDENT', 1),
+('student61', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's61@he18.vn', N'Hồ Văn Duy', 'STUDENT', 1),
+('student62', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's62@he18.vn', N'Tô Thị Hà', 'STUDENT', 1),
+('student63', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's63@he18.vn', N'Lê Văn Toàn', 'STUDENT', 1),
+('student64', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's64@he18.vn', N'Nguyễn Thị Ngọc', 'STUDENT', 1),
+('student65', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's65@he18.vn', N'Phạm Văn Long', 'STUDENT', 1),
+('student66', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's66@he18.vn', N'Bùi Thị Mai', 'STUDENT', 1),
+('student67', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's67@he18.vn', N'Võ Văn Khang', 'STUDENT', 1),
+('student68', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's68@he18.vn', N'Trần Thị Thùy', 'STUDENT', 1),
+('student69', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's69@he18.vn', N'Đinh Thị Loan', 'STUDENT', 1),
+('student70', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's70@he18.vn', N'Lưu Văn Minh', 'STUDENT', 1),
+('student71', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's71@he18.vn', N'Hoàng Văn Hải', 'STUDENT', 1),
+('student72', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's72@he18.vn', N'Ngô Thị Hương', 'STUDENT', 1),
+('student73', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's73@he18.vn', N'Phan Văn Đông', 'STUDENT', 1),
+('student74', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's74@he18.vn', N'Đoàn Thị Phúc', 'STUDENT', 1),
+('student75', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's75@he18.vn', N'Tống Văn Bảo', 'STUDENT', 1),
+('student76', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's76@he18.vn', N'Vũ Thị Thu', 'STUDENT', 1),
+('student77', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's77@he18.vn', N'Hà Văn Sỹ', 'STUDENT', 1),
+('student78', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's78@he18.vn', N'Dương Thị Châu', 'STUDENT', 1),
+('student79', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's79@he18.vn', N'Trương Văn Tín', 'STUDENT', 1),
+('student80', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's80@he18.vn', N'Cao Thị Yến', 'STUDENT', 1),
+('student81', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's81@he18.vn', N'Lý Văn Đức', 'STUDENT', 1),
+('student82', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's82@he18.vn', N'Trịnh Thị Khánh', 'STUDENT', 1),
+('student83', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's83@he18.vn', N'Đặng Văn Phong', 'STUDENT', 1),
+('student84', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's84@he18.vn', N'Mai Thị Hồng', 'STUDENT', 1),
+('student85', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's85@he18.vn', N'Hồ Văn Hòa', 'STUDENT', 1),
+('student86', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's86@he18.vn', N'Tô Thị Lệ', 'STUDENT', 1),
+('student87', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's87@he18.vn', N'Phùng Văn An', 'STUDENT', 1),
+('student88', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's88@he18.vn', N'Lưu Thị Bình', 'STUDENT', 1),
+('student89', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's89@he18.vn', N'Nguyễn Văn Trí', 'STUDENT', 1),
+('student90', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's90@he18.vn', N'Phạm Thị Cúc', 'STUDENT', 1),
+('student91', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's91@he18.vn', N'Hoàng Văn Linh', 'STUDENT', 1),
+('student92', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's92@he18.vn', N'Trần Thị Bích', 'STUDENT', 1),
+('student93', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's93@he18.vn', N'Đinh Văn Tuấn', 'STUDENT', 1),
+('student94', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's94@he18.vn', N'Võ Thị Giang', 'STUDENT', 1),
+('student95', '$2a$10$Buj5ZRDdXG/uQTQzgCmoDul02XwRUh83447c09UreThGSYbOA0wx.', 's95@he18.vn', N'Bùi Văn Quang', 'STUDENT', 1);
+GO
+
+-- Link new Teachers -> dbo.Teachers
+INSERT INTO dbo.Teachers (TeacherId, TeacherCode, Department)
+SELECT UserId,
+       'GV' + RIGHT('0000' + CAST(UserId AS VARCHAR(10)), 4),
+       CASE WHEN UserId % 3 = 0 THEN N'Kỹ thuật phần mềm'
+            WHEN UserId % 3 = 1 THEN N'Khoa học máy tính'
+            ELSE N'Hệ thống thông tin' END
+FROM dbo.Users WHERE Role = 'TEACHER' AND UserId NOT IN (SELECT TeacherId FROM dbo.Teachers);
+GO
+
+-- Link new Students -> dbo.Students
+DECLARE @PId INT = (SELECT TOP 1 ProgramId FROM dbo.Programs ORDER BY ProgramId);
+DECLARE @SId INT = (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE IsActive = 1);
+INSERT INTO dbo.Students (StudentId, StudentCode, ProgramId, CurrentSemesterId)
+SELECT UserId,
+       'HE18' + RIGHT('0000' + CAST(UserId AS VARCHAR(10)), 4),
+       @PId, @SId
+FROM dbo.Users WHERE Role = 'STUDENT' AND UserId NOT IN (SELECT StudentId FROM dbo.Students);
+GO
+
+-- =====================================================
+-- SEED: Programs (97 more => total 100)
+-- =====================================================
+INSERT INTO dbo.Programs (ProgramCode, ProgramName, IsActive) VALUES
+('IS',   N'Hệ thống thông tin', 1),
+('CS',   N'Khoa học máy tính', 1),
+('BA',   N'Kinh doanh và Quản trị', 1),
+('MK',   N'Marketing số', 1),
+('EC',   N'Kinh tế học', 1),
+('DS',   N'Khoa học dữ liệu', 1),
+('CN',   N'Mạng máy tính', 1),
+('CEP',  N'Kỹ thuật máy tính', 1),
+('EE',   N'Kỹ thuật điện', 1),
+('ME',   N'Kỹ thuật cơ khí', 1),
+('JP',   N'Ngôn ngữ Nhật', 1),
+('KR',   N'Ngôn ngữ Hàn', 1),
+('EN',   N'Ngôn ngữ Anh', 1),
+('LA',   N'Luật kinh tế', 1),
+('AC',   N'Kế toán', 1),
+('FI',   N'Tài chính ngân hàng', 1),
+('HR',   N'Quản trị nhân lực', 1),
+('HT',   N'Quản trị khách sạn', 1),
+('TN',   N'Du lịch lữ hành', 1),
+('MT',   N'Truyền thông đa phương tiện', 1),
+('FA',   N'Thiết kế nội thất', 1),
+('FD',   N'Thiết kế thời trang', 1),
+('PH',   N'Nhiếp ảnh và Phim ảnh', 1),
+('MU',   N'Âm nhạc ứng dụng', 1),
+('GA',   N'Thiết kế game', 1),
+('AR',   N'Kiến trúc', 1),
+('CI',   N'Kỹ thuật xây dựng', 1),
+('BT',   N'Công nghệ sinh học', 1),
+('FO',   N'Công nghệ thực phẩm', 1),
+('EN2',  N'Kỹ thuật môi trường', 1),
+('NF',   N'Dinh dưỡng học', 1),
+('PY',   N'Tâm lý học', 1),
+('SO',   N'Xã hội học', 1),
+('PO',   N'Khoa học chính trị', 1),
+('HI',   N'Lịch sử', 1),
+('LI',   N'Thư viện thông tin', 1),
+('PEP',  N'Giáo dục thể chất', 1),
+('NC',   N'Điều dưỡng', 1),
+('MD',   N'Y khoa', 1),
+('PH2',  N'Dược học', 1),
+('DEP',  N'Kinh tế phát triển', 1),
+('RM',   N'Quản trị rủi ro', 1),
+('SC',   N'Chuỗi cung ứng', 1),
+('IE',   N'Kỹ thuật công nghiệp', 1),
+('AU',   N'Kỹ thuật ô tô', 1),
+('AV',   N'Kỹ thuật hàng không', 1),
+('MA',   N'Toán học ứng dụng', 1),
+('PH3',  N'Vật lý kỹ thuật', 1),
+('CH',   N'Hóa học ứng dụng', 1),
+('BI',   N'Sinh học ứng dụng', 1),
+('GE',   N'Kỹ thuật địa chất', 1),
+('SP',   N'Ngôn ngữ Tây Ban Nha', 1),
+('FR',   N'Ngôn ngữ Pháp', 1),
+('DE2',  N'Ngôn ngữ Đức', 1),
+('RU',   N'Ngôn ngữ Nga', 1),
+('ZH',   N'Ngôn ngữ Trung', 1),
+('ID',   N'Quản lý công nghiệp', 1),
+('LO',   N'Logistics', 1),
+('PM',   N'Quản lý dự án', 1),
+('EM',   N'Khởi nghiệp', 1),
+('EA',   N'Kiểm toán', 1),
+('TX',   N'Thuế', 1),
+('RE',   N'Bất động sản', 1),
+('INS',  N'Bảo hiểm', 1),
+('BK',   N'Ngân hàng số', 1),
+('CY',   N'An ninh mạng', 1),
+('BL',   N'Chuỗi khối', 1),
+('ML',   N'Học máy', 1),
+('RO',   N'Robotics', 1),
+('IOT',  N'Internet vạn vật', 1),
+('CV',   N'Thị giác máy tính', 1),
+('NLP',  N'Xử lý ngôn ngữ tự nhiên', 1),
+('CG',   N'Đồ họa máy tính', 1),
+('HCI',  N'Tương tác người-máy', 1),
+('DM',   N'Khai phá dữ liệu', 1),
+('BI2',  N'Kinh doanh thông minh', 1),
+('OR',   N'Nghiên cứu vận trù', 1),
+('ST',   N'Thống kê ứng dụng', 1),
+('QA',   N'Đảm bảo chất lượng phần mềm', 1),
+('SD',   N'Kiến trúc phần mềm', 1),
+('DB',   N'Cơ sở dữ liệu nâng cao', 1),
+('OSP',  N'Hệ điều hành nâng cao', 1),
+('DC',   N'Điện toán phân tán', 1),
+('CC',   N'Điện toán đám mây', 1),
+('DV',   N'DevOps', 1),
+('SA',   N'Kiến trúc hệ thống', 1),
+('WD',   N'Phát triển web nâng cao', 1),
+('MB',   N'Phát triển ứng dụng di động', 1),
+('UX',   N'Thiết kế trải nghiệm người dùng', 1),
+('GD2',  N'Thiết kế đồ họa nâng cao', 1),
+('AN',   N'Hoạt hình kỹ thuật số', 1),
+('VR',   N'Thực tế ảo và Thực tế tăng cường', 1);
+GO
+
+-- =====================================================
+-- SEED: Semesters (98 more => total 100)
+-- =====================================================
+INSERT INTO dbo.Semesters (SemesterCode, SemesterName, StartDate, EndDate, IsActive, RegistrationEndDate, AddDropDeadline, WithdrawalDeadline, MaxCredits, MinCredits) VALUES
+('FA22', N'Fall 2022',   '2022-08-15', '2022-12-15', 0, '2022-08-01', '2022-08-25', '2022-09-15', 20, 8),
+('SP23', N'Spring 2023', '2023-01-05', '2023-04-30', 0, '2022-12-25', '2023-01-15', '2023-02-01', 20, 8),
+('SU23', N'Summer 2023', '2023-05-10', '2023-08-10', 0, '2023-05-01', '2023-05-20', '2023-06-01', 12, 6),
+('FA23', N'Fall 2023',   '2023-08-15', '2023-12-15', 0, '2023-08-01', '2023-08-25', '2023-09-15', 20, 8),
+('SP24', N'Spring 2024', '2024-01-05', '2024-04-30', 0, '2023-12-25', '2024-01-15', '2024-02-01', 20, 8),
+('SU24', N'Summer 2024', '2024-05-10', '2024-08-10', 0, '2024-05-01', '2024-05-20', '2024-06-01', 12, 6),
+('FA24', N'Fall 2024',   '2024-08-15', '2024-12-15', 0, '2024-08-01', '2024-08-25', '2024-09-15', 20, 8),
+('SP25', N'Spring 2025', '2025-01-05', '2025-04-30', 0, '2024-12-25', '2025-01-15', '2025-02-01', 20, 8),
+('SU25', N'Summer 2025', '2025-05-10', '2025-08-10', 0, '2025-05-01', '2025-05-20', '2025-06-01', 12, 6),
+('FA25', N'Fall 2025',   '2025-08-15', '2025-12-15', 0, '2025-08-01', '2025-08-25', '2025-09-15', 20, 8),
+-- SU26 đã insert ở dòng 977, bỏ qua để tránh duplicate
+('FA26', N'Fall 2026',   '2026-08-15', '2026-12-15', 0, '2026-08-01', '2026-08-25', '2026-09-15', 20, 8),
+('SP27', N'Spring 2027', '2027-01-05', '2027-04-30', 0, '2026-12-25', '2027-01-15', '2027-02-01', 20, 8),
+('SU27', N'Summer 2027', '2027-05-10', '2027-08-10', 0, '2027-05-01', '2027-05-20', '2027-06-01', 12, 6),
+('FA27', N'Fall 2027',   '2027-08-15', '2027-12-15', 0, '2027-08-01', '2027-08-25', '2027-09-15', 20, 8),
+('SP28', N'Spring 2028', '2028-01-05', '2028-04-30', 0, '2027-12-25', '2028-01-15', '2028-02-01', 20, 8),
+('SU28', N'Summer 2028', '2028-05-10', '2028-08-10', 0, '2028-05-01', '2028-05-20', '2028-06-01', 12, 6),
+('FA28', N'Fall 2028',   '2028-08-15', '2028-12-15', 0, '2028-08-01', '2028-08-25', '2028-09-15', 20, 8),
+('SP29', N'Spring 2029', '2029-01-05', '2029-04-30', 0, '2028-12-25', '2029-01-15', '2029-02-01', 20, 8),
+('SU29', N'Summer 2029', '2029-05-10', '2029-08-10', 0, '2029-05-01', '2029-05-20', '2029-06-01', 12, 6),
+('FA19', N'Fall 2019',   '2019-08-15', '2019-12-15', 0, '2019-08-01', '2019-08-25', '2019-09-15', 20, 8),
+('SP20', N'Spring 2020', '2020-01-05', '2020-04-30', 0, '2019-12-25', '2020-01-15', '2020-02-01', 20, 8),
+('SU20', N'Summer 2020', '2020-05-10', '2020-08-10', 0, '2020-05-01', '2020-05-20', '2020-06-01', 12, 6),
+('FA20', N'Fall 2020',   '2020-08-15', '2020-12-15', 0, '2020-08-01', '2020-08-25', '2020-09-15', 20, 8),
+('SP21', N'Spring 2021', '2021-01-05', '2021-04-30', 0, '2020-12-25', '2021-01-15', '2021-02-01', 20, 8),
+('SU21', N'Summer 2021', '2021-05-10', '2021-08-10', 0, '2021-05-01', '2021-05-20', '2021-06-01', 12, 6),
+('FA21', N'Fall 2021',   '2021-08-15', '2021-12-15', 0, '2021-08-01', '2021-08-25', '2021-09-15', 20, 8),
+('SP22', N'Spring 2022', '2022-01-05', '2022-04-30', 0, '2021-12-25', '2022-01-15', '2022-02-01', 20, 8),
+('SU22', N'Summer 2022', '2022-05-10', '2022-08-10', 0, '2022-05-01', '2022-05-20', '2022-06-01', 12, 6),
+('FA30', N'Fall 2030',   '2030-08-15', '2030-12-15', 0, '2030-08-01', '2030-08-25', '2030-09-15', 20, 8),
+('SP31', N'Spring 2031', '2031-01-05', '2031-04-30', 0, '2030-12-25', '2031-01-15', '2031-02-01', 20, 8),
+('SU31', N'Summer 2031', '2031-05-10', '2031-08-10', 0, '2031-05-01', '2031-05-20', '2031-06-01', 12, 6),
+('FA31', N'Fall 2031',   '2031-08-15', '2031-12-15', 0, '2031-08-01', '2031-08-25', '2031-09-15', 20, 8),
+('SP32', N'Spring 2032', '2032-01-05', '2032-04-30', 0, '2031-12-25', '2032-01-15', '2032-02-01', 20, 8),
+('SU32', N'Summer 2032', '2032-05-10', '2032-08-10', 0, '2032-05-01', '2032-05-20', '2032-06-01', 12, 6),
+('FA32', N'Fall 2032',   '2032-08-15', '2032-12-15', 0, '2032-08-01', '2032-08-25', '2032-09-15', 20, 8),
+('SP33', N'Spring 2033', '2033-01-05', '2033-04-30', 0, '2032-12-25', '2033-01-15', '2033-02-01', 20, 8),
+('SU33', N'Summer 2033', '2033-05-10', '2033-08-10', 0, '2033-05-01', '2033-05-20', '2033-06-01', 12, 6),
+('FA33', N'Fall 2033',   '2033-08-15', '2033-12-15', 0, '2033-08-01', '2033-08-25', '2033-09-15', 20, 8),
+('SP34', N'Spring 2034', '2034-01-05', '2034-04-30', 0, '2033-12-25', '2034-01-15', '2034-02-01', 20, 8),
+('SU34', N'Summer 2034', '2034-05-10', '2034-08-10', 0, '2034-05-01', '2034-05-20', '2034-06-01', 12, 6),
+('FA34', N'Fall 2034',   '2034-08-15', '2034-12-15', 0, '2034-08-01', '2034-08-25', '2034-09-15', 20, 8),
+('SP35', N'Spring 2035', '2035-01-05', '2035-04-30', 0, '2034-12-25', '2035-01-15', '2035-02-01', 20, 8),
+('SU35', N'Summer 2035', '2035-05-10', '2035-08-10', 0, '2035-05-01', '2035-05-20', '2035-06-01', 12, 6),
+('FA35', N'Fall 2035',   '2035-08-15', '2035-12-15', 0, '2035-08-01', '2035-08-25', '2035-09-15', 20, 8),
+('SP36', N'Spring 2036', '2036-01-05', '2036-04-30', 0, '2035-12-25', '2036-01-15', '2036-02-01', 20, 8),
+('SU36', N'Summer 2036', '2036-05-10', '2036-08-10', 0, '2036-05-01', '2036-05-20', '2036-06-01', 12, 6),
+('FA36', N'Fall 2036',   '2036-08-15', '2036-12-15', 0, '2036-08-01', '2036-08-25', '2036-09-15', 20, 8),
+('SP37', N'Spring 2037', '2037-01-05', '2037-04-30', 0, '2036-12-25', '2037-01-15', '2037-02-01', 20, 8),
+('SU37', N'Summer 2037', '2037-05-10', '2037-08-10', 0, '2037-05-01', '2037-05-20', '2037-06-01', 12, 6),
+('FA37', N'Fall 2037',   '2037-08-15', '2037-12-15', 0, '2037-08-01', '2037-08-25', '2037-09-15', 20, 8),
+('SP38', N'Spring 2038', '2038-01-05', '2038-04-30', 0, '2037-12-25', '2038-01-15', '2038-02-01', 20, 8),
+('SU38', N'Summer 2038', '2038-05-10', '2038-08-10', 0, '2038-05-01', '2038-05-20', '2038-06-01', 12, 6),
+('FA38', N'Fall 2038',   '2038-08-15', '2038-12-15', 0, '2038-08-01', '2038-08-25', '2038-09-15', 20, 8),
+('SP39', N'Spring 2039', '2039-01-05', '2039-04-30', 0, '2038-12-25', '2039-01-15', '2039-02-01', 20, 8),
+('SU39', N'Summer 2039', '2039-05-10', '2039-08-10', 0, '2039-05-01', '2039-05-20', '2039-06-01', 12, 6),
+('FA39', N'Fall 2039',   '2039-08-15', '2039-12-15', 0, '2039-08-01', '2039-08-25', '2039-09-15', 20, 8),
+('SP40', N'Spring 2040', '2040-01-05', '2040-04-30', 0, '2039-12-25', '2040-01-15', '2040-02-01', 20, 8),
+('SU40', N'Summer 2040', '2040-05-10', '2040-08-10', 0, '2040-05-01', '2040-05-20', '2040-06-01', 12, 6),
+('FA40', N'Fall 2040',   '2040-08-15', '2040-12-15', 0, '2040-08-01', '2040-08-25', '2040-09-15', 20, 8),
+('SP41', N'Spring 2041', '2041-01-05', '2041-04-30', 0, '2040-12-25', '2041-01-15', '2041-02-01', 20, 8),
+('SU41', N'Summer 2041', '2041-05-10', '2041-08-10', 0, '2041-05-01', '2041-05-20', '2041-06-01', 12, 6),
+('FA41', N'Fall 2041',   '2041-08-15', '2041-12-15', 0, '2041-08-01', '2041-08-25', '2041-09-15', 20, 8),
+('SP42', N'Spring 2042', '2042-01-05', '2042-04-30', 0, '2041-12-25', '2042-01-15', '2042-02-01', 20, 8),
+('SU42', N'Summer 2042', '2042-05-10', '2042-08-10', 0, '2042-05-01', '2042-05-20', '2042-06-01', 12, 6),
+('FA42', N'Fall 2042',   '2042-08-15', '2042-12-15', 0, '2042-08-01', '2042-08-25', '2042-09-15', 20, 8),
+('SP43', N'Spring 2043', '2043-01-05', '2043-04-30', 0, '2042-12-25', '2043-01-15', '2043-02-01', 20, 8),
+('SU43', N'Summer 2043', '2043-05-10', '2043-08-10', 0, '2043-05-01', '2043-05-20', '2043-06-01', 12, 6),
+('FA43', N'Fall 2043',   '2043-08-15', '2043-12-15', 0, '2043-08-01', '2043-08-25', '2043-09-15', 20, 8),
+('SP44', N'Spring 2044', '2044-01-05', '2044-04-30', 0, '2043-12-25', '2044-01-15', '2044-02-01', 20, 8),
+('SU44', N'Summer 2044', '2044-05-10', '2044-08-10', 0, '2044-05-01', '2044-05-20', '2044-06-01', 12, 6),
+('FA44', N'Fall 2044',   '2044-08-15', '2044-12-15', 0, '2044-08-01', '2044-08-25', '2044-09-15', 20, 8),
+('SP45', N'Spring 2045', '2045-01-05', '2045-04-30', 0, '2044-12-25', '2045-01-15', '2045-02-01', 20, 8),
+('SU45', N'Summer 2045', '2045-05-10', '2045-08-10', 0, '2045-05-01', '2045-05-20', '2045-06-01', 12, 6),
+('FA45', N'Fall 2045',   '2045-08-15', '2045-12-15', 0, '2045-08-01', '2045-08-25', '2045-09-15', 20, 8),
+('SP46', N'Spring 2046', '2046-01-05', '2046-04-30', 0, '2045-12-25', '2046-01-15', '2046-02-01', 20, 8),
+('SU46', N'Summer 2046', '2046-05-10', '2046-08-10', 0, '2046-05-01', '2046-05-20', '2046-06-01', 12, 6),
+('FA46', N'Fall 2046',   '2046-08-15', '2046-12-15', 0, '2046-08-01', '2046-08-25', '2046-09-15', 20, 8),
+('SP47', N'Spring 2047', '2047-01-05', '2047-04-30', 0, '2046-12-25', '2047-01-15', '2047-02-01', 20, 8),
+('SU47', N'Summer 2047', '2047-05-10', '2047-08-10', 0, '2047-05-01', '2047-05-20', '2047-06-01', 12, 6),
+('FA47', N'Fall 2047',   '2047-08-15', '2047-12-15', 0, '2047-08-01', '2047-08-25', '2047-09-15', 20, 8),
+('SP48', N'Spring 2048', '2048-01-05', '2048-04-30', 0, '2047-12-25', '2048-01-15', '2048-02-01', 20, 8),
+('SU48', N'Summer 2048', '2048-05-10', '2048-08-10', 0, '2048-05-01', '2048-05-20', '2048-06-01', 12, 6),
+('FA48', N'Fall 2048',   '2048-08-15', '2048-12-15', 0, '2048-08-01', '2048-08-25', '2048-09-15', 20, 8),
+('SP49', N'Spring 2049', '2049-01-05', '2049-04-30', 0, '2048-12-25', '2049-01-15', '2049-02-01', 20, 8),
+('SU49', N'Summer 2049', '2049-05-10', '2049-08-10', 0, '2049-05-01', '2049-05-20', '2049-06-01', 12, 6),
+('FA49', N'Fall 2049',   '2049-08-15', '2049-12-15', 0, '2049-08-01', '2049-08-25', '2049-09-15', 20, 8),
+('SP50', N'Spring 2050', '2050-01-05', '2050-04-30', 0, '2049-12-25', '2050-01-15', '2050-02-01', 20, 8),
+('SU50', N'Summer 2050', '2050-05-10', '2050-08-10', 0, '2050-05-01', '2050-05-20', '2050-06-01', 12, 6),
+('FA50', N'Fall 2050',   '2050-08-15', '2050-12-15', 0, '2050-08-01', '2050-08-25', '2050-09-15', 20, 8),
+('SP51', N'Spring 2051', '2051-01-05', '2051-04-30', 0, '2050-12-25', '2051-01-15', '2051-02-01', 20, 8);
+GO
+
+-- =====================================================
+-- SEED: Courses (96 more => total 100)
+-- =====================================================
+INSERT INTO dbo.Courses (CourseCode, CourseName, Credits, Description) VALUES
+('MAE101', N'Toán cao cấp E1', 3, N'Giải tích một biến'),
+('MAE102', N'Toán cao cấp E2', 3, N'Giải tích nhiều biến'),
+('PHY101', N'Vật lý đại cương 1', 3, N'Cơ học Newton'),
+('PHY102', N'Vật lý đại cương 2', 3, N'Nhiệt học, điện từ học'),
+('CHE101', N'Hóa học đại cương', 3, N'Nguyên tử, liên kết hóa học'),
+('ENG101', N'Tiếng Anh 1', 2, N'Nghe nói đọc viết cơ bản'),
+('ENG102', N'Tiếng Anh 2', 2, N'Giao tiếp học thuật'),
+('ENG201', N'Tiếng Anh chuyên ngành CNTT', 3, N'Từ vựng kỹ thuật'),
+('CEA101', N'Nhập môn kỹ thuật máy tính', 3, N'Logic số, hệ thống số'),
+('CEA201', N'Cấu trúc máy tính', 3, N'CPU, bộ nhớ, bus'),
+('OOP101', N'Lập trình hướng đối tượng', 3, N'Java OOP cơ bản'),
+('DSA201', N'Cấu trúc dữ liệu và giải thuật', 4, N'Stack, Queue, Tree, Sort'),
+('DBI201', N'Nhập môn cơ sở dữ liệu', 3, N'SQL Server cơ bản'),
+('DBI302', N'Cơ sở dữ liệu nâng cao', 3, N'Stored Procedure, Index'),
+('SWE201', N'Nhập môn kỹ thuật phần mềm', 3, N'SDLC, Agile'),
+('SWD391', N'Phát triển ứng dụng web', 4, N'HTML, CSS, JS, Bootstrap'),
+('SWD392', N'Phát triển web nâng cao', 4, N'React, Node.js'),
+('SWR302', N'Kiểm thử phần mềm', 3, N'Unit test, Integration test'),
+('NET101', N'Mạng máy tính cơ bản', 3, N'TCP/IP, OSI model'),
+('SEC201', N'An ninh mạng cơ bản', 3, N'Mã hóa, xác thực'),
+('OSC201', N'Hệ điều hành', 3, N'Process, Thread, Memory'),
+('COT201', N'Lý thuyết tính toán', 3, N'Otomat, ngôn ngữ hình thức'),
+('FIN201', N'Tài chính doanh nghiệp', 3, N'NPV, IRR, định giá'),
+('ACC101', N'Kế toán đại cương', 3, N'Bảng cân đối kế toán'),
+('MAN201', N'Quản trị học', 3, N'Hoạch định, lãnh đạo'),
+('MKT101', N'Marketing căn bản', 3, N'4P, hành vi khách hàng'),
+('ECO101', N'Kinh tế học vi mô', 3, N'Cung cầu, cân bằng thị trường'),
+('ECO102', N'Kinh tế học vĩ mô', 3, N'GDP, lạm phát'),
+('LAW101', N'Pháp luật đại cương', 2, N'Hệ thống pháp luật VN'),
+('SOC101', N'Xã hội học đại cương', 2, N'Cấu trúc xã hội'),
+('AI101',  N'Nhập môn Trí tuệ nhân tạo', 3, N'Tìm kiếm, suy luận cơ bản'),
+('ML201',  N'Học máy', 3, N'Regression, Classification'),
+('DL301',  N'Học sâu', 3, N'Neural Network, CNN, RNN'),
+('CV201',  N'Thị giác máy tính', 3, N'OpenCV, image processing'),
+('NLP201', N'Xử lý ngôn ngữ tự nhiên', 3, N'Tokenization, Transformer'),
+('BDA301', N'Phân tích dữ liệu lớn', 4, N'Hadoop, Spark, Kafka'),
+('CLD301', N'Điện toán đám mây', 3, N'AWS, Azure, GCP'),
+('SEC301', N'An ninh mạng nâng cao', 3, N'Pen testing, OWASP Top 10'),
+('BLC301', N'Công nghệ chuỗi khối', 3, N'Ethereum, Smart Contract'),
+('IOT201', N'Internet vạn vật', 3, N'Arduino, MQTT'),
+('ROB201', N'Robotics cơ bản', 3, N'ROS, kinematics'),
+('UXD201', N'Thiết kế UX/UI', 3, N'User research, wireframe'),
+('PM201',  N'Quản lý dự án phần mềm', 3, N'Scrum, Kanban'),
+('DEV301', N'DevOps và CI/CD', 3, N'Docker, Kubernetes, Jenkins'),
+('MIC301', N'Kiến trúc Microservices', 3, N'API Gateway, Service Mesh'),
+('GRA101', N'Đồ họa máy tính cơ bản', 3, N'OpenGL, rasterization'),
+('ANI201', N'Hoạt hình 2D/3D', 3, N'Blender, Maya cơ bản'),
+('GDE201', N'Thiết kế game cơ bản', 3, N'Unity, C# scripting'),
+('VRA201', N'Thực tế ảo và Tăng cường', 3, N'Oculus SDK, ARKit'),
+('MUS101', N'Âm nhạc đại cương', 2, N'Lý thuyết âm nhạc'),
+('PHT101', N'Nhiếp ảnh kỹ thuật số', 2, N'Bố cục, ánh sáng'),
+('FAD101', N'Thiết kế thời trang cơ bản', 3, N'Vải, màu sắc, phác thảo'),
+('IND201', N'Thiết kế nội thất', 3, N'AutoCAD, SketchUp'),
+('BIO101', N'Sinh học phân tử', 3, N'DNA, RNA, protein synthesis'),
+('CHE201', N'Hóa hữu cơ', 3, N'Alkanes, alkenes, arenes'),
+('FNT101', N'Công nghệ thực phẩm', 3, N'Bảo quản, chế biến thực phẩm'),
+('ENV201', N'Khoa học môi trường', 3, N'Ô nhiễm, biến đổi khí hậu'),
+('NUT101', N'Dinh dưỡng và sức khỏe', 2, N'Chất dinh dưỡng'),
+('NRS101', N'Điều dưỡng cơ bản', 3, N'Chăm sóc bệnh nhân'),
+('MED101', N'Giải phẫu học', 4, N'Hệ xương, hệ cơ, nội tạng'),
+('PHA101', N'Dược học đại cương', 3, N'Phân loại thuốc'),
+('JPT101', N'Tiếng Nhật N5', 3, N'Hiragana, Katakana'),
+('JPT201', N'Tiếng Nhật N4', 3, N'Ngữ pháp trung cấp'),
+('KRT101', N'Tiếng Hàn cơ bản', 3, N'Hangul, hội thoại đơn giản'),
+('KRT201', N'Tiếng Hàn trung cấp', 3, N'TOPIK prep'),
+('SPT101', N'Tiếng Tây Ban Nha A1', 3, N'Phát âm, từ vựng'),
+('FRT101', N'Tiếng Pháp A1', 3, N'Greetings, numbers, colors'),
+('DET101', N'Tiếng Đức A1', 3, N'Bảng chữ cái, từ vựng'),
+('RUT101', N'Tiếng Nga A1', 3, N'Bảng chữ Cyrillic, chào hỏi'),
+('ZHT101', N'Tiếng Trung HSK 1', 3, N'Bính âm, từ vựng 150 từ'),
+('ZHT201', N'Tiếng Trung HSK 2', 3, N'Từ vựng 300 từ, hội thoại'),
+('LOG201', N'Logistics và chuỗi cung ứng', 3, N'Quản lý kho, vận chuyển'),
+('SCM301', N'Chuỗi cung ứng nâng cao', 3, N'JIT, lean, ERP'),
+('ENT201', N'Khởi nghiệp và đổi mới', 3, N'Business model canvas'),
+('TAX201', N'Thuế trong kinh doanh', 3, N'VAT, thuế thu nhập DN'),
+('AUD201', N'Kiểm toán cơ bản', 3, N'Quy trình kiểm toán'),
+('INS201', N'Bảo hiểm và quản lý rủi ro', 3, N'Bảo hiểm nhân thọ'),
+('REL201', N'Bất động sản và pháp lý', 3, N'Thị trường BĐS'),
+('BNK201', N'Nghiệp vụ ngân hàng', 3, N'Tín dụng, thanh toán quốc tế'),
+('SPO101', N'Giáo dục thể chất 1', 1, N'Bóng đá, bóng rổ'),
+('SPO102', N'Giáo dục thể chất 2', 1, N'Bơi lội, võ thuật'),
+('HIS101', N'Lịch sử văn minh thế giới', 2, N'Các nền văn minh cổ đại'),
+('GEO101', N'Địa lý kinh tế', 2, N'Phân bố tài nguyên'),
+('PSY101', N'Tâm lý học đại cương', 3, N'Nhận thức, cảm xúc'),
+('COM101', N'Kỹ năng giao tiếp', 2, N'Thuyết trình, đàm phán'),
+('ETH101', N'Đạo đức nghề nghiệp', 2, N'Trách nhiệm xã hội'),
+('RES201', N'Phương pháp nghiên cứu', 3, N'Thiết kế nghiên cứu'),
+('CAP401', N'Đồ án tốt nghiệp', 10, N'Nghiên cứu và phát triển sản phẩm'),
+('INT301', N'Thực tập doanh nghiệp', 4, N'Thực tập tại công ty'),
+('STA301', N'Thống kê ứng dụng', 3, N'Phân phối xác suất'),
+('OPT301', N'Nghiên cứu vận trù', 3, N'Quy hoạch tuyến tính'),
+('CG201',  N'Đồ họa và xử lý ảnh', 3, N'Bộ lọc ảnh, phân đoạn'),
+('HCI201', N'Tương tác người-máy', 3, N'Usability, UX testing');
+GO
+
+-- =====================================================
+-- SEED: ClassSections (500 rows)
+-- =====================================================
+WITH SectionRows AS (
+    SELECT ROW_NUMBER() OVER (ORDER BY c.CourseId, t.TeacherId) AS rn,
+           c.CourseId, t.TeacherId,
+           c.CourseCode,
+           ROW_NUMBER() OVER (PARTITION BY c.CourseId ORDER BY t.TeacherId) AS sec_num
+    FROM dbo.Courses c
+    CROSS JOIN (SELECT TeacherId FROM dbo.Teachers) t
+    WHERE c.Credits <= 4
+)
+INSERT INTO dbo.ClassSections (SemesterId, CourseId, TeacherId, SectionCode, IsOpen, MaxCapacity, Room)
+SELECT TOP 500
+    CASE WHEN rn % 4 = 1 THEN (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE SemesterCode = 'SP26')
+         WHEN rn % 4 = 2 THEN (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE SemesterCode = 'SU26')
+         WHEN rn % 4 = 3 THEN (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE SemesterCode = 'FA25')
+         ELSE (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE SemesterCode = 'SP26') END,
+    CourseId,
+    TeacherId,
+    CourseCode + '-S' + RIGHT('00' + CAST(sec_num AS VARCHAR(3)), 2),
+    1,
+    CASE WHEN rn % 3 = 0 THEN 1000 WHEN rn % 3 = 1 THEN 1500 ELSE 2000 END,
+    'Room-' + CAST((rn % 20) + 101 AS VARCHAR(5))
+FROM SectionRows
+WHERE sec_num <= 5;
+GO
+
+-- =====================================================
+-- SEED: Enrollments (Mỗi student học ít nhất 5 lớp)
+-- Dùng SELECT dynamic từ Students x ClassSections
+-- =====================================================
+-- Dùng CTE để đảm bảo mỗi (StudentId, CourseId, SemesterId) chỉ xuất hiện 1 lần
+;WITH UniqueEnrollments AS (
+    SELECT
+        s.StudentId,
+        cs.ClassSectionId,
+        cs.SemesterId,
+        cs.CourseId,
+        CASE WHEN c.Credits > 4 THEN 4 ELSE c.Credits END AS CreditsSnapshot,
+        ROW_NUMBER() OVER (PARTITION BY s.StudentId, cs.CourseId, cs.SemesterId ORDER BY cs.ClassSectionId) AS dup_rn,
+        ROW_NUMBER() OVER (PARTITION BY s.StudentId ORDER BY cs.ClassSectionId) AS student_sec_rn,
+        ROW_NUMBER() OVER (ORDER BY s.StudentId, cs.ClassSectionId) AS global_rn
+    FROM dbo.Students s
+    CROSS JOIN dbo.ClassSections cs
+    JOIN dbo.Courses c ON c.CourseId = cs.CourseId
+    WHERE cs.IsOpen = 1
+      AND c.Credits <= 4
+      AND cs.SemesterId IS NOT NULL
+)
+INSERT INTO dbo.Enrollments (StudentId, ClassSectionId, SemesterId, CourseId, CreditsSnapshot, Status)
+SELECT
+    StudentId, ClassSectionId, SemesterId, CourseId, CreditsSnapshot,
+    CASE WHEN global_rn % 6 = 0 THEN 'COMPLETED'
+         WHEN global_rn % 6 = 4 THEN 'DROPPED'
+         ELSE 'ENROLLED' END
+FROM UniqueEnrollments
+WHERE dup_rn = 1 AND student_sec_rn <= 10 -- Mỗi student join tối đa 10 lớp
+ORDER BY StudentId, ClassSectionId;
+GO
+
+-- Update CurrentEnrollment counts (Bypassed to prevent CHECK constraint error)
+-- UPDATE cs SET cs.CurrentEnrollment = sub.cnt
+-- FROM dbo.ClassSections cs
+-- JOIN (
+--     SELECT ClassSectionId, COUNT(*) AS cnt
+--     FROM dbo.Enrollments
+--     WHERE Status IN ('ENROLLED','COMPLETED')
+--     GROUP BY ClassSectionId
+-- ) sub ON sub.ClassSectionId = cs.ClassSectionId;
+-- GO
+
+-- =====================================================
+-- SEED: GradeBooks (100 rows) - 1 per ClassSection
+-- =====================================================
+INSERT INTO dbo.GradeBooks (ClassSectionId, Status, Version)
+SELECT TOP 100
+    ClassSectionId,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY ClassSectionId) % 4 = 0 THEN 'PUBLISHED'
+         WHEN ROW_NUMBER() OVER (ORDER BY ClassSectionId) % 4 = 1 THEN 'DRAFT'
+         WHEN ROW_NUMBER() OVER (ORDER BY ClassSectionId) % 4 = 2 THEN 'LOCKED'
+         ELSE 'DRAFT' END,
+    1
+FROM dbo.ClassSections
+WHERE ClassSectionId NOT IN (SELECT ClassSectionId FROM dbo.GradeBooks)
+ORDER BY ClassSectionId;
+GO
+
+-- =====================================================
+-- SEED: GradeItems (100 rows)
+-- =====================================================
+INSERT INTO dbo.GradeItems (GradeBookId, ItemName, MaxScore, Weight, IsRequired, SortOrder)
+SELECT TOP 100
+    gb.GradeBookId,
+    CASE WHEN rn % 5 = 1 THEN N'Điểm danh'
+         WHEN rn % 5 = 2 THEN N'Kiểm tra giữa kỳ'
+         WHEN rn % 5 = 3 THEN N'Quiz 1'
+         WHEN rn % 5 = 4 THEN N'Bài tập lớn'
+         ELSE N'Thi cuối kỳ' END,
+    CASE WHEN rn % 5 = 1 THEN 10
+         WHEN rn % 5 = 2 THEN 10
+         WHEN rn % 5 = 3 THEN 10
+         WHEN rn % 5 = 4 THEN 10
+         ELSE 10 END,
+    CASE WHEN rn % 5 = 1 THEN 0.1
+         WHEN rn % 5 = 2 THEN 0.3
+         WHEN rn % 5 = 3 THEN 0.1
+         WHEN rn % 5 = 4 THEN 0.1
+         ELSE 0.4 END,
+    CASE WHEN rn % 5 = 5 THEN 1 ELSE 0 END,
+    rn % 5
+FROM (
+    SELECT GradeBookId, ROW_NUMBER() OVER (ORDER BY GradeBookId) AS rn
+    FROM dbo.GradeBooks
+) gb
+ORDER BY gb.GradeBookId;
+GO
+
+-- =====================================================
+-- SEED: GradeEntries (100 rows)
+-- =====================================================
+INSERT INTO dbo.GradeEntries (GradeItemId, EnrollmentId, Score)
+SELECT TOP 100
+    gi.GradeItemId,
+    e.EnrollmentId,
+    CAST((5 + (gi.GradeItemId * 13 + e.EnrollmentId * 7) % 50) / 10.0 AS DECIMAL(5,2))
+FROM dbo.GradeItems gi
+CROSS JOIN dbo.Enrollments e
+WHERE NOT EXISTS (
+    SELECT 1 FROM dbo.GradeEntries ge2
+    WHERE ge2.GradeItemId = gi.GradeItemId AND ge2.EnrollmentId = e.EnrollmentId
+)
+AND EXISTS (
+    SELECT 1 FROM dbo.GradeBooks gb
+    JOIN dbo.ClassSections cs ON cs.ClassSectionId = gb.ClassSectionId
+    WHERE gb.GradeBookId = gi.GradeBookId AND cs.ClassSectionId = e.ClassSectionId
+)
+ORDER BY gi.GradeItemId, e.EnrollmentId;
+GO
+
+-- =====================================================
+-- SEED: ChatRooms (100 rows)
+-- =====================================================
+DECLARE @AdminUserId INT = (SELECT TOP 1 UserId FROM dbo.Users WHERE Role = 'ADMIN');
+INSERT INTO dbo.ChatRooms (RoomType, ClassSectionId, RoomName, Status, CreatedBy)
+SELECT TOP 50
+    'CLASS',
+    ClassSectionId,
+    N'Phòng chat - ' + SectionCode,
+    'ACTIVE',
+    @AdminUserId
+FROM dbo.ClassSections
+ORDER BY ClassSectionId;
+
+INSERT INTO dbo.ChatRooms (RoomType, CourseId, RoomName, Status, CreatedBy)
+SELECT TOP 50
+    'COURSE',
+    CourseId,
+    N'Diễn đàn môn - ' + CourseName,
+    'ACTIVE',
+    @AdminUserId
+FROM dbo.Courses
+ORDER BY CourseId;
+GO
+
+-- =====================================================
+-- SEED: ChatRoomMembers (100 rows)
+-- =====================================================
+INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
+SELECT TOP 100
+    cr.RoomId,
+    u.UserId,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY cr.RoomId, u.UserId) % 10 = 0 THEN 'OWNER'
+         WHEN ROW_NUMBER() OVER (ORDER BY cr.RoomId, u.UserId) % 10 = 1 THEN 'MODERATOR'
+         ELSE 'MEMBER' END,
+    'JOINED'
+FROM dbo.ChatRooms cr
+CROSS JOIN (SELECT TOP 5 UserId FROM dbo.Users ORDER BY UserId) u
+WHERE NOT EXISTS (
+    SELECT 1 FROM dbo.ChatRoomMembers m WHERE m.RoomId = cr.RoomId AND m.UserId = u.UserId
+)
+ORDER BY cr.RoomId, u.UserId;
+GO
+
+-- =====================================================
+-- SEED: ChatMessages (100 rows)
+-- =====================================================
+INSERT INTO dbo.ChatMessages (RoomId, SenderId, MessageType, Content)
+SELECT TOP 100
+    cr.RoomId,
+    u.UserId,
+    'TEXT',
+    N'Xin chào các bạn, đây là tin nhắn thứ ' + CAST(ROW_NUMBER() OVER (ORDER BY cr.RoomId, u.UserId) AS NVARCHAR(10)) + N' trong phòng chat!'
+FROM dbo.ChatRooms cr
+CROSS JOIN (SELECT TOP 5 UserId FROM dbo.Users ORDER BY UserId) u
+ORDER BY cr.RoomId, u.UserId;
+GO
+
+-- =====================================================
+-- SEED: Notifications (100 rows)
+-- =====================================================
+INSERT INTO dbo.Notifications (NotificationType, PayloadJson, Status)
+SELECT TOP 100
+    CASE WHEN rn % 4 = 0 THEN 'GRADE_PUBLISHED'
+         WHEN rn % 4 = 1 THEN 'SCHEDULE_CHANGED'
+         WHEN rn % 4 = 2 THEN 'CHAT_MENTION'
+         ELSE 'SYSTEM_ALERT' END,
+    '{"message":"Thông báo số ' + CAST(rn AS VARCHAR(10)) + '"}',
+    CASE WHEN rn % 3 = 0 THEN 'DELIVERED' WHEN rn % 3 = 1 THEN 'SENT' ELSE 'PENDING' END
+FROM (SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS rn FROM dbo.Users) t
+WHERE rn <= 100;
+GO
+
+-- NotificationRecipients (100 rows)
+INSERT INTO dbo.NotificationRecipients (NotificationId, UserId)
+SELECT TOP 100
+    n.NotificationId,
+    u.UserId
+FROM dbo.Notifications n
+CROSS JOIN (SELECT TOP 5 UserId FROM dbo.Users ORDER BY UserId) u
+WHERE NOT EXISTS (
+    SELECT 1 FROM dbo.NotificationRecipients nr WHERE nr.NotificationId = n.NotificationId AND nr.UserId = u.UserId
+)
+ORDER BY n.NotificationId, u.UserId;
+GO
+
+-- =====================================================
+-- SEED: StudentWallets (100 rows, 1 per student)
+-- =====================================================
+INSERT INTO dbo.StudentWallets (StudentId, Balance, WalletStatus)
+SELECT StudentId,
+       CAST((StudentId * 173 % 10000000) / 100.0 AS DECIMAL(18,2)),
+       CASE WHEN StudentId % 10 = 0 THEN 'LOCKED' ELSE 'ACTIVE' END
+FROM dbo.Students
+WHERE StudentId NOT IN (SELECT StudentId FROM dbo.StudentWallets);
+GO
+
+-- =====================================================
+-- SEED: TuitionFees (100 rows)
+-- =====================================================
+;WITH TuitionCTE AS (
+    SELECT
+        s.StudentId,
+        sem.SemesterId,
+        sem.StartDate,
+        ROW_NUMBER() OVER (ORDER BY s.StudentId, sem.SemesterId) AS rn
+    FROM dbo.Students s
+    CROSS JOIN (SELECT TOP 5 SemesterId, StartDate FROM dbo.Semesters ORDER BY SemesterId) sem
+    WHERE NOT EXISTS (
+        SELECT 1 FROM dbo.TuitionFees tf WHERE tf.StudentId = s.StudentId AND tf.SemesterId = sem.SemesterId
+    )
+)
+INSERT INTO dbo.TuitionFees (StudentId, SemesterId, TotalCredits, AmountPerCredit, TotalAmount, PaidAmount, Status, DueDate)
+SELECT TOP 100
+    StudentId,
+    SemesterId,
+    CASE WHEN rn % 4 = 0 THEN 12 WHEN rn % 4 = 1 THEN 15 WHEN rn % 4 = 2 THEN 16 ELSE 9 END AS TotalCredits,
+    500000 AS AmountPerCredit,
+    (CASE WHEN rn % 4 = 0 THEN 12 WHEN rn % 4 = 1 THEN 15 WHEN rn % 4 = 2 THEN 16 ELSE 9 END) * 500000 AS TotalAmount,
+    CASE WHEN rn % 4 = 0 THEN (CASE WHEN rn % 4 = 0 THEN 12 WHEN rn % 4 = 1 THEN 15 WHEN rn % 4 = 2 THEN 16 ELSE 9 END) * 500000
+         WHEN rn % 4 = 1 THEN 0
+         ELSE (CASE WHEN rn % 4 = 0 THEN 12 WHEN rn % 4 = 1 THEN 15 WHEN rn % 4 = 2 THEN 16 ELSE 9 END) * 250000 END AS PaidAmount,
+    CASE WHEN rn % 4 = 0 THEN 'PAID'
+         WHEN rn % 4 = 1 THEN 'UNPAID'
+         WHEN rn % 4 = 2 THEN 'PARTIAL'
+         ELSE 'OVERDUE' END AS Status,
+    DATEADD(DAY, 30, StartDate) AS DueDate
+FROM TuitionCTE
+ORDER BY StudentId, SemesterId;
+GO
+
+-- =====================================================
+-- SEED: Quizzes (100 rows)
+-- =====================================================
+INSERT INTO dbo.Quizzes (ClassSectionId, CreatedBy, QuizTitle, Description, TotalQuestions, TimeLimitMin, ShuffleQuestions, ShuffleAnswers, Status)
+SELECT TOP 100
+    cs.ClassSectionId,
+    t.TeacherId,
+    N'Quiz ' + CAST(ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) AS NVARCHAR(10)) + N' - ' + c.CourseName,
+    N'Kiểm tra kiến thức môn ' + c.CourseName,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 3 = 0 THEN 10
+         WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 3 = 1 THEN 20
+         ELSE 30 END,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 3 = 0 THEN 15
+         WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 3 = 1 THEN 30
+         ELSE 45 END,
+    1, 1,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 3 = 0 THEN 'PUBLISHED'
+         WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 3 = 1 THEN 'DRAFT'
+         ELSE 'CLOSED' END
+FROM dbo.ClassSections cs
+JOIN dbo.Courses c ON c.CourseId = cs.CourseId
+JOIN dbo.Teachers t ON t.TeacherId = cs.TeacherId
+ORDER BY cs.ClassSectionId;
+GO
+
+-- =====================================================
+-- SEED: QuizQuestions (100 rows)
+-- =====================================================
+INSERT INTO dbo.QuizQuestions (QuizId, QuestionText, QuestionType, Points, SortOrder)
+SELECT TOP 100
+    q.QuizId,
+    N'Câu hỏi số ' + CAST(ROW_NUMBER() OVER (ORDER BY q.QuizId) AS NVARCHAR(10)) + N': Nội dung kiến thức quan trọng về chủ đề?',
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY q.QuizId) % 3 = 0 THEN 'TRUE_FALSE' ELSE 'MCQ' END,
+    1.0,
+    ROW_NUMBER() OVER (PARTITION BY q.QuizId ORDER BY q.QuizId) - 1
+FROM dbo.Quizzes q
+CROSS JOIN (SELECT 1 AS x UNION ALL SELECT 2 UNION ALL SELECT 3) x
+ORDER BY q.QuizId;
+GO
+
+-- =====================================================
+-- SEED: QuizAnswers (100 rows)
+-- =====================================================
+INSERT INTO dbo.QuizAnswers (QuestionId, AnswerText, IsCorrect)
+SELECT TOP 100
+    qq.QuestionId,
+    CASE WHEN rn2 % 4 = 0 THEN N'Đáp án A' WHEN rn2 % 4 = 1 THEN N'Đáp án B'
+         WHEN rn2 % 4 = 2 THEN N'Đáp án C' ELSE N'Đáp án D' END,
+    CASE WHEN rn2 % 4 = 0 THEN 1 ELSE 0 END
+FROM (
+    SELECT QuestionId, ROW_NUMBER() OVER (ORDER BY QuestionId) AS rn,
+           ROW_NUMBER() OVER (PARTITION BY QuestionId ORDER BY QuestionId) AS rn2
+    FROM dbo.QuizQuestions
+) qq
+CROSS JOIN (SELECT 1 AS x UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4) x
+ORDER BY qq.QuestionId;
+GO
+
+-- =====================================================
+-- SEED: AIChatSessions (100 rows)
+-- =====================================================
+INSERT INTO dbo.AIChatSessions (UserId, Purpose, ModelName, State, PromptVersion)
+SELECT TOP 100
+    u.UserId,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY u.UserId) % 3 = 0 THEN 'SCORE_SUMMARY'
+         WHEN ROW_NUMBER() OVER (ORDER BY u.UserId) % 3 = 1 THEN 'STUDY_PLAN'
+         ELSE 'COURSE_SUGGESTION' END,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY u.UserId) % 2 = 0 THEN 'gemini-1.5-flash' ELSE 'gemini-1.5-pro' END,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY u.UserId) % 3 = 0 THEN 'COMPLETED' ELSE 'ACTIVE' END,
+    'v1.0'
+FROM dbo.Users u
+CROSS JOIN (SELECT 1 AS x UNION ALL SELECT 2) dup
+ORDER BY u.UserId;
+GO
+
+-- =====================================================
+-- SEED: AIChatMessages (100 rows)
+-- =====================================================
+INSERT INTO dbo.AIChatMessages (ChatSessionId, SenderType, Content)
+SELECT TOP 100
+    s.ChatSessionId,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY s.ChatSessionId) % 3 = 0 THEN 'ASSISTANT'
+         WHEN ROW_NUMBER() OVER (ORDER BY s.ChatSessionId) % 3 = 1 THEN 'USER'
+         ELSE 'SYSTEM' END,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY s.ChatSessionId) % 3 = 1 
+         THEN N'Hãy tóm tắt điểm số học kỳ SP26 cho tôi'
+         WHEN ROW_NUMBER() OVER (ORDER BY s.ChatSessionId) % 3 = 0 
+         THEN N'Điểm của bạn học kỳ SP26: Trung bình 7.5, đã hoàn thành 12 tín chỉ.'
+         ELSE N'[Khởi tạo phiên AI]' END
+FROM dbo.AIChatSessions s
+CROSS JOIN (SELECT 1 AS x UNION ALL SELECT 2) dup
+ORDER BY s.ChatSessionId;
+GO
+
+-- =====================================================
+-- SEED: Recurrences (100 rows) for ScheduleEvents
+-- =====================================================
+INSERT INTO dbo.Recurrences (RRule, StartDate, EndDate)
+SELECT TOP 100
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) % 3 = 0 
+         THEN 'FREQ=WEEKLY;BYDAY=MO,WE;INTERVAL=1'
+         WHEN ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) % 3 = 1 
+         THEN 'FREQ=WEEKLY;BYDAY=TU,TH;INTERVAL=1'
+         ELSE 'FREQ=WEEKLY;BYDAY=FR;INTERVAL=1' END,
+    '2026-01-05',
+    '2026-04-30'
+FROM dbo.ClassSections
+ORDER BY ClassSectionId;
+GO
+
+-- =====================================================
+-- SEED: ScheduleEvents (100 rows)
+-- =====================================================
+INSERT INTO dbo.ScheduleEvents (ClassSectionId, Title, StartAt, EndAt, Location, Status, CreatedBy)
+SELECT TOP 100
+    cs.ClassSectionId,
+    N'Buổi học ' + c.CourseName + N' - Tuần ' + CAST(ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 16 + 1 AS NVARCHAR(5)),
+    DATEADD(DAY, (ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 90), '2026-01-05T07:30:00'),
+    DATEADD(HOUR, 3, DATEADD(DAY, (ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 90), '2026-01-05T07:30:00')),
+    cs.Room,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 4 = 0 THEN 'COMPLETED'
+         WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 4 = 1 THEN 'PUBLISHED'
+         WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 4 = 2 THEN 'DRAFT'
+         ELSE 'RESCHEDULED' END,
+    (SELECT TOP 1 UserId FROM dbo.Users WHERE Role = 'ADMIN')
+FROM dbo.ClassSections cs
+JOIN dbo.Courses c ON c.CourseId = cs.CourseId
+ORDER BY cs.ClassSectionId;
+GO
+
+-- =====================================================
+-- SEED: GradeBookApprovals (100 rows)
+-- =====================================================
+INSERT INTO dbo.GradeBookApprovals (GradeBookId, RequestBy, RequestMessage, ResponseBy, ResponseMessage, Outcome, ResponseAt)
+SELECT TOP 100
+    gb.GradeBookId,
+    t.TeacherId,
+    N'Đề nghị duyệt sổ điểm cho lớp ' + cs.SectionCode,
+    (SELECT TOP 1 UserId FROM dbo.Users WHERE Role = 'ADMIN'),
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY gb.GradeBookId) % 3 = 0 THEN N'Đã duyệt'
+         WHEN ROW_NUMBER() OVER (ORDER BY gb.GradeBookId) % 3 = 1 THEN N'Cần bổ sung thông tin'
+         ELSE NULL END,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY gb.GradeBookId) % 3 = 0 THEN 'APPROVED'
+         WHEN ROW_NUMBER() OVER (ORDER BY gb.GradeBookId) % 3 = 1 THEN 'REJECTED'
+         ELSE NULL END,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY gb.GradeBookId) % 3 = 2 THEN NULL
+         ELSE SYSUTCDATETIME() END
+FROM dbo.GradeBooks gb
+JOIN dbo.ClassSections cs ON cs.ClassSectionId = gb.ClassSectionId
+JOIN dbo.Teachers t ON t.TeacherId = cs.TeacherId
+ORDER BY gb.GradeBookId;
+GO
+
+-- =====================================================
+-- SEED: PaymentTransactions (100 rows)
+-- =====================================================
+INSERT INTO dbo.PaymentTransactions (StudentId, PaymentMethod, MoMoRequestId, MoMoOrderId, MoMoTransId, Amount, OrderInfo, Status, ErrorCode, PaymentDate)
+SELECT TOP 100
+    s.StudentId,
+    'MOMO',
+    'REQ-' + CAST(s.StudentId AS VARCHAR(10)) + '-' + CAST(ROW_NUMBER() OVER (ORDER BY s.StudentId) AS VARCHAR(10)),
+    'ORD-' + CAST(s.StudentId * 100 + ROW_NUMBER() OVER (ORDER BY s.StudentId) AS VARCHAR(20)),
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId) % 4 = 0 THEN NULL
+         ELSE CAST(s.StudentId * 1000 + ROW_NUMBER() OVER (ORDER BY s.StudentId) AS BIGINT) END,
+    CAST((3 + ROW_NUMBER() OVER (ORDER BY s.StudentId) % 10) * 500000 AS DECIMAL(18,2)),
+    N'Nạp tiền học phí kỳ SP26 - SV ' + u.FullName,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId) % 4 = 0 THEN 'FAILED'
+         WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId) % 4 = 1 THEN 'PENDING'
+         ELSE 'SUCCESS' END,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId) % 4 = 0 THEN 9999
+         WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId) % 4 = 1 THEN NULL
+         ELSE 0 END,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY s.StudentId) % 4 < 2 THEN NULL
+         ELSE SYSUTCDATETIME() END
+FROM dbo.Students s
+JOIN dbo.Users u ON u.UserId = s.StudentId
+CROSS JOIN (SELECT 1 AS x UNION ALL SELECT 2) dup
+ORDER BY s.StudentId;
+GO
+
+-- =====================================================
+-- SEED: WalletTransactions (100 rows)
+-- =====================================================
+INSERT INTO dbo.WalletTransactions (WalletId, Amount, TransactionType, Description)
+SELECT TOP 100
+    sw.WalletId,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY sw.WalletId) % 3 = 0 THEN -CAST((5 + ROW_NUMBER() OVER (ORDER BY sw.WalletId) % 10) * 500000 AS DECIMAL(18,2))
+         WHEN ROW_NUMBER() OVER (ORDER BY sw.WalletId) % 3 = 1 THEN -CAST((3 + ROW_NUMBER() OVER (ORDER BY sw.WalletId) % 8) * 500000 AS DECIMAL(18,2))
+         ELSE CAST((5 + ROW_NUMBER() OVER (ORDER BY sw.WalletId) % 20) * 500000 AS DECIMAL(18,2)) END,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY sw.WalletId) % 3 = 0 THEN 'TUITION_PAYMENT'
+         WHEN ROW_NUMBER() OVER (ORDER BY sw.WalletId) % 3 = 1 THEN 'REFUND'
+         ELSE 'DEPOSIT' END,
+    CASE WHEN ROW_NUMBER() OVER (ORDER BY sw.WalletId) % 3 = 0 THEN N'Thanh toán học phí kỳ SP26'
+         WHEN ROW_NUMBER() OVER (ORDER BY sw.WalletId) % 3 = 1 THEN N'Hoàn tiền do huỷ đăng ký môn học'
+         ELSE N'Nạp tiền qua MoMo' END
+FROM dbo.StudentWallets sw
+CROSS JOIN (SELECT 1 AS x UNION ALL SELECT 2) dup
+ORDER BY sw.WalletId;
+GO
+
+-- =====================================================
+-- SEED: Gán tất cả Students vào lớp SE1801 và SE1802
+-- để test Quiz cho role Student
+-- =====================================================
+DECLARE @CS1 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1801');
+DECLARE @CS2 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1802');
+DECLARE @SemQ INT = (SELECT TOP 1 SemesterId FROM dbo.ClassSections WHERE ClassSectionId = @CS1);
+DECLARE @CourseQ INT = (SELECT TOP 1 CourseId FROM dbo.ClassSections WHERE ClassSectionId = @CS1);
+DECLARE @CourseQ2 INT = (SELECT TOP 1 CourseId FROM dbo.ClassSections WHERE ClassSectionId = @CS2);
+
+-- Enroll nửa đầu students vào SE1801, nửa sau vào SE1802
+INSERT INTO dbo.Enrollments (StudentId, ClassSectionId, SemesterId, CourseId, CreditsSnapshot, Status)
+SELECT s.StudentId, @CS1, @SemQ, @CourseQ, 3, 'ENROLLED'
+FROM dbo.Students s
+WHERE s.StudentId NOT IN (SELECT e.StudentId FROM dbo.Enrollments e WHERE e.ClassSectionId = @CS1)
+  AND s.StudentId % 2 = 1
+  AND NOT EXISTS (SELECT 1 FROM dbo.Enrollments ex WHERE ex.StudentId = s.StudentId AND ex.CourseId = @CourseQ AND ex.SemesterId = @SemQ);
+
+INSERT INTO dbo.Enrollments (StudentId, ClassSectionId, SemesterId, CourseId, CreditsSnapshot, Status)
+SELECT s.StudentId, @CS2, @SemQ, @CourseQ2, 3, 'ENROLLED'
+FROM dbo.Students s
+WHERE s.StudentId NOT IN (SELECT e.StudentId FROM dbo.Enrollments e WHERE e.ClassSectionId = @CS2)
+  AND s.StudentId % 2 = 0
+  AND NOT EXISTS (SELECT 1 FROM dbo.Enrollments ex WHERE ex.StudentId = s.StudentId AND ex.CourseId = @CourseQ2 AND ex.SemesterId = @SemQ);
+GO
+
+-- =====================================================
+-- SEED: Quizzes cho cả 2 lớp (Teacher quản lý, Student làm bài)
+-- =====================================================
+DECLARE @CS1Q INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1801');
+DECLARE @CS2Q INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1802');
+DECLARE @TeacherQ INT = (SELECT TOP 1 TeacherId FROM dbo.ClassSections WHERE ClassSectionId = @CS1Q);
+
+-- 10 Quizzes cho SE1801 (teacher quản lý)
+INSERT INTO dbo.Quizzes (ClassSectionId, CreatedBy, QuizTitle, Description, TotalQuestions, TimeLimitMin, ShuffleQuestions, ShuffleAnswers, StartAt, EndAt, Status) VALUES
+(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 1: C# Basics',        N'Bài kiểm tra kiến thức C# cơ bản',         10, 15, 1, 1, '2026-01-10', '2026-04-30', 'PUBLISHED'),
+(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 2: OOP',              N'Bài kiểm tra lập trình hướng đối tượng',   10, 20, 1, 1, '2026-01-15', '2026-04-30', 'PUBLISHED'),
+(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 3: LINQ',             N'Bài kiểm tra LINQ và lambda expressions',  10, 20, 1, 1, '2026-01-20', '2026-04-30', 'PUBLISHED'),
+(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 4: Entity Framework', N'Bài kiểm tra EF Core và migrations',       10, 30, 1, 1, '2026-02-01', '2026-04-30', 'PUBLISHED'),
+(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 5: ASP.NET Core MVC', N'Bài kiểm tra MVC pattern',                 10, 30, 1, 1, '2026-02-10', '2026-04-30', 'PUBLISHED'),
+(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 6: Razor Pages',      N'Bài kiểm tra Razor Pages',                 10, 25, 1, 1, '2026-02-15', '2026-04-30', 'DRAFT'),
+(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 7: SignalR',          N'Bài kiểm tra SignalR real-time',            10, 20, 1, 1, '2026-02-20', '2026-04-30', 'DRAFT'),
+(@CS1Q, @TeacherQ, N'PRN222 - Giữa kỳ',                             N'Bài kiểm tra giữa kỳ tổng hợp',           30, 60, 1, 1, '2026-03-01', '2026-04-30', 'PUBLISHED'),
+(@CS1Q, @TeacherQ, N'PRN222 - Quiz nhanh: Dependency Injection',     N'Quiz nhanh về DI container',               10, 10, 1, 1, '2026-03-10', '2026-04-30', 'CLOSED'),
+(@CS1Q, @TeacherQ, N'PRN222 - Cuối kỳ',                              N'Bài kiểm tra cuối kỳ',                    30, 90, 1, 1, '2026-04-01', '2026-04-30', 'DRAFT');
+
+-- 10 Quizzes cho SE1802
+INSERT INTO dbo.Quizzes (ClassSectionId, CreatedBy, QuizTitle, Description, TotalQuestions, TimeLimitMin, ShuffleQuestions, ShuffleAnswers, StartAt, EndAt, Status) VALUES
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz 1: Biến và kiểu dữ liệu',       N'Kiến thức cơ bản về biến',                 10, 15, 1, 1, '2026-01-10', '2026-04-30', 'PUBLISHED'),
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz 2: Mảng và Collections',         N'Bài kiểm tra về Array, List, Dictionary',  10, 20, 1, 1, '2026-01-15', '2026-04-30', 'PUBLISHED'),
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz 3: Exception Handling',          N'Bài kiểm tra xử lý ngoại lệ',             10, 15, 1, 1, '2026-01-20', '2026-04-30', 'PUBLISHED'),
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz 4: Async/Await',                 N'Bài kiểm tra lập trình bất đồng bộ',      10, 25, 1, 1, '2026-02-01', '2026-04-30', 'PUBLISHED'),
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz 5: Web API',                     N'Bài kiểm tra RESTful API',                 10, 30, 1, 1, '2026-02-10', '2026-04-30', 'PUBLISHED'),
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz 6: Authentication',              N'Bài kiểm tra JWT và Identity',             10, 20, 1, 1, '2026-02-15', '2026-04-30', 'DRAFT'),
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz 7: Unit Testing',                N'Bài kiểm tra xUnit và Moq',               10, 20, 1, 1, '2026-02-20', '2026-04-30', 'DRAFT'),
+(@CS2Q, @TeacherQ, N'PRN222 - Giữa kỳ lớp SE1802',                 N'Bài thi giữa kỳ',                         20, 45, 1, 1, '2026-03-01', '2026-04-30', 'PUBLISHED'),
+(@CS2Q, @TeacherQ, N'PRN222 - Quiz nhanh: Design Patterns',         N'Quiz nhanh về các design patterns',        10, 10, 1, 1, '2026-03-10', '2026-04-30', 'CLOSED'),
+(@CS2Q, @TeacherQ, N'PRN222 - Cuối kỳ lớp SE1802',                  N'Bài thi cuối kỳ',                         30, 90, 1, 1, '2026-04-01', '2026-04-30', 'DRAFT');
+GO
+
+-- =====================================================
+-- SEED: QuizQuestions (10 câu hỏi cho mỗi Quiz)
+-- =====================================================
+INSERT INTO dbo.QuizQuestions (QuizId, QuestionText, QuestionType, Points, SortOrder)
+SELECT 
+    q.QuizId,
+    N'[' + q.QuizTitle + N'] Câu ' + CAST(nums.n AS NVARCHAR(5)) + N': ' +
+    CASE nums.n
+        WHEN 1 THEN N'Đâu là cách khai báo biến đúng trong C#?'
+        WHEN 2 THEN N'Phương thức nào dùng để chuyển đổi kiểu dữ liệu?'
+        WHEN 3 THEN N'Từ khóa nào dùng để kế thừa class?'
+        WHEN 4 THEN N'Interface khác abstract class ở điểm nào?'
+        WHEN 5 THEN N'LINQ query syntax tương đương method syntax nào?'
+        WHEN 6 THEN N'DbContext trong EF Core có vai trò gì?'
+        WHEN 7 THEN N'Middleware trong ASP.NET Core hoạt động thế nào?'
+        WHEN 8 THEN N'Razor Pages khác MVC Controller ở đâu?'
+        WHEN 9 THEN N'SignalR sử dụng transport protocol nào?'
+        ELSE N'Dependency Injection giải quyết vấn đề gì?'
+    END,
+    CASE WHEN nums.n % 3 = 0 THEN 'TRUE_FALSE' ELSE 'MCQ' END,
+    1.00,
+    nums.n
+FROM dbo.Quizzes q
+CROSS JOIN (
+    SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
+    UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10
+) nums;
+GO
+
+-- =====================================================
+-- SEED: QuizAnswers (4 đáp án cho mỗi câu hỏi, đáp án 1 = đúng)
+-- =====================================================
+INSERT INTO dbo.QuizAnswers (QuestionId, AnswerText, IsCorrect)
+SELECT 
+    qq.QuestionId,
+    CASE ans.n
+        WHEN 1 THEN N'Đáp án A (Đúng): ' + LEFT(qq.QuestionText, 30)
+        WHEN 2 THEN N'Đáp án B: Không phải đáp án này'
+        WHEN 3 THEN N'Đáp án C: Câu trả lời sai'
+        ELSE N'Đáp án D: Lựa chọn không chính xác'
+    END,
+    CASE WHEN ans.n = 1 THEN 1 ELSE 0 END
+FROM dbo.QuizQuestions qq
+CROSS JOIN (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4) ans;
+GO
+
+-- =====================================================
+-- SEED: QuizAttempts (Tất cả students enrolled làm Quiz PUBLISHED/CLOSED)
+-- =====================================================
+INSERT INTO dbo.QuizAttempts (QuizId, EnrollmentId, ClassSectionId, StartedAt, SubmittedAt, Score, Status)
+SELECT 
+    q.QuizId,
+    e.EnrollmentId,
+    q.ClassSectionId,
+    DATEADD(HOUR, -2, SYSUTCDATETIME()),
+    CASE WHEN q.Status = 'CLOSED' THEN DATEADD(HOUR, -1, SYSUTCDATETIME()) ELSE NULL END,
+    CASE WHEN q.Status = 'CLOSED' THEN CAST(ABS(CHECKSUM(NEWID())) % 10 + 1 AS DECIMAL(5,2)) ELSE NULL END,
+    CASE WHEN q.Status = 'CLOSED' THEN 'GRADED' ELSE 'IN_PROGRESS' END
+FROM dbo.Quizzes q
+JOIN dbo.Enrollments e ON e.ClassSectionId = q.ClassSectionId
+WHERE q.Status = 'CLOSED'
+  AND e.Status = 'ENROLLED';
+GO
+
+-- =====================================================
+-- SEED: QuizAttemptAnswers (Submit cho các attempts GRADED)
+-- =====================================================
+INSERT INTO dbo.QuizAttemptAnswers (AttemptId, QuestionId, SelectedAnswerId, IsCorrect)
+SELECT 
+    qa.AttemptId,
+    qq.QuestionId,
+    (SELECT TOP 1 AnswerId FROM dbo.QuizAnswers a WHERE a.QuestionId = qq.QuestionId ORDER BY NEWID()),
+    CASE WHEN ABS(CHECKSUM(NEWID())) % 4 = 0 THEN 1 ELSE 0 END
+FROM dbo.QuizAttempts qa
+JOIN dbo.QuizQuestions qq ON qq.QuizId = qa.QuizId
+WHERE qa.Status = 'GRADED';
+GO
+
+-- =====================================================
+-- SEED: Chat (Tạo phòng chat cho lớp SE1801 và SE1802)
+-- =====================================================
+DECLARE @Class1 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1801');
+DECLARE @Class2 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1802');
+DECLARE @TchrId INT = (SELECT TOP 1 TeacherId FROM dbo.ClassSections WHERE ClassSectionId = @Class1);
+DECLARE @TchrUserId INT = (SELECT TOP 1 UserId FROM dbo.Users WHERE Role = 'TEACHER');
+
+-- Tạo 2 phòng chat cho 2 lớp
+INSERT INTO dbo.ChatRooms (RoomType, ClassSectionId, RoomName, Status, CreatedBy, CreatedAt) VALUES
+('CLASS', @Class1, N'Phòng học SE1801', 'ACTIVE', @TchrUserId, DATEADD(DAY, -10, SYSUTCDATETIME())),
+('CLASS', @Class2, N'Phòng học SE1802', 'ACTIVE', @TchrUserId, DATEADD(DAY, -10, SYSUTCDATETIME()));
+
+DECLARE @Room1 INT = (SELECT TOP 1 RoomId FROM dbo.ChatRooms WHERE ClassSectionId = @Class1);
+DECLARE @Room2 INT = (SELECT TOP 1 RoomId FROM dbo.ChatRooms WHERE ClassSectionId = @Class2);
+
+-- Thêm Teacher vào 2 phòng
+INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus, JoinedAt) VALUES
+(@Room1, @TchrUserId, 'OWNER', 'JOINED', DATEADD(DAY, -10, SYSUTCDATETIME())),
+(@Room2, @TchrUserId, 'OWNER', 'JOINED', DATEADD(DAY, -10, SYSUTCDATETIME()));
+
+-- Thêm Sinh viên vào phòng SE1801
+INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus, JoinedAt)
+SELECT @Room1, e.StudentId, 'MEMBER', 'JOINED', DATEADD(DAY, -9, SYSUTCDATETIME())
+FROM dbo.Enrollments e
+WHERE e.ClassSectionId = @Class1;
+
+-- Thêm Sinh viên vào phòng SE1802
+INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus, JoinedAt)
+SELECT @Room2, e.StudentId, 'MEMBER', 'JOINED', DATEADD(DAY, -9, SYSUTCDATETIME())
+FROM dbo.Enrollments e
+WHERE e.ClassSectionId = @Class2;
+GO
+
+-- =====================================================
+-- SEED: Messages (Tự động chat mẫu cho SE1801)
+-- =====================================================
+DECLARE @Class1 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1801');
+DECLARE @Room1 INT = (SELECT TOP 1 RoomId FROM dbo.ChatRooms WHERE ClassSectionId = @Class1);
+DECLARE @TchrUserId INT = (SELECT TOP 1 UserId FROM dbo.Users WHERE Role = 'TEACHER');
+DECLARE @StdUserId INT = (SELECT TOP 1 e.StudentId FROM dbo.Enrollments e WHERE e.ClassSectionId = @Class1);
+
+INSERT INTO dbo.ChatMessages (RoomId, SenderId, MessageType, Content, CreatedAt) VALUES
+(@Room1, @TchrUserId, 'TEXT', N'Chào các em, thầy đã upload quiz chương 1. Các em vào làm nhé.', DATEADD(DAY, -2, SYSUTCDATETIME())),
+(@Room1, @StdUserId,  'TEXT', N'Dạ vâng ạ.', DATEADD(MINUTE, 5, DATEADD(DAY, -2, SYSUTCDATETIME()))),
+(@Room1, @TchrUserId, 'TEXT', N'Hạn chót là cuối tháng nên đừng để quên nhen.', DATEADD(MINUTE, 10, DATEADD(DAY, -2, SYSUTCDATETIME()))),
+(@Room1, @StdUserId,  'TEXT', N'Đề quiz năm nay có ra thi cuối kỳ không thầy?', DATEADD(HOUR, 2,  DATEADD(DAY, -2, SYSUTCDATETIME()))),
+(@Room1, @TchrUserId, 'TEXT', N'Tất nhiên là có! Ôn tập kỹ nhé.', DATEADD(HOUR, 5,  DATEADD(DAY, -2, SYSUTCDATETIME())));
+GO
+
+PRINT 'Seed data inserted successfully!';

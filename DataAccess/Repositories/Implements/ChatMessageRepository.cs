@@ -18,6 +18,7 @@ public sealed class ChatMessageRepository : IChatMessageRepository
         var query = _context.ChatMessages
             .AsNoTracking()
             .Include(m => m.ChatMessageAttachments)
+            .Include(m => m.Sender)
             .Where(m => m.RoomId == roomId);
 
         if (beforeMessageId.HasValue)
@@ -37,6 +38,7 @@ public sealed class ChatMessageRepository : IChatMessageRepository
         return await _context.ChatMessages
             .AsNoTracking()
             .Include(m => m.ChatMessageAttachments)
+            .Include(m => m.Sender)
             .Where(m => m.RoomId == roomId)
             .OrderByDescending(m => m.CreatedAt)
             .ThenByDescending(m => m.MessageId)
@@ -47,6 +49,7 @@ public sealed class ChatMessageRepository : IChatMessageRepository
     {
         return await _context.ChatMessages
             .Include(m => m.ChatMessageAttachments)
+            .Include(m => m.Sender)
             .FirstOrDefaultAsync(m => m.MessageId == messageId);
     }
 

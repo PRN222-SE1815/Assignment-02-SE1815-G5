@@ -60,7 +60,13 @@ public sealed class ChatService : IChatService
     public async Task<List<ChatRoomDto>> GetMyRoomsAsync(int userId)
     {
         var rooms = await _roomRepo.ListRoomsForUserAsync(userId);
-        return rooms.Select(MapRoom).ToList();
+        var result = new List<ChatRoomDto>();
+        foreach(var room in rooms)
+        {
+            var membership = await _memberRepo.GetMembershipAsync(room.RoomId, userId);
+            result.Add(MapRoom(room, membership));
+        }
+        return result;
     }
 
     public async Task<ChatRoomDto?> GetRoomAsync(int roomId, int userId)
@@ -70,7 +76,7 @@ public sealed class ChatService : IChatService
             return null;
 
         var room = await _roomRepo.GetRoomByIdAsync(roomId);
-        return room is null ? null : MapRoom(room);
+        return room is null ? null : MapRoom(room, membership);
     }
 
     #endregion
@@ -237,21 +243,7 @@ public sealed class ChatService : IChatService
 
         if (!isSender)
         {
-            // Non-sender deletion requires OWNER/MODERATOR role + moderation log
-            var membership = await _memberRepo.GetMembershipAsync(roomId, userId);
-            if (membership is null || !IsOwnerOrModerator(membership))
-                return OperationResult.Fail("You can only delete your own messages, or be an OWNER/MODERATOR.", "FORBIDDEN");
-
-            await _moderationRepo.InsertModerationLogAsync(new ChatModerationLog
-            {
-                RoomId = roomId,
-                ActorUserId = userId,
-                Action = "DELETE_MESSAGE",
-                TargetUserId = message.SenderId,
-                TargetMessageId = messageId,
-                CreatedAt = DateTime.UtcNow
-            });
-            _logger.LogInformation("Moderator {UserId} deleted message {MessageId} by {SenderId}", userId, messageId, message.SenderId);
+            return OperationResult.Fail("You can only delete your own messages.", "FORBIDDEN");
         }
 
         await _messageRepo.SoftDeleteMessageAsync(messageId, DateTime.UtcNow);
@@ -494,7 +486,7 @@ public sealed class ChatService : IChatService
 
     #region Mapping
 
-    private static ChatRoomDto MapRoom(ChatRoom r) => new()
+    private static ChatRoomDto MapRoom(ChatRoom r, ChatRoomMember? m = null) => new()
     {
         RoomId = r.RoomId,
         RoomType = r.RoomType,
@@ -503,7 +495,9 @@ public sealed class ChatService : IChatService
         RoomName = r.RoomName,
         Status = r.Status,
         CreatedBy = r.CreatedBy,
-        CreatedAt = r.CreatedAt
+        CreatedAt = r.CreatedAt,
+        CurrentUserRole = m?.RoleInRoom,
+        CurrentMemberStatus = m?.MemberStatus
     };
 
     private static ChatMessageDto MapMessage(ChatMessage m,
@@ -512,6 +506,7 @@ public sealed class ChatService : IChatService
         MessageId = m.MessageId,
         RoomId = m.RoomId,
         SenderId = m.SenderId,
+        SenderName = m.Sender?.FullName ?? $"User #{m.SenderId}",
         MessageType = m.MessageType,
         Content = m.Content,
         CreatedAt = m.CreatedAt,

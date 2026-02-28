@@ -347,15 +347,16 @@
     opacity: 1;
 }
 
-/* Message actions (edit/delete) */
 .message-actions {
-    display: none;
+    display: flex;
+    opacity: 0;
+    transition: opacity 0.2s;
     gap: 2px;
     align-items: center;
 }
 
 .message-row:hover .message-actions {
-    display: flex;
+    opacity: 1;
 }
 
 .btn-msg-action {

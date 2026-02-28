@@ -59,6 +59,32 @@ public class QuizRepository : IQuizRepository
             .ToListAsync();
     }
 
+    public async Task<List<Quiz>> GetPublishedQuizzesForStudentAsync(int studentUserId)
+    {
+        var enrolledClassSectionIds = await _context.Enrollments
+            .AsNoTracking()
+            .Where(e => e.StudentId == studentUserId && (e.Status == "ENROLLED" || e.Status == "COMPLETED"))
+            .Select(e => e.ClassSectionId)
+            .ToListAsync();
+
+        return await _context.Quizzes
+            .AsNoTracking()
+            .Include(q => q.ClassSection)
+            .Where(q => enrolledClassSectionIds.Contains(q.ClassSectionId) && q.Status == "PUBLISHED")
+            .OrderByDescending(q => q.CreatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<List<Quiz>> GetQuizzesByTeacherIdAsync(int teacherUserId)
+    {
+        return await _context.Quizzes
+            .AsNoTracking()
+            .Include(q => q.ClassSection)
+            .Where(q => q.CreatedBy == teacherUserId)
+            .OrderByDescending(q => q.CreatedAt)
+            .ToListAsync();
+    }
+
     public async Task<int> GetQuestionCountAsync(int quizId)
     {
         return await _context.QuizQuestions
@@ -167,6 +193,54 @@ public class QuizRepository : IQuizRepository
     public void UpdateQuiz(Quiz quiz)
     {
         _context.Quizzes.Update(quiz);
+    }
+
+    public async Task DeleteQuizAsync(int quizId)
+    {
+        var quiz = await _context.Quizzes
+            .Include(q => q.QuizQuestions)
+                .ThenInclude(qq => qq.QuizAnswers)
+            .Include(q => q.QuizAttempts)
+                .ThenInclude(qa => qa.QuizAttemptAnswers)
+            .FirstOrDefaultAsync(q => q.QuizId == quizId);
+
+        if (quiz != null)
+        {
+            foreach (var attempt in quiz.QuizAttempts)
+                _context.QuizAttemptAnswers.RemoveRange(attempt.QuizAttemptAnswers);
+            _context.QuizAttempts.RemoveRange(quiz.QuizAttempts);
+
+            foreach (var question in quiz.QuizQuestions)
+                _context.QuizAnswers.RemoveRange(question.QuizAnswers);
+            _context.QuizQuestions.RemoveRange(quiz.QuizQuestions);
+
+            _context.Quizzes.Remove(quiz);
+        }
+    }
+
+    public async Task<QuizQuestion?> GetQuestionByIdAsync(int questionId)
+    {
+        return await _context.QuizQuestions
+            .Include(q => q.QuizAnswers)
+            .FirstOrDefaultAsync(q => q.QuestionId == questionId);
+    }
+
+    public void UpdateQuestion(QuizQuestion question)
+    {
+        _context.QuizQuestions.Update(question);
+    }
+
+    public async Task DeleteQuestionAsync(int questionId)
+    {
+        var question = await _context.QuizQuestions
+            .Include(q => q.QuizAnswers)
+            .FirstOrDefaultAsync(q => q.QuestionId == questionId);
+
+        if (question != null)
+        {
+            _context.QuizAnswers.RemoveRange(question.QuizAnswers);
+            _context.QuizQuestions.Remove(question);
+        }
     }
 
     public async Task<QuizAttempt> CreateAttemptAsync(QuizAttempt attempt)

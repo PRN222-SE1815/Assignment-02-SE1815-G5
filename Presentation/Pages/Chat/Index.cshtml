@@ -7,6 +7,16 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/Chat/chat.css" asp-append-version="true" />
+    <style>
+        .app-content {
+            padding: 0 !important;
+        }
+        .chat-container {
+            height: calc(100vh - var(--header-height)) !important;
+            max-height: calc(100vh - var(--header-height)) !important;
+            border-radius: 0;
+        }
+    </style>
 }
 
 <div class="chat-container">
@@ -116,7 +126,7 @@
                                 {
                                     @if (!isMine)
                                     {
-                                        <span class="message-sender">User #@msg.SenderId</span>
+                                        <span class="message-sender">@msg.SenderName</span>
                                     }
                                     <span class="message-content">@msg.Content</span>
                                     @if (msg.Attachments.Count > 0)
@@ -137,17 +147,27 @@
                                 }
                                 <span class="message-time">@msg.CreatedAt.ToString("MMM dd, HH:mm")</span>
                             </div>
-                            @if (isMine && !isDeleted)
+                            @{
+                                var canDelete = (!isDeleted) && isMine;
+                                var canEdit = (!isDeleted) && isMine;
+                            }
+                            @if (canEdit || canDelete)
                             {
                                 <div class="message-actions">
-                                    <button type="button" class="btn-msg-action" title="Edit"
-                                            onclick="startEditMessage(@msg.MessageId)">
-                                        <i class="fas fa-pen"></i>
-                                    </button>
-                                    <button type="button" class="btn-msg-action btn-danger" title="Delete"
-                                            onclick="deleteMessage(@msg.MessageId)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
+                                    @if(canEdit)
+                                    {
+                                        <button type="button" class="btn-msg-action" title="Edit"
+                                                onclick="startEditMessage(@msg.MessageId)">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                    }
+                                    @if(canDelete)
+                                    {
+                                        <button type="button" class="btn-msg-action btn-danger" title="Delete"
+                                                onclick="deleteMessage(@msg.MessageId)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    }
                                 </div>
                             }
                         </div>
@@ -244,6 +264,7 @@
 <!-- Hidden data for JS -->
 <input type="hidden" id="currentUserId" value="@Model.CurrentUserId" />
 <input type="hidden" id="selectedRoomId" value="@(Model.SelectedRoom?.RoomId ?? 0)" />
+<input type="hidden" id="currentUserRole" value="@(Model.SelectedRoom?.CurrentUserRole ?? "")" />
 
 <script src="~/lib/microsoft/signalr/dist/browser/signalr.min.js" asp-append-version="true"></script>
 <script src="~/js/chat.js" asp-append-version="true"></script>

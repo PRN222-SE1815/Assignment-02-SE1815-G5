@@ -34,6 +34,16 @@ public interface IQuizRepository
     Task<List<Quiz>> GetPublishedQuizzesForClassAsync(int classSectionId);
 
     /// <summary>
+    /// Get published quizzes across all active enrollments for a student.
+    /// </summary>
+    Task<List<Quiz>> GetPublishedQuizzesForStudentAsync(int studentUserId);
+
+    /// <summary>
+    /// Get all quizzes created by a specific teacher (all statuses).
+    /// </summary>
+    Task<List<Quiz>> GetQuizzesByTeacherIdAsync(int teacherUserId);
+
+    /// <summary>
     /// Get question count for a quiz.
     /// </summary>
     Task<int> GetQuestionCountAsync(int quizId);
@@ -86,6 +96,10 @@ public interface IQuizRepository
     Task<QuizQuestion> CreateQuestionAsync(QuizQuestion question);
     Task CreateAnswersAsync(IEnumerable<QuizAnswer> answers);
     void UpdateQuiz(Quiz quiz);
+    Task DeleteQuizAsync(int quizId);
+    Task<QuizQuestion?> GetQuestionByIdAsync(int questionId);
+    void UpdateQuestion(QuizQuestion question);
+    Task DeleteQuestionAsync(int questionId);
     Task<QuizAttempt> CreateAttemptAsync(QuizAttempt attempt);
     void UpdateAttempt(QuizAttempt attempt);
     Task CreateAttemptAnswersAsync(IEnumerable<QuizAttemptAnswer> answers);
