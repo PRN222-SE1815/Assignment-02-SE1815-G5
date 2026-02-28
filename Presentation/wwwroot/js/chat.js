@@ -259,12 +259,8 @@ function buildMessageElement(msg) {
 
     let actionsHtml = "";
     
-    const roleInput = document.getElementById("currentUserRole");
-    const currentUserRole = roleInput ? roleInput.value : "";
-    const isOwnerOrMod = currentUserRole === "OWNER" || currentUserRole === "MODERATOR";
-    
     const canEdit = !isDeleted && isMine;
-    const canDelete = !isDeleted && (isMine || isOwnerOrMod);
+    const canDelete = !isDeleted && isMine;
 
     if (canEdit || canDelete) {
         actionsHtml = `<div class="message-actions">`;

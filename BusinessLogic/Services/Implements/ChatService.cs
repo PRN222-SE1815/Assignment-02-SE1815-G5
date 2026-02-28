@@ -243,21 +243,7 @@ public sealed class ChatService : IChatService
 
         if (!isSender)
         {
-            // Non-sender deletion requires OWNER/MODERATOR role + moderation log
-            var membership = await _memberRepo.GetMembershipAsync(roomId, userId);
-            if (membership is null || !IsOwnerOrModerator(membership))
-                return OperationResult.Fail("You can only delete your own messages, or be an OWNER/MODERATOR.", "FORBIDDEN");
-
-            await _moderationRepo.InsertModerationLogAsync(new ChatModerationLog
-            {
-                RoomId = roomId,
-                ActorUserId = userId,
-                Action = "DELETE_MESSAGE",
-                TargetUserId = message.SenderId,
-                TargetMessageId = messageId,
-                CreatedAt = DateTime.UtcNow
-            });
-            _logger.LogInformation("Moderator {UserId} deleted message {MessageId} by {SenderId}", userId, messageId, message.SenderId);
+            return OperationResult.Fail("You can only delete your own messages.", "FORBIDDEN");
         }
 
         await _messageRepo.SoftDeleteMessageAsync(messageId, DateTime.UtcNow);

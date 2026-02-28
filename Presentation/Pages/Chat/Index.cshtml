@@ -7,6 +7,16 @@
 
 @section Styles {
     <link rel="stylesheet" href="~/css/Chat/chat.css" asp-append-version="true" />
+    <style>
+        .app-content {
+            padding: 0 !important;
+        }
+        .chat-container {
+            height: calc(100vh - var(--header-height)) !important;
+            max-height: calc(100vh - var(--header-height)) !important;
+            border-radius: 0;
+        }
+    </style>
 }
 
 <div class="chat-container">
@@ -138,8 +148,7 @@
                                 <span class="message-time">@msg.CreatedAt.ToString("MMM dd, HH:mm")</span>
                             </div>
                             @{
-                                var isOwnerOrMod = Model.SelectedRoom.CurrentUserRole == "OWNER" || Model.SelectedRoom.CurrentUserRole == "MODERATOR";
-                                var canDelete = (!isDeleted) && (isMine || isOwnerOrMod);
+                                var canDelete = (!isDeleted) && isMine;
                                 var canEdit = (!isDeleted) && isMine;
                             }
                             @if (canEdit || canDelete)
