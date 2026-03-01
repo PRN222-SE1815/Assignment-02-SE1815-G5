@@ -5,7 +5,9 @@ using DataAccess;
 using DataAccess.Repositories.Implements;
 using DataAccess.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Presentation.Hubs;
 using Presentation.Realtime;
 
@@ -15,8 +17,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SchoolManagementDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// MoMo settings
+// Settings
 builder.Services.Configure<MoMoSettings>(builder.Configuration.GetSection(MoMoSettings.SectionName));
+builder.Services.Configure<ReliabilitySettings>(builder.Configuration.GetSection(ReliabilitySettings.SectionName));
 builder.Services.AddHttpClient();
 
 // DI for services
@@ -31,6 +34,8 @@ builder.Services.AddScoped<ITeacherScheduleService, TeacherScheduleService>();
 builder.Services.AddScoped<IAdminScheduleService, AdminScheduleService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<INotificationRealtimePublisher, SignalRNotificationRealtimePublisher>();
+builder.Services.AddScoped<IGradebookService, GradebookService>();
+builder.Services.AddScoped<IGradebookSyncService, GradebookSyncService>();
 
 // DI for repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -50,6 +55,7 @@ builder.Services.AddScoped<IChatMessageAttachmentRepository, ChatMessageAttachme
 builder.Services.AddScoped<IChatModerationLogRepository, ChatModerationLogRepository>();
 builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IGradeBookRepository, GradeBookRepository>();
 
 
 // ==================== Razor Pages ====================

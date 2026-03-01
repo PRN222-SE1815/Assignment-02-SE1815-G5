@@ -285,10 +285,6 @@ ALTER TABLE dbo.GradeBooks
 ADD CONSTRAINT UQ_GradeBooks_ClassSection UNIQUE (ClassSectionId);
 GO
 
-ALTER TABLE dbo.GradeBooks
-ADD CONSTRAINT CK_GradeBooks_Status CHECK (Status IN (N'DRAFT', N'PUBLISHED', N'LOCKED', N'ARCHIVED'));
-GO
-
 -- Bảng lưu lịch sử yêu cầu/duyệt (Optional nhưng recommend)
 CREATE TABLE dbo.GradeBookApprovals (
     ApprovalId INT IDENTITY(1,1) PRIMARY KEY,
@@ -302,6 +298,120 @@ CREATE TABLE dbo.GradeBookApprovals (
     ResponseMessage NVARCHAR(500), -- Lý do reject
     Outcome NVARCHAR(20) NULL -- APPROVED / REJECTED
 );
+GO
+
+/* Phase 1 alignment: Gradebook workflow statuses + approval constraints/indexes */
+IF EXISTS (
+    SELECT 1
+    FROM sys.check_constraints
+    WHERE name = N'CK_GradeBooks_Status'
+      AND parent_object_id = OBJECT_ID(N'dbo.GradeBooks')
+)
+BEGIN
+    ALTER TABLE dbo.GradeBooks DROP CONSTRAINT CK_GradeBooks_Status;
+END
+GO
+
+ALTER TABLE dbo.GradeBooks
+ADD CONSTRAINT CK_GradeBooks_Status
+CHECK (Status IN (N'DRAFT', N'PENDING_APPROVAL', N'REJECTED', N'PUBLISHED', N'LOCKED', N'ARCHIVED'));
+GO
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = N'IX_GradeBooks_Status_ClassSection'
+      AND object_id = OBJECT_ID(N'dbo.GradeBooks')
+)
+BEGIN
+    DROP INDEX IX_GradeBooks_Status_ClassSection ON dbo.GradeBooks;
+END
+GO
+
+CREATE INDEX IX_GradeBooks_Status_ClassSection ON dbo.GradeBooks(Status, ClassSectionId);
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.foreign_keys
+    WHERE name = N'FK_GradeBookApprovals_GradeBooks'
+)
+BEGIN
+    ALTER TABLE dbo.GradeBookApprovals
+    ADD CONSTRAINT FK_GradeBookApprovals_GradeBooks
+        FOREIGN KEY (GradeBookId) REFERENCES dbo.GradeBooks(GradeBookId);
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.foreign_keys
+    WHERE name = N'FK_GradeBookApprovals_RequestBy'
+)
+BEGIN
+    ALTER TABLE dbo.GradeBookApprovals
+    ADD CONSTRAINT FK_GradeBookApprovals_RequestBy
+        FOREIGN KEY (RequestBy) REFERENCES dbo.Users(UserId);
+END
+GO
+
+IF NOT EXISTS (
+    SELECT 1
+    FROM sys.foreign_keys
+    WHERE name = N'FK_GradeBookApprovals_ResponseBy'
+)
+BEGIN
+    ALTER TABLE dbo.GradeBookApprovals
+    ADD CONSTRAINT FK_GradeBookApprovals_ResponseBy
+        FOREIGN KEY (ResponseBy) REFERENCES dbo.Users(UserId);
+END
+GO
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.check_constraints
+    WHERE name = N'CK_GradeBookApprovals_Outcome'
+      AND parent_object_id = OBJECT_ID(N'dbo.GradeBookApprovals')
+)
+BEGIN
+    ALTER TABLE dbo.GradeBookApprovals DROP CONSTRAINT CK_GradeBookApprovals_Outcome;
+END
+GO
+
+ALTER TABLE dbo.GradeBookApprovals
+ADD CONSTRAINT CK_GradeBookApprovals_Outcome
+CHECK (Outcome IS NULL OR Outcome IN (N'APPROVED', N'REJECTED'));
+GO
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = N'IX_GradeBookApprovals_GradeBookId_RequestAt'
+      AND object_id = OBJECT_ID(N'dbo.GradeBookApprovals')
+)
+BEGIN
+    DROP INDEX IX_GradeBookApprovals_GradeBookId_RequestAt ON dbo.GradeBookApprovals;
+END
+GO
+
+CREATE INDEX IX_GradeBookApprovals_GradeBookId_RequestAt
+ON dbo.GradeBookApprovals(GradeBookId, RequestAt DESC);
+GO
+
+IF EXISTS (
+    SELECT 1
+    FROM sys.indexes
+    WHERE name = N'IX_GradeBookApprovals_Outcome'
+      AND object_id = OBJECT_ID(N'dbo.GradeBookApprovals')
+)
+BEGIN
+    DROP INDEX IX_GradeBookApprovals_Outcome ON dbo.GradeBookApprovals;
+END
+GO
+
+CREATE INDEX IX_GradeBookApprovals_Outcome
+ON dbo.GradeBookApprovals(Outcome);
+GO
 
 CREATE TABLE dbo.GradeItems (
     GradeItemId    INT IDENTITY(1,1) NOT NULL CONSTRAINT PK_GradeItems PRIMARY KEY,

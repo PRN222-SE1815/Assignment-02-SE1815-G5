@@ -19,12 +19,18 @@ public sealed class NotificationHub : Hub
         var userId = GetUserId();
         if (userId <= 0)
         {
+            _logger.LogWarning("NotificationHub connection rejected - invalid user claim. ConnectionId={ConnectionId}", Context.ConnectionId);
             Context.Abort();
             return;
         }
 
+        var correlationId = Context.GetHttpContext()?.Request.Headers["X-Correlation-Id"].FirstOrDefault()
+            ?? Context.ConnectionId;
+
         await Groups.AddToGroupAsync(Context.ConnectionId, $"user:{userId}");
-        _logger.LogInformation("User {UserId} connected to NotificationHub ({ConnectionId})", userId, Context.ConnectionId);
+        _logger.LogInformation(
+            "NotificationHub connected. UserId={UserId}, ConnectionId={ConnectionId}, CorrelationId={CorrelationId}",
+            userId, Context.ConnectionId, correlationId);
 
         await base.OnConnectedAsync();
     }
@@ -35,6 +41,19 @@ public sealed class NotificationHub : Hub
         if (userId > 0)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"user:{userId}");
+        }
+
+        if (exception is not null)
+        {
+            _logger.LogWarning(exception,
+                "NotificationHub disconnected with error. UserId={UserId}, ConnectionId={ConnectionId}",
+                userId, Context.ConnectionId);
+        }
+        else
+        {
+            _logger.LogInformation(
+                "NotificationHub disconnected. UserId={UserId}, ConnectionId={ConnectionId}",
+                userId, Context.ConnectionId);
         }
 
         await base.OnDisconnectedAsync(exception);
