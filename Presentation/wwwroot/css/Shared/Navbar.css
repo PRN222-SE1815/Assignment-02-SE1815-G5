@@ -155,6 +155,38 @@ body[data-role="STUDENT"] .nav-link:hover {
     position: relative;
 }
 
+/* Wallet Badge */
+.navbar-wallet-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+    color: #ffffff;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.navbar-wallet-badge:hover {
+    background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    color: #ffffff;
+}
+
+.navbar-wallet-icon {
+    font-size: 14px;
+    color: #FDE68A;
+}
+
+.navbar-wallet-amount {
+    letter-spacing: 0.3px;
+}
+
 .bell-btn {
     display: flex;
     align-items: center;
@@ -398,6 +430,11 @@ body[data-role="ADMIN"] .bell-btn:hover {
 
     .user-info {
         display: none;
+    }
+
+    .navbar-wallet-badge {
+        padding: 5px 10px;
+        font-size: 12px;
     }
 
     .notification-panel {

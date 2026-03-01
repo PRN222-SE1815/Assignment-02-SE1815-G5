@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>553e2b04-02ab-4bfa-9d14-e542a3e3ded2</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,11 +14,8 @@
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Pages\CourseManagement\" />
-    <Folder Include="Areas\Admin\Pages\ClassManagement\" />
     <Folder Include="Areas\Admin\Pages\ScheduleManagement\" />
     <Folder Include="Areas\Admin\Pages\UserManagement\" />
-    <Folder Include="Areas\Student\Pages\CourseRegistration\" />
-    <Folder Include="Areas\Student\Pages\Wallet\" />
     <Folder Include="Areas\Student\Pages\StudentGrade\" />
     <Folder Include="Areas\Student\Pages\StudentQuiz\" />
     <Folder Include="Areas\Student\Pages\StudentSchedule\" />
@@ -25,10 +23,10 @@
     <Folder Include="Areas\Teacher\Pages\TeacherQuiz\" />
     <Folder Include="Areas\Teacher\Pages\TeacherGrade\" />
     <Folder Include="Pages\AI\" />
-    <Folder Include="wwwroot\css\Admin\ClassManagement\" />
     <Folder Include="wwwroot\css\Admin\CourseManagement\" />
     <Folder Include="wwwroot\css\Admin\ScheduleManagement\" />
     <Folder Include="wwwroot\css\Admin\UserManagement\" />
+    <Folder Include="wwwroot\css\Chat\" />
     <Folder Include="wwwroot\css\Student\CourseRegistration\" />
     <Folder Include="wwwroot\css\Student\StudentGrade\" />
     <Folder Include="wwwroot\css\Student\StudentQuiz\" />
