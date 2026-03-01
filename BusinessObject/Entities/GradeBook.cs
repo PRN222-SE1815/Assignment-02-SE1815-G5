@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace BusinessObject.Entities;
 
 [Index("ClassSectionId", Name = "UQ_GradeBooks_ClassSection", IsUnique = true)]
+[Index("Status", "ClassSectionId", Name = "IX_GradeBooks_Status_ClassSection")]
 public partial class GradeBook
 {
     [Key]
@@ -37,4 +38,7 @@ public partial class GradeBook
 
     [InverseProperty("GradeBook")]
     public virtual ICollection<GradeItem> GradeItems { get; set; } = new List<GradeItem>();
+
+    [InverseProperty("GradeBook")]
+    public virtual ICollection<GradeBookApproval> GradeBookApprovals { get; set; } = new List<GradeBookApproval>();
 }

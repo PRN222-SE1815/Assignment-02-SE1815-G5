@@ -14,4 +14,5 @@ public interface IUserRepository
     Task<(IReadOnlyList<User> Users, int TotalCount)> GetUsersAsync(string? role, string? search, int page, int pageSize);
     Task UpdateUserAsync(User user);
     Task<IReadOnlyList<User>> SearchActiveUsersAsync(string? search, int excludeUserId, int limit);
+    Task<IReadOnlyList<int>> GetActiveUserIdsByRoleAsync(string role, CancellationToken ct = default);
 }

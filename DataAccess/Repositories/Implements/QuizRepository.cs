@@ -171,6 +171,41 @@ public class QuizRepository : IQuizRepository
             .AnyAsync(a => a.QuizId == quizId && a.EnrollmentId == enrollmentId);
     }
 
+    public async Task<QuizAttempt?> GetAttemptForGradeSyncAsync(int attemptId, CancellationToken ct = default)
+    {
+        return await _context.QuizAttempts
+            .AsNoTracking()
+            .Include(a => a.Quiz)
+                .ThenInclude(q => q.ClassSection)
+            .Include(a => a.Enrollment)
+            .FirstOrDefaultAsync(a => a.AttemptId == attemptId, ct);
+    }
+
+    public async Task<QuizAttempt?> GetLatestGradedAttemptByQuizAndEnrollmentAsync(int quizId, int enrollmentId, CancellationToken ct = default)
+    {
+        return await _context.QuizAttempts
+            .AsNoTracking()
+            .Include(a => a.Quiz)
+                .ThenInclude(q => q.ClassSection)
+            .Include(a => a.Enrollment)
+            .Where(a => a.QuizId == quizId
+                && a.EnrollmentId == enrollmentId
+                && a.Status == "GRADED")
+            .OrderByDescending(a => a.SubmittedAt ?? DateTime.MinValue)
+            .ThenByDescending(a => a.AttemptId)
+            .FirstOrDefaultAsync(ct);
+    }
+
+    public async Task<GradeItem?> FindGradeItemForQuizAsync(int gradeBookId, int quizId, CancellationToken ct = default)
+    {
+        var mappingName = $"QUIZ:{quizId}";
+
+        return await _context.GradeItems
+            .AsNoTracking()
+            .Where(gi => gi.GradeBookId == gradeBookId)
+            .FirstOrDefaultAsync(gi => gi.ItemName.ToUpper() == mappingName.ToUpper(), ct);
+    }
+
     // ==================== Create/Update ====================
 
     public async Task<Quiz> CreateQuizAsync(Quiz quiz)

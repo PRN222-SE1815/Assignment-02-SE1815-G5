@@ -15,19 +15,15 @@
   <ItemGroup>
     <Folder Include="Areas\Admin\Pages\CourseManagement\" />
     <Folder Include="Areas\Admin\Pages\UserManagement\" />
-    <Folder Include="Areas\Student\Pages\StudentGrade\" />
     <Folder Include="Areas\Student\Pages\StudentQuiz\" />
     <Folder Include="Areas\Teacher\Pages\TeacherQuiz\" />
-    <Folder Include="Areas\Teacher\Pages\TeacherGrade\" />
     <Folder Include="Pages\AI\" />
     <Folder Include="wwwroot\css\Admin\CourseManagement\" />
     <Folder Include="wwwroot\css\Admin\UserManagement\" />
     <Folder Include="wwwroot\css\Chat\" />
     <Folder Include="wwwroot\css\Student\CourseRegistration\" />
-    <Folder Include="wwwroot\css\Student\StudentGrade\" />
     <Folder Include="wwwroot\css\Student\StudentQuiz\" />
     <Folder Include="wwwroot\css\Student\Wallet\" />
-    <Folder Include="wwwroot\css\Teacher\TeacherGrade\" />
     <Folder Include="wwwroot\css\Teacher\TeacherQuiz\" />
     <Folder Include="wwwroot\css\Teacher\TeacherSchedule\" />
   </ItemGroup>

@@ -1,4 +1,5 @@
 ﻿using BusinessLogic.DTOs.Requests.Quiz;
+using BusinessLogic.DTOs.Requests.Gradebook;
 using BusinessLogic.DTOs.Responses.Quiz;
 using BusinessLogic.Exceptions;
 using BusinessLogic.Services.Interfaces;
@@ -14,6 +15,7 @@ public class QuizService : IQuizService
 {
     private readonly IQuizRepository _quizRepo;
     private readonly IEnrollmentRepository _enrollmentRepo;
+    private readonly IGradebookSyncService _gradebookSyncService;
     private readonly SchoolManagementDbContext _dbContext;
     private readonly ILogger<QuizService> _logger;
 
@@ -26,6 +28,7 @@ public class QuizService : IQuizService
     private const string STATUS_CLOSED = "CLOSED";
     private const string ATTEMPT_IN_PROGRESS = "IN_PROGRESS";
     private const string ATTEMPT_SUBMITTED = "SUBMITTED";
+    private const string ATTEMPT_GRADED = "GRADED";
 
     // Role constants
     private const string ROLE_TEACHER = "TEACHER";
@@ -38,11 +41,13 @@ public class QuizService : IQuizService
     public QuizService(
         IQuizRepository quizRepo,
         IEnrollmentRepository enrollmentRepo,
+        IGradebookSyncService gradebookSyncService,
         SchoolManagementDbContext dbContext,
         ILogger<QuizService> logger)
     {
         _quizRepo = quizRepo;
         _enrollmentRepo = enrollmentRepo;
+        _gradebookSyncService = gradebookSyncService;
         _dbContext = dbContext;
         _logger = logger;
     }
@@ -692,7 +697,7 @@ public class QuizService : IQuizService
         }
 
         // 8. Update attempt
-        attempt.Status = ATTEMPT_SUBMITTED;
+        attempt.Status = ATTEMPT_GRADED;
         attempt.SubmittedAt = nowUtc;
         attempt.Score = totalScore;
 
@@ -703,13 +708,34 @@ public class QuizService : IQuizService
         _logger.LogInformation("Student {StudentId} submitted attempt {AttemptId}. Score: {Score}, Correct: {Correct}/{Total}",
             studentUserId, request.AttemptId, totalScore, correctCount, validQuestionIds.Count);
 
+        string? syncWarning = null;
+        var syncResult = await _gradebookSyncService.SyncQuizAttemptScoreAsync(
+            new SyncQuizScoreRequest
+            {
+                AttemptId = request.AttemptId,
+                ActorUserId = studentUserId,
+                Reason = "QUIZ_AUTO_GRADED"
+            },
+            CancellationToken.None);
+
+        if (!syncResult.IsSuccess)
+        {
+            syncWarning = $"Gradebook sync failed: {syncResult.ErrorCode}";
+            _logger.LogWarning(
+                "Gradebook sync failed for AttemptId={AttemptId}, ErrorCode={ErrorCode}, Message={Message}",
+                request.AttemptId,
+                syncResult.ErrorCode,
+                syncResult.Message);
+        }
+
         return new SubmitAttemptResponse
         {
             AttemptId = request.AttemptId,
             Score = totalScore,
             CorrectCount = correctCount,
             TotalCount = validQuestionIds.Count,
-            SubmittedAt = nowUtc
+            SubmittedAt = nowUtc,
+            WarningMessage = syncWarning
         };
     }
 

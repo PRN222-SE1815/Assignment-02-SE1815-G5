@@ -154,4 +154,14 @@ public sealed class EnrollmentRepository : IEnrollmentRepository
                            && e.CourseId == courseId
                            && e.Status == "ENROLLED");
     }
+
+    public async Task<IReadOnlyList<int>> GetEnrolledStudentUserIdsAsync(int classSectionId, CancellationToken ct = default)
+    {
+        return await _context.Enrollments
+            .AsNoTracking()
+            .Where(e => e.ClassSectionId == classSectionId && e.Status == "ENROLLED")
+            .Select(e => e.StudentId)
+            .Distinct()
+            .ToListAsync(ct);
+    }
 }

@@ -140,4 +140,13 @@ public sealed class UserRepository : IUserRepository
             .Take(limit)
             .ToListAsync();
     }
+
+    public async Task<IReadOnlyList<int>> GetActiveUserIdsByRoleAsync(string role, CancellationToken ct = default)
+    {
+        return await _context.Users
+            .AsNoTracking()
+            .Where(u => u.IsActive && u.Role == role)
+            .Select(u => u.UserId)
+            .ToListAsync(ct);
+    }
 }

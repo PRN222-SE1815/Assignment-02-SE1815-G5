@@ -3,6 +3,7 @@ namespace BusinessLogic.DTOs.Response;
 public sealed class MyCourseItemDto
 {
     public int EnrollmentId { get; set; }
+    public int ClassSectionId { get; set; }
     public string CourseCode { get; set; } = string.Empty;
     public string CourseName { get; set; } = string.Empty;
     public int Credits { get; set; }

@@ -1,0 +1,90 @@
+@page
+@model Presentation.Areas.Admin.Pages.GradebookManagement.IndexModel
+@{
+    ViewData["Title"] = "Gradebook Management";
+}
+
+<section class="admin-gradebook-page">
+    <div class="admin-gradebook-container">
+        <div class="page-header">
+            <div class="header-content">
+                <h1 class="page-title"><i class="fas fa-clipboard-check"></i> Gradebook Management</h1>
+                <p class="page-subtitle">Search gradebooks by class section and review pending approvals.</p>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i> @Model.SuccessMessage
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage
+            </div>
+        }
+
+        <div class="search-section">
+            <form method="get" class="search-form">
+                <label for="SearchClassSectionId">Class Section ID:</label>
+                <input type="number" id="SearchClassSectionId" name="SearchClassSectionId"
+                       value="@Model.SearchClassSectionId" min="1" class="input-field" placeholder="Enter ID..." />
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Search</button>
+            </form>
+        </div>
+
+        @if (Model.SearchResult is not null)
+        {
+            var gb = Model.SearchResult;
+            <div class="result-card">
+                <div class="result-header">
+                    <div class="result-info">
+                        <span class="result-label">Gradebook #@gb.GradeBookId</span>
+                        <span class="result-label">Class Section #@gb.ClassSectionId</span>
+                        <span class="status-badge status-@gb.Status.ToLower().Replace("_", "-")">@gb.Status</span>
+                        <span class="result-label">Version: @gb.Version</span>
+                    </div>
+                    <div class="result-actions">
+                        @if (string.Equals(gb.Status, "PENDING_APPROVAL", StringComparison.OrdinalIgnoreCase))
+                        {
+                            <a asp-page="Review" asp-route-classSectionId="@gb.ClassSectionId" class="btn btn-review">
+                                <i class="fas fa-eye"></i> Review & Decide
+                            </a>
+                        }
+                        else
+                        {
+                            <a asp-page="Review" asp-route-classSectionId="@gb.ClassSectionId" class="btn btn-secondary">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                        }
+                    </div>
+                </div>
+                <div class="result-summary">
+                    <span><i class="fas fa-list"></i> @gb.GradeItems.Count grade item(s)</span>
+                    <span><i class="fas fa-pen"></i> @gb.GradeEntries.Count grade entry(ies)</span>
+                </div>
+            </div>
+        }
+        else if (Model.SearchClassSectionId.HasValue)
+        {
+            <div class="empty-state">
+                <i class="fas fa-folder-open"></i>
+                <p>No gradebook found for Class Section #@Model.SearchClassSectionId.</p>
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-search"></i>
+                <p>Enter a Class Section ID to search for gradebooks.</p>
+            </div>
+        }
+    </div>
+</section>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Admin/GradebookManagement/Index.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+}
