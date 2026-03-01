@@ -285,6 +285,8 @@ public partial class SchoolManagementDbContext : DbContext
 
         modelBuilder.Entity<GradeBook>(entity =>
         {
+            entity.HasIndex(e => new { e.Status, e.ClassSectionId }, "IX_GradeBooks_Status_ClassSection");
+
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())");
             entity.Property(e => e.Status).HasDefaultValue("DRAFT");
             entity.Property(e => e.Version).HasDefaultValue(1);
@@ -298,7 +300,22 @@ public partial class SchoolManagementDbContext : DbContext
         {
             entity.HasKey(e => e.ApprovalId).HasName("PK__GradeBoo__328477F4F70674EC");
 
+            entity.HasIndex(e => new { e.GradeBookId, e.RequestAt }, "IX_GradeBookApprovals_GradeBookId_RequestAt")
+                .IsDescending(false, true);
+
+            entity.HasIndex(e => e.Outcome, "IX_GradeBookApprovals_Outcome");
+
             entity.Property(e => e.RequestAt).HasDefaultValueSql("(sysutcdatetime())");
+
+            entity.HasOne(d => d.GradeBook).WithMany(p => p.GradeBookApprovals)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_GradeBookApprovals_GradeBooks");
+
+            entity.HasOne(d => d.RequestByNavigation).WithMany(p => p.GradeBookApprovalRequestByNavigations)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_GradeBookApprovals_RequestBy");
+
+            entity.HasOne(d => d.ResponseByNavigation).WithMany(p => p.GradeBookApprovalResponseByNavigations).HasConstraintName("FK_GradeBookApprovals_ResponseBy");
         });
 
         modelBuilder.Entity<GradeEntry>(entity =>

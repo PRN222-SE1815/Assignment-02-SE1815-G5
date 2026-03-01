@@ -7,6 +7,7 @@ using DataAccess.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Presentation.Hubs;
+using Presentation.Realtime;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,11 @@ builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IQuizService, QuizService>();
 builder.Services.AddScoped<IChatService, ChatService>();
+builder.Services.AddScoped<IStudentScheduleService, StudentScheduleService>();
+builder.Services.AddScoped<ITeacherScheduleService, TeacherScheduleService>();
+builder.Services.AddScoped<IAdminScheduleService, AdminScheduleService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<INotificationRealtimePublisher, SignalRNotificationRealtimePublisher>();
 
 // DI for repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -42,9 +48,8 @@ builder.Services.AddScoped<IChatRoomMemberRepository, ChatRoomMemberRepository>(
 builder.Services.AddScoped<IChatMessageRepository, ChatMessageRepository>();
 builder.Services.AddScoped<IChatMessageAttachmentRepository, ChatMessageAttachmentRepository>();
 builder.Services.AddScoped<IChatModerationLogRepository, ChatModerationLogRepository>();
-
-
-builder.Services.AddScoped<IClassSectionRepository, ClassSectionRepository>();
+builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 
 
 // ==================== Razor Pages ====================
@@ -88,5 +93,6 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapHub<ChatHub>("/chatHub");
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.Run();
