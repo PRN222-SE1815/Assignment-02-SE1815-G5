@@ -1,5 +1,6 @@
 using BusinessLogic.Services.Implements;
 using BusinessLogic.Services.Interfaces;
+using BusinessLogic.Settings;
 using DataAccess;
 using DataAccess.Repositories.Implements;
 using DataAccess.Repositories.Interfaces;
@@ -18,9 +19,19 @@ builder.Services.AddHttpClient();
 // DI for services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 // DI for repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+builder.Services.AddScoped<IClassSectionRepository, ClassSectionRepository>();
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<IWalletRepository, WalletRepository>();
+builder.Services.AddScoped<ITuitionFeeRepository, TuitionFeeRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<ISemesterRepository, SemesterRepository>();
+builder.Services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepository>();
 
 
 // Add services to the container.
