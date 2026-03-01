@@ -2228,35 +2228,264 @@ GO
 -- =====================================================
 -- SEED: Chat (Tạo phòng chat cho lớp SE1801 và SE1802)
 -- =====================================================
-DECLARE @Class1 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1801');
-DECLARE @Class2 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1802');
-DECLARE @TchrId INT = (SELECT TOP 1 TeacherId FROM dbo.ClassSections WHERE ClassSectionId = @Class1);
-DECLARE @TchrUserId INT = (SELECT TOP 1 UserId FROM dbo.Users WHERE Role = 'TEACHER');
+SET NOCOUNT ON;
+GO
 
--- Tạo 2 phòng chat cho 2 lớp
-INSERT INTO dbo.ChatRooms (RoomType, ClassSectionId, RoomName, Status, CreatedBy, CreatedAt) VALUES
-('CLASS', @Class1, N'Phòng học SE1801', 'ACTIVE', @TchrUserId, DATEADD(DAY, -10, SYSUTCDATETIME())),
-('CLASS', @Class2, N'Phòng học SE1802', 'ACTIVE', @TchrUserId, DATEADD(DAY, -10, SYSUTCDATETIME()));
+BEGIN TRY
+    BEGIN TRANSACTION;
 
-DECLARE @Room1 INT = (SELECT TOP 1 RoomId FROM dbo.ChatRooms WHERE ClassSectionId = @Class1);
-DECLARE @Room2 INT = (SELECT TOP 1 RoomId FROM dbo.ChatRooms WHERE ClassSectionId = @Class2);
+    /* ---------- Resolve core IDs ---------- */
+    DECLARE @AdminUserId INT =
+        (SELECT TOP (1) u.UserId FROM dbo.Users u WHERE u.Role = N'ADMIN' ORDER BY u.UserId);
 
--- Thêm Teacher vào 2 phòng
-INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus, JoinedAt) VALUES
-(@Room1, @TchrUserId, 'OWNER', 'JOINED', DATEADD(DAY, -10, SYSUTCDATETIME())),
-(@Room2, @TchrUserId, 'OWNER', 'JOINED', DATEADD(DAY, -10, SYSUTCDATETIME()));
+    DECLARE @Teacher1Id INT =
+        (SELECT TOP (1) t.TeacherId
+         FROM dbo.Teachers t
+         JOIN dbo.Users u ON u.UserId = t.TeacherId
+         WHERE u.Username = N'teacher1'
+         ORDER BY t.TeacherId);
 
--- Thêm Sinh viên vào phòng SE1801
-INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus, JoinedAt)
-SELECT @Room1, e.StudentId, 'MEMBER', 'JOINED', DATEADD(DAY, -9, SYSUTCDATETIME())
-FROM dbo.Enrollments e
-WHERE e.ClassSectionId = @Class1;
+    IF @Teacher1Id IS NULL
+    BEGIN
+        SET @Teacher1Id =
+            (SELECT TOP (1) t.TeacherId FROM dbo.Teachers t ORDER BY t.TeacherId);
+    END
 
--- Thêm Sinh viên vào phòng SE1802
-INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus, JoinedAt)
-SELECT @Room2, e.StudentId, 'MEMBER', 'JOINED', DATEADD(DAY, -9, SYSUTCDATETIME())
-FROM dbo.Enrollments e
-WHERE e.ClassSectionId = @Class2;
+    DECLARE @ClassSectionId INT =
+        (SELECT TOP (1) cs.ClassSectionId
+         FROM dbo.ClassSections cs
+         JOIN dbo.Semesters s ON s.SemesterId = cs.SemesterId
+         WHERE s.SemesterCode = N'SP26'
+         ORDER BY cs.ClassSectionId);
+
+    IF @ClassSectionId IS NULL
+    BEGIN
+        SET @ClassSectionId = (SELECT TOP (1) cs.ClassSectionId FROM dbo.ClassSections cs ORDER BY cs.ClassSectionId);
+    END
+
+    DECLARE @CourseId INT =
+        (SELECT TOP (1) cs.CourseId FROM dbo.ClassSections cs WHERE cs.ClassSectionId = @ClassSectionId);
+
+    IF @CourseId IS NULL
+    BEGIN
+        SET @CourseId = (SELECT TOP (1) c.CourseId FROM dbo.Courses c ORDER BY c.CourseId);
+    END
+
+    IF @AdminUserId IS NULL OR @Teacher1Id IS NULL OR @ClassSectionId IS NULL OR @CourseId IS NULL
+    BEGIN
+        RAISERROR(N'Chat seed aborted: missing prerequisite Users/Teachers/ClassSections/Courses data.', 16, 1);
+    END
+
+    /* ---------- Prepare sample students ---------- */
+    IF OBJECT_ID('tempdb..#SeedStudents') IS NOT NULL DROP TABLE #SeedStudents;
+    CREATE TABLE #SeedStudents
+    (
+        RowNum INT NOT NULL PRIMARY KEY,
+        StudentUserId INT NOT NULL
+    );
+
+    INSERT INTO #SeedStudents (RowNum, StudentUserId)
+    SELECT TOP (8)
+        ROW_NUMBER() OVER (ORDER BY u.UserId) AS RowNum,
+        u.UserId
+    FROM dbo.Users u
+    WHERE u.Role = N'STUDENT'
+    ORDER BY u.UserId;
+
+    /* ---------- Idempotent room upsert (by business key) ---------- */
+    DECLARE @ClassRoomName NVARCHAR(200) = N'Class Chat - Section ' + CAST(@ClassSectionId AS NVARCHAR(20));
+    DECLARE @CourseRoomName NVARCHAR(200) = N'Course Chat - Course ' + CAST(@CourseId AS NVARCHAR(20));
+
+    DECLARE @ClassRoomId INT;
+    DECLARE @CourseRoomId INT;
+    DECLARE @TeacherDmRoomId INT;
+
+    -- CLASS room
+    SELECT TOP (1) @ClassRoomId = cr.RoomId
+    FROM dbo.ChatRooms cr WITH (UPDLOCK, HOLDLOCK)
+    WHERE cr.RoomType = N'CLASS'
+      AND cr.ClassSectionId = @ClassSectionId
+      AND cr.RoomName = @ClassRoomName
+      AND cr.Status <> N'DELETED'
+    ORDER BY cr.RoomId;
+
+    IF @ClassRoomId IS NULL
+    BEGIN
+        INSERT INTO dbo.ChatRooms (RoomType, CourseId, ClassSectionId, RoomName, Status, CreatedBy)
+        VALUES (N'CLASS', NULL, @ClassSectionId, @ClassRoomName, N'ACTIVE', @Teacher1Id);
+
+        SET @ClassRoomId = CAST(SCOPE_IDENTITY() AS INT);
+    END
+
+    -- COURSE room
+    SELECT TOP (1) @CourseRoomId = cr.RoomId
+    FROM dbo.ChatRooms cr WITH (UPDLOCK, HOLDLOCK)
+    WHERE cr.RoomType = N'COURSE'
+      AND cr.CourseId = @CourseId
+      AND cr.RoomName = @CourseRoomName
+      AND cr.Status <> N'DELETED'
+    ORDER BY cr.RoomId;
+
+    IF @CourseRoomId IS NULL
+    BEGIN
+        INSERT INTO dbo.ChatRooms (RoomType, CourseId, ClassSectionId, RoomName, Status, CreatedBy)
+        VALUES (N'COURSE', @CourseId, NULL, @CourseRoomName, N'ACTIVE', @Teacher1Id);
+
+        SET @CourseRoomId = CAST(SCOPE_IDENTITY() AS INT);
+    END
+
+    -- DM room (teacher <-> admin), deterministic name to avoid duplicate
+    SELECT TOP (1) @TeacherDmRoomId = cr.RoomId
+    FROM dbo.ChatRooms cr WITH (UPDLOCK, HOLDLOCK)
+    WHERE cr.RoomType = N'DM'
+      AND cr.RoomName = N'DM:' + CAST(CASE WHEN @Teacher1Id < @AdminUserId THEN @Teacher1Id ELSE @AdminUserId END AS NVARCHAR(20))
+                     + N'-' + CAST(CASE WHEN @Teacher1Id < @AdminUserId THEN @AdminUserId ELSE @Teacher1Id END AS NVARCHAR(20))
+      AND cr.Status <> N'DELETED'
+    ORDER BY cr.RoomId;
+
+    IF @TeacherDmRoomId IS NULL
+    BEGIN
+        INSERT INTO dbo.ChatRooms (RoomType, CourseId, ClassSectionId, RoomName, Status, CreatedBy)
+        VALUES
+        (
+            N'DM',
+            NULL,
+            NULL,
+            N'DM:' + CAST(CASE WHEN @Teacher1Id < @AdminUserId THEN @Teacher1Id ELSE @AdminUserId END AS NVARCHAR(20))
+                 + N'-' + CAST(CASE WHEN @Teacher1Id < @AdminUserId THEN @AdminUserId ELSE @Teacher1Id END AS NVARCHAR(20)),
+            N'ACTIVE',
+            @Teacher1Id
+        );
+
+        SET @TeacherDmRoomId = CAST(SCOPE_IDENTITY() AS INT);
+    END
+
+    /* ---------- Idempotent ChatRoomMembers ---------- */
+    -- helper: upsert room member
+    -- CLASS room: teacher owner + first 5 students
+    IF NOT EXISTS (SELECT 1 FROM dbo.ChatRoomMembers WHERE RoomId = @ClassRoomId AND UserId = @Teacher1Id)
+    BEGIN
+        INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
+        VALUES (@ClassRoomId, @Teacher1Id, N'OWNER', N'JOINED');
+    END
+
+    INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
+    SELECT
+        @ClassRoomId,
+        s.StudentUserId,
+        N'MEMBER',
+        N'JOINED'
+    FROM #SeedStudents s
+    WHERE s.RowNum <= 5
+      AND NOT EXISTS
+      (
+          SELECT 1
+          FROM dbo.ChatRoomMembers m
+          WHERE m.RoomId = @ClassRoomId
+            AND m.UserId = s.StudentUserId
+      );
+
+    -- COURSE room: teacher moderator + first 8 students
+    IF NOT EXISTS (SELECT 1 FROM dbo.ChatRoomMembers WHERE RoomId = @CourseRoomId AND UserId = @Teacher1Id)
+    BEGIN
+        INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
+        VALUES (@CourseRoomId, @Teacher1Id, N'MODERATOR', N'JOINED');
+    END
+
+    INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
+    SELECT
+        @CourseRoomId,
+        s.StudentUserId,
+        N'MEMBER',
+        N'JOINED'
+    FROM #SeedStudents s
+    WHERE s.RowNum <= 8
+      AND NOT EXISTS
+      (
+          SELECT 1
+          FROM dbo.ChatRoomMembers m
+          WHERE m.RoomId = @CourseRoomId
+            AND m.UserId = s.StudentUserId
+      );
+
+    -- DM room: teacher + admin
+    IF NOT EXISTS (SELECT 1 FROM dbo.ChatRoomMembers WHERE RoomId = @TeacherDmRoomId AND UserId = @Teacher1Id)
+    BEGIN
+        INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
+        VALUES (@TeacherDmRoomId, @Teacher1Id, N'OWNER', N'JOINED');
+    END
+
+    IF NOT EXISTS (SELECT 1 FROM dbo.ChatRoomMembers WHERE RoomId = @TeacherDmRoomId AND UserId = @AdminUserId)
+    BEGIN
+        INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
+        VALUES (@TeacherDmRoomId, @AdminUserId, N'MEMBER', N'JOINED');
+    END
+
+    /* ---------- Idempotent ChatMessages seed ---------- */
+    DECLARE @S1 INT = (SELECT StudentUserId FROM #SeedStudents WHERE RowNum = 1);
+    DECLARE @S2 INT = (SELECT StudentUserId FROM #SeedStudents WHERE RowNum = 2);
+
+    -- marker token để không insert lại
+    DECLARE @SeedTag NVARCHAR(50) = N'[SEED_CHAT_V1]';
+
+    IF NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.ChatMessages
+        WHERE RoomId = @ClassRoomId
+          AND Content = @SeedTag + N' Welcome to class room.'
+    )
+    BEGIN
+        INSERT INTO dbo.ChatMessages (RoomId, SenderId, MessageType, Content)
+        VALUES
+        (@ClassRoomId, @Teacher1Id, N'SYSTEM', @SeedTag + N' Welcome to class room.'),
+        (@ClassRoomId, @Teacher1Id, N'TEXT',   @SeedTag + N' Chào lớp, vui lòng đọc syllabus trước buổi học đầu tiên.'),
+        (@ClassRoomId, @S1,         N'TEXT',   @SeedTag + N' Dạ em đã đọc, thầy cho em hỏi về rubric Lab 1 ạ?'),
+        (@ClassRoomId, @Teacher1Id, N'TEXT',   @SeedTag + N' Rubric sẽ được đăng trong LMS tối nay.');
+    END
+
+    IF NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.ChatMessages
+        WHERE RoomId = @CourseRoomId
+          AND Content = @SeedTag + N' Course room created.'
+    )
+    BEGIN
+        INSERT INTO dbo.ChatMessages (RoomId, SenderId, MessageType, Content)
+        VALUES
+        (@CourseRoomId, @Teacher1Id, N'SYSTEM', @SeedTag + N' Course room created.'),
+        (@CourseRoomId, @Teacher1Id, N'TEXT',   @SeedTag + N' Đây là phòng chung môn học, các em trao đổi học thuật tại đây.'),
+        (@CourseRoomId, @S2,         N'TEXT',   @SeedTag + N' Em xin tài liệu ôn tập giữa kỳ ạ.');
+    END
+
+    IF NOT EXISTS
+    (
+        SELECT 1
+        FROM dbo.ChatMessages
+        WHERE RoomId = @TeacherDmRoomId
+          AND Content = @SeedTag + N' DM channel opened.'
+    )
+    BEGIN
+        INSERT INTO dbo.ChatMessages (RoomId, SenderId, MessageType, Content)
+        VALUES
+        (@TeacherDmRoomId, @Teacher1Id, N'SYSTEM', @SeedTag + N' DM channel opened.'),
+        (@TeacherDmRoomId, @Teacher1Id, N'TEXT',   @SeedTag + N' Em gửi lịch dự kiến kiểm tra giữa kỳ để admin duyệt.'),
+        (@TeacherDmRoomId, @AdminUserId, N'TEXT',  @SeedTag + N' Đã nhận, tôi sẽ review trong hôm nay.');
+    END
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+
+    DECLARE @ErrMsg NVARCHAR(4000) = ERROR_MESSAGE();
+    DECLARE @ErrNo INT = ERROR_NUMBER();
+    DECLARE @ErrState INT = ERROR_STATE();
+
+    RAISERROR(N'Idempotent chat seed failed. %s', 16, 1, @ErrMsg);
+END CATCH;
 GO
 
 -- =====================================================
