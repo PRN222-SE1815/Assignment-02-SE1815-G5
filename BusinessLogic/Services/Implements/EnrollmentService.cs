@@ -494,6 +494,27 @@ public sealed class EnrollmentService : IEnrollmentService
         return user != null && string.Equals(user.Role, UserRole.ADMIN.ToString(), StringComparison.OrdinalIgnoreCase);
     }
 
+    private async Task<decimal> GetAmountPerCreditAsync(int studentId, int semesterId)
+    {
+        var rate = await _context.TuitionFees
+            .AsNoTracking()
+            .Where(tf => tf.StudentId == studentId && tf.SemesterId == semesterId && tf.AmountPerCredit > 0)
+            .Select(tf => (decimal?)tf.AmountPerCredit)
+            .SingleOrDefaultAsync();
+
+        if (rate.HasValue)
+            return rate.Value;
+
+        rate = await _context.TuitionFees
+            .AsNoTracking()
+            .Where(tf => tf.StudentId == studentId && tf.AmountPerCredit > 0)
+            .OrderByDescending(tf => tf.SemesterId)
+            .Select(tf => (decimal?)tf.AmountPerCredit)
+            .FirstOrDefaultAsync();
+
+        return rate ?? DefaultAmountPerCredit;
+    }
+
     public async Task<IReadOnlyList<ClassSectionSummaryViewModel>> GetOpenClassSectionsAsync()
     {
         var items = await _context.vw_ClassSectionSummaries
@@ -610,6 +631,8 @@ public sealed class EnrollmentService : IEnrollmentService
 
         if (selectedSemester != null)
         {
+            var amountPerCredit = await GetAmountPerCreditAsync(userId, selectedSemester.SemesterId);
+
             var semesterIdLookup = await _context.ClassSections
                 .AsNoTracking()
                 .Where(cs => cs.Semester.SemesterCode == selectedSemester.SemesterCode)
@@ -641,7 +664,7 @@ public sealed class EnrollmentService : IEnrollmentService
                     CurrentEnrollment = cs.CurrentEnrollment,
                     MaxCapacity = cs.MaxCapacity,
                     IsOpen = cs.IsOpen,
-                    EstimatedFee = cs.Credits * DefaultAmountPerCredit + DefaultSurcharge,
+                    EstimatedFee = cs.Credits * amountPerCredit + DefaultSurcharge,
                     CanRegister = canRegisterInSemester && cs.IsOpen && !isFull
                 };
             }).ToList();

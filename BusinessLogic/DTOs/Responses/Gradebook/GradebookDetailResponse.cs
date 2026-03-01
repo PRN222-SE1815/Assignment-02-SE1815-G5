@@ -6,6 +6,14 @@ public sealed class GradebookDetailResponse
 
     public int ClassSectionId { get; set; }
 
+    public string SectionCode { get; set; } = string.Empty;
+
+    public string CourseCode { get; set; } = string.Empty;
+
+    public string CourseName { get; set; } = string.Empty;
+
+    public string SemesterName { get; set; } = string.Empty;
+
     public string Status { get; set; } = string.Empty;
 
     public int Version { get; set; }

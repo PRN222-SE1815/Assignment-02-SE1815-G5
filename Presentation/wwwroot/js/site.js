@@ -201,11 +201,47 @@
 
         var connection = new signalR.HubConnectionBuilder()
             .withUrl('/notificationHub')
-            .withAutomaticReconnect()
+            .withAutomaticReconnect([0, 2000, 5000, 10000])
             .build();
 
         connection.on('ReceiveNotification', function (notification) {
             prependNotification(notification);
+        });
+
+        connection.on('CourseCreated', function (payload) {
+            var code = (payload && payload.courseCode) || '';
+            showRealtimeToast('info', 'Course Created', 'New course added: ' + code);
+            reloadIfOnCoursePage();
+        });
+
+        connection.on('CourseUpdated', function (payload) {
+            var code = (payload && payload.courseCode) || '';
+            showRealtimeToast('info', 'Course Updated', 'Course updated: ' + code);
+            reloadIfOnCoursePage();
+        });
+
+        connection.on('CourseDeactivated', function (payload) {
+            var code = (payload && payload.courseCode) || '';
+            var reason = (payload && payload.reason) || '';
+            var dropped = (payload && payload.droppedEnrollmentCount) || 0;
+            var msg = 'Course ' + code + ' has been deactivated.';
+            if (reason) { msg += ' Reason: ' + reason + '.'; }
+            if (dropped > 0) { msg += ' (' + dropped + ' enrollments dropped)'; }
+            showRealtimeToast('warning', 'Course Deactivated', msg);
+            reloadIfOnCoursePage();
+            reloadIfOnMyCoursesPage();
+        });
+
+        connection.on('CourseEnrollmentsDropped', function (payload) {
+            var code = (payload && payload.courseCode) || '';
+            var dropped = (payload && payload.droppedEnrollmentCount) || 0;
+            showRealtimeToast('warning', 'Enrollments Dropped', dropped + ' enrollments dropped for ' + code);
+            reloadIfOnMyCoursesPage();
+        });
+
+        connection.onreconnected(function () {
+            loadNotifications();
+            loadUnreadCount();
         });
 
         try {
@@ -213,6 +249,46 @@
         } catch (e) {
             console.error('Notification hub connection failed:', e);
         }
+    }
+
+    function reloadIfOnCoursePage() {
+        var path = window.location.pathname.toLowerCase();
+        if (path.indexOf('/admin/coursemanagement') !== -1) {
+            setTimeout(function () { window.location.reload(); }, 1500);
+        }
+    }
+
+    function reloadIfOnMyCoursesPage() {
+        var path = window.location.pathname.toLowerCase();
+        if (path.indexOf('/student/mycourses') !== -1
+            || path.indexOf('/student/courseregistration') !== -1
+            || path.indexOf('/teacher/myclasses') !== -1) {
+            setTimeout(function () { window.location.reload(); }, 1500);
+        }
+    }
+
+    function ensureToastHost() {
+        var host = document.getElementById('globalToastHost');
+        if (!host) {
+            host = document.createElement('div');
+            host.id = 'globalToastHost';
+            document.body.appendChild(host);
+        }
+        return host;
+    }
+
+    function showRealtimeToast(type, title, message) {
+        var host = ensureToastHost();
+        var toast = document.createElement('div');
+        toast.className = 'toast toast-' + (type || 'info');
+        toast.innerHTML = '<strong>' + escapeHtml(title || '') + '</strong>&nbsp; ' + escapeHtml(message || '');
+        host.appendChild(toast);
+        setTimeout(function () {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(30px)';
+            toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+            setTimeout(function () { toast.remove(); }, 350);
+        }, 5000);
     }
 
     async function initializeNotifications() {

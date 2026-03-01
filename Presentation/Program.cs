@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Presentation.Hubs;
+using Presentation.Middleware;
 using Presentation.Realtime;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,8 @@ builder.Services.AddDbContext<SchoolManagementDbContext>(options =>
 // Settings
 builder.Services.Configure<MoMoSettings>(builder.Configuration.GetSection(MoMoSettings.SectionName));
 builder.Services.Configure<ReliabilitySettings>(builder.Configuration.GetSection(ReliabilitySettings.SectionName));
+builder.Services.Configure<GeminiSettings>(builder.Configuration.GetSection(GeminiSettings.SectionName));
+builder.Services.Configure<AIChatSettings>(builder.Configuration.GetSection(AIChatSettings.SectionName));
 builder.Services.AddHttpClient();
 
 // DI for services
@@ -34,8 +37,13 @@ builder.Services.AddScoped<ITeacherScheduleService, TeacherScheduleService>();
 builder.Services.AddScoped<IAdminScheduleService, AdminScheduleService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<INotificationRealtimePublisher, SignalRNotificationRealtimePublisher>();
+builder.Services.AddScoped<IRealtimeEventDispatcher, SignalRRealtimeEventDispatcher>();
+builder.Services.AddScoped<ICourseManagementService, CourseManagementService>();
 builder.Services.AddScoped<IGradebookService, GradebookService>();
 builder.Services.AddScoped<IGradebookSyncService, GradebookSyncService>();
+builder.Services.AddScoped<IAIChatService, AIChatService>();
+builder.Services.AddScoped<IGeminiClientService, GeminiClientService>();
+builder.Services.AddScoped<IAIToolService, AIToolService>();
 
 // DI for repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -56,6 +64,8 @@ builder.Services.AddScoped<IChatModerationLogRepository, ChatModerationLogReposi
 builder.Services.AddScoped<IScheduleRepository, ScheduleRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IGradeBookRepository, GradeBookRepository>();
+builder.Services.AddScoped<IAIChatRepository, AIChatRepository>();
+builder.Services.AddScoped<IAIAnalyticsRepository, AIAnalyticsRepository>();
 
 
 // ==================== Razor Pages ====================
@@ -79,6 +89,10 @@ builder.Services.AddAuthorization();
 // ==================== SignalR ====================
 builder.Services.AddSignalR();
 
+// ==================== Health Checks ====================
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<SchoolManagementDbContext>("database", HealthStatus.Unhealthy, tags: ["ready"]);
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -94,11 +108,36 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+// Correlation-Id middleware
+app.UseMiddleware<CorrelationIdMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapHub<ChatHub>("/chatHub");
 app.MapHub<NotificationHub>("/notificationHub");
+
+// Health check endpoints
+app.MapHealthChecks("/health/live", new HealthCheckOptions
+{
+    Predicate = _ => false,
+    ResultStatusCodes =
+    {
+        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+        [HealthStatus.Degraded] = StatusCodes.Status200OK,
+        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+    }
+});
+app.MapHealthChecks("/health/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready"),
+    ResultStatusCodes =
+    {
+        [HealthStatus.Healthy] = StatusCodes.Status200OK,
+        [HealthStatus.Degraded] = StatusCodes.Status200OK,
+        [HealthStatus.Unhealthy] = StatusCodes.Status503ServiceUnavailable
+    }
+});
 
 app.Run();

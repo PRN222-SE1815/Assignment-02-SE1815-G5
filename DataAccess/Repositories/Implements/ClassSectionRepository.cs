@@ -47,4 +47,48 @@ public sealed class ClassSectionRepository : IClassSectionRepository
             .AsNoTracking()
             .AnyAsync(cs => cs.CourseId == courseId && cs.TeacherId == teacherUserId);
     }
+
+    public async Task<IReadOnlyList<ClassSection>> GetByTeacherIdAsync(int teacherUserId, CancellationToken ct = default)
+    {
+        return await _context.ClassSections
+            .AsNoTracking()
+            .Include(cs => cs.Course)
+            .Include(cs => cs.Semester)
+            .Include(cs => cs.GradeBook)
+            .Where(cs => cs.TeacherId == teacherUserId)
+            .OrderByDescending(cs => cs.Semester.StartDate)
+            .ThenBy(cs => cs.Course.CourseCode)
+            .ThenBy(cs => cs.SectionCode)
+            .ToListAsync(ct);
+    }
+
+    public async Task<IReadOnlyList<ClassSection>> GetByCourseIdAsync(
+        int courseId,
+        bool asTracking = false,
+        CancellationToken ct = default)
+    {
+        IQueryable<ClassSection> query = _context.ClassSections
+            .Include(cs => cs.Semester)
+            .Where(cs => cs.CourseId == courseId);
+
+        query = asTracking ? query.AsTracking() : query.AsNoTracking();
+
+        return await query
+            .OrderByDescending(cs => cs.SemesterId)
+            .ThenBy(cs => cs.SectionCode)
+            .ThenBy(cs => cs.ClassSectionId)
+            .ToListAsync(ct);
+    }
+
+    public Task<int> CountOpenSectionsByCourseAsync(int courseId, CancellationToken ct = default)
+    {
+        return _context.ClassSections
+            .AsNoTracking()
+            .CountAsync(cs => cs.CourseId == courseId && cs.IsOpen, ct);
+    }
+
+    public void UpdateRange(IEnumerable<ClassSection> sections)
+    {
+        _context.ClassSections.UpdateRange(sections);
+    }
 }

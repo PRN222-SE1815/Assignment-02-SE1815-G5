@@ -49,7 +49,10 @@ public class IndexModel : PageModel
         var userId = GetUserId();
         if (userId == 0) return RedirectToPage("/Account/Login");
 
-        if (ClassSectionId <= 0) return Page();
+        if (ClassSectionId <= 0)
+        {
+            return RedirectToPage("/MyClasses/Index");
+        }
 
         await LoadGradebookAsync(userId);
         return Page();
@@ -123,11 +126,11 @@ public class IndexModel : PageModel
     {
         if (Gradebook is null) return;
 
-        var enrollmentIds = Gradebook.GradeEntries
-            .Select(e => e.EnrollmentId)
-            .Distinct()
-            .OrderBy(id => id)
-            .ToList();
+        var studentLookup = Gradebook.GradeEntries
+            .GroupBy(e => e.EnrollmentId)
+            .ToDictionary(g => g.Key, g => g.First());
+
+        var enrollmentIds = studentLookup.Keys.OrderBy(id => id).ToList();
 
         var entryLookup = Gradebook.GradeEntries
             .GroupBy(e => e.EnrollmentId)
@@ -136,7 +139,13 @@ public class IndexModel : PageModel
         var rows = new List<EnrollmentRow>();
         foreach (var enrollmentId in enrollmentIds)
         {
-            var row = new EnrollmentRow { EnrollmentId = enrollmentId };
+            var first = studentLookup[enrollmentId];
+            var row = new EnrollmentRow
+            {
+                EnrollmentId = enrollmentId,
+                StudentCode = first.StudentCode,
+                StudentName = first.StudentName
+            };
             entryLookup.TryGetValue(enrollmentId, out var entriesByItem);
 
             foreach (var item in Gradebook.GradeItems)
@@ -162,6 +171,8 @@ public class IndexModel : PageModel
     public sealed class EnrollmentRow
     {
         public int EnrollmentId { get; set; }
+        public string StudentCode { get; set; } = string.Empty;
+        public string StudentName { get; set; } = string.Empty;
         public Dictionary<int, decimal?> Scores { get; set; } = new();
     }
 }
