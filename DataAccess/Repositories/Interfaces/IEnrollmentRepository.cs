@@ -45,4 +45,17 @@ public interface IEnrollmentRepository
     /// Get all enrolled student UserIds for a class section.
     /// </summary>
     Task<IReadOnlyList<int>> GetEnrolledStudentUserIdsAsync(int classSectionId, CancellationToken ct = default);
+
+    Task<IReadOnlyList<Enrollment>> GetByCourseIdAndStatusesAsync(
+        int courseId,
+        IReadOnlyCollection<string> statuses,
+        bool asTracking = false,
+        CancellationToken ct = default);
+
+    Task<int> CountByCourseIdAndStatusesAsync(
+        int courseId,
+        IReadOnlyCollection<string> statuses,
+        CancellationToken ct = default);
+
+    void UpdateRange(IEnumerable<Enrollment> enrollments);
 }

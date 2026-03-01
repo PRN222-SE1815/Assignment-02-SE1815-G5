@@ -6,6 +6,8 @@ namespace BusinessLogic.Services.Interfaces;
 
 public interface IGradebookService
 {
+    Task<ServiceResult<IReadOnlyList<TeacherClassSectionDto>>> GetTeacherClassSectionsAsync(int teacherUserId, string actorRole, CancellationToken ct = default);
+
     Task<ServiceResult<GradebookDetailResponse>> GetGradebookAsync(int actorUserId, string actorRole, int classSectionId, CancellationToken ct = default);
 
     Task<ServiceResult<bool>> UpsertTeacherScoresAsync(int teacherUserId, string actorRole, UpsertScoresRequest request, CancellationToken ct = default);

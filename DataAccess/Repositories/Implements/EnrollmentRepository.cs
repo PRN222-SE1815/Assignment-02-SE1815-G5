@@ -164,4 +164,48 @@ public sealed class EnrollmentRepository : IEnrollmentRepository
             .Distinct()
             .ToListAsync(ct);
     }
+
+    public async Task<IReadOnlyList<Enrollment>> GetByCourseIdAndStatusesAsync(
+        int courseId,
+        IReadOnlyCollection<string> statuses,
+        bool asTracking = false,
+        CancellationToken ct = default)
+    {
+        if (statuses is null || statuses.Count == 0)
+        {
+            return [];
+        }
+
+        IQueryable<Enrollment> query = _context.Enrollments
+            .Include(e => e.Student)
+            .Include(e => e.Course)
+            .Include(e => e.ClassSection)
+            .Where(e => e.CourseId == courseId && statuses.Contains(e.Status));
+
+        query = asTracking ? query.AsTracking() : query.AsNoTracking();
+
+        return await query
+            .OrderBy(e => e.EnrollmentId)
+            .ToListAsync(ct);
+    }
+
+    public async Task<int> CountByCourseIdAndStatusesAsync(
+        int courseId,
+        IReadOnlyCollection<string> statuses,
+        CancellationToken ct = default)
+    {
+        if (statuses is null || statuses.Count == 0)
+        {
+            return 0;
+        }
+
+        return await _context.Enrollments
+            .AsNoTracking()
+            .CountAsync(e => e.CourseId == courseId && statuses.Contains(e.Status), ct);
+    }
+
+    public void UpdateRange(IEnumerable<Enrollment> enrollments)
+    {
+        _context.Enrollments.UpdateRange(enrollments);
+    }
 }

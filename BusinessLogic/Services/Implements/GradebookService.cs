@@ -50,6 +50,50 @@ public sealed class GradebookService : IGradebookService
         _logger = logger;
     }
 
+    public async Task<ServiceResult<IReadOnlyList<TeacherClassSectionDto>>> GetTeacherClassSectionsAsync(
+        int teacherUserId,
+        string actorRole,
+        CancellationToken ct = default)
+    {
+        try
+        {
+            if (!string.Equals(actorRole, RoleTeacher, StringComparison.OrdinalIgnoreCase))
+            {
+                return ServiceResult<IReadOnlyList<TeacherClassSectionDto>>.Fail(ErrorCodes.Forbidden, "Only teachers can view their class sections.");
+            }
+
+            var user = await _userRepository.GetUserByIdAsync(teacherUserId);
+            if (user is null || !string.Equals(user.Role, RoleTeacher, StringComparison.OrdinalIgnoreCase) || !user.IsActive)
+            {
+                return ServiceResult<IReadOnlyList<TeacherClassSectionDto>>.Fail(ErrorCodes.Forbidden, "Actor is not an active teacher.");
+            }
+
+            var sections = await _classSectionRepository.GetByTeacherIdAsync(teacherUserId, ct);
+
+            var result = sections.Select(cs => new TeacherClassSectionDto
+            {
+                ClassSectionId = cs.ClassSectionId,
+                SectionCode = cs.SectionCode,
+                CourseCode = cs.Course.CourseCode,
+                CourseName = cs.Course.CourseName,
+                Credits = cs.Course.Credits,
+                SemesterName = cs.Semester.SemesterName,
+                IsOpen = cs.IsOpen,
+                MaxCapacity = cs.MaxCapacity,
+                CurrentEnrollment = cs.CurrentEnrollment,
+                Room = cs.Room,
+                GradebookStatus = cs.GradeBook?.Status
+            }).ToList();
+
+            return ServiceResult<IReadOnlyList<TeacherClassSectionDto>>.Success(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "GetTeacherClassSectionsAsync failed. TeacherUserId={TeacherUserId}", teacherUserId);
+            return ServiceResult<IReadOnlyList<TeacherClassSectionDto>>.Fail(ErrorCodes.InternalError, "An unexpected error occurred.");
+        }
+    }
+
     public async Task<ServiceResult<GradebookDetailResponse>> GetGradebookAsync(
         int actorUserId,
         string actorRole,
@@ -75,10 +119,15 @@ public sealed class GradebookService : IGradebookService
                 return ServiceResult<GradebookDetailResponse>.Fail(ErrorCodes.GradebookNotFound, "Gradebook not found.");
             }
 
+            var cs = gradebook.ClassSection;
             var response = new GradebookDetailResponse
             {
                 GradeBookId = gradebook.GradeBookId,
                 ClassSectionId = gradebook.ClassSectionId,
+                SectionCode = cs?.SectionCode ?? string.Empty,
+                CourseCode = cs?.Course?.CourseCode ?? string.Empty,
+                CourseName = cs?.Course?.CourseName ?? string.Empty,
+                SemesterName = cs?.Semester?.SemesterName ?? string.Empty,
                 Status = gradebook.Status,
                 Version = gradebook.Version,
                 GradeItems = gradebook.GradeItems
@@ -103,6 +152,8 @@ public sealed class GradebookService : IGradebookService
                         GradeEntryId = x.GradeEntryId,
                         GradeItemId = x.GradeItemId,
                         EnrollmentId = x.EnrollmentId,
+                        StudentCode = x.Enrollment?.Student?.StudentCode ?? string.Empty,
+                        StudentName = x.Enrollment?.Student?.StudentNavigation?.FullName ?? string.Empty,
                         Score = x.Score,
                         UpdatedAt = x.UpdatedAt
                     })

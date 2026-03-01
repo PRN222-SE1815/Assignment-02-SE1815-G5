@@ -8,6 +8,10 @@ public sealed class GradeEntryResponse
 
     public int EnrollmentId { get; set; }
 
+    public string StudentCode { get; set; } = string.Empty;
+
+    public string StudentName { get; set; } = string.Empty;
+
     public decimal? Score { get; set; }
 
     public DateTime UpdatedAt { get; set; }

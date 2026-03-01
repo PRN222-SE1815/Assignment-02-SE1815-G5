@@ -61,7 +61,7 @@
                     <span class="nav-icon"><i class="fas fa-comments"></i></span>
                     <span class="nav-text">Chat</span>
                 </a>
-                <a href="#" class="nav-link">
+                <a asp-area="Admin" asp-page="/CourseManagement/Index" class="nav-link">
                     <span class="nav-icon"><i class="fas fa-book"></i></span>
                     <span class="nav-text">Courses</span>
                 </a>
@@ -76,13 +76,9 @@
                     <span class="nav-icon"><i class="fas fa-calendar-alt"></i></span>
                     <span class="nav-text">Schedule</span>
                 </a>
-                <a asp-area="Teacher" asp-page="/TeacherGrade/Index" class="nav-link">
+                <a asp-area="Teacher" asp-page="/MyClasses/Index" class="nav-link">
                     <span class="nav-icon"><i class="fas fa-chalkboard-teacher"></i></span>
                     <span class="nav-text">My Classes</span>
-                </a>
-                <a asp-area="Teacher" asp-page="/TeacherGrade/Index" class="nav-link">
-                    <span class="nav-icon"><i class="fas fa-pen-to-square"></i></span>
-                    <span class="nav-text">Grading</span>
                 </a>
                 <a asp-area="Teacher" asp-page="/Quiz/List" class="nav-link">
                     <span class="nav-icon"><i class="fas fa-clipboard-list"></i></span>
@@ -118,6 +114,10 @@
                 <a asp-page="/Chat/Index" class="nav-link">
                     <span class="nav-icon"><i class="fas fa-comments"></i></span>
                     <span class="nav-text">Chat</span>
+                </a>
+                <a asp-area="Student" asp-page="/AI/Index" class="nav-link">
+                    <span class="nav-icon"><i class="fas fa-robot"></i></span>
+                    <span class="nav-text">AI Assistant</span>
                 </a>
             }
         </div>

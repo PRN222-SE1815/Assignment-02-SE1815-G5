@@ -29,6 +29,10 @@ public sealed class GradeBookRepository : IGradeBookRepository
     {
         return _context.GradeBooks
             .AsNoTracking()
+            .Include(gb => gb.ClassSection)
+                .ThenInclude(cs => cs.Course)
+            .Include(gb => gb.ClassSection)
+                .ThenInclude(cs => cs.Semester)
             .Include(gb => gb.GradeItems)
                 .ThenInclude(gi => gi.GradeEntries)
                     .ThenInclude(ge => ge.Enrollment)
