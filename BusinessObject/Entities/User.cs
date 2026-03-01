@@ -56,6 +56,12 @@ public partial class User
     [InverseProperty("ActorUser")]
     public virtual ICollection<GradeAuditLog> GradeAuditLogs { get; set; } = new List<GradeAuditLog>();
 
+    [InverseProperty("RequestByNavigation")]
+    public virtual ICollection<GradeBookApproval> GradeBookApprovalRequestByNavigations { get; set; } = new List<GradeBookApproval>();
+
+    [InverseProperty("ResponseByNavigation")]
+    public virtual ICollection<GradeBookApproval> GradeBookApprovalResponseByNavigations { get; set; } = new List<GradeBookApproval>();
+
     [InverseProperty("UpdatedByNavigation")]
     public virtual ICollection<GradeEntry> GradeEntries { get; set; } = new List<GradeEntry>();
 

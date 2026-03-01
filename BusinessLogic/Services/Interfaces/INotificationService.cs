@@ -5,6 +5,14 @@ namespace BusinessLogic.Services.Interfaces;
 
 public interface INotificationService
 {
+    Task<ServiceResult<bool>> SendAsync(
+        string notificationType,
+        string title,
+        string message,
+        string? deepLink,
+        IReadOnlyCollection<int> recipientUserIds,
+        CancellationToken ct = default);
+
     Task<ServiceResult<bool>> CreateScheduleNotificationAsync(
         int actorUserId,
         CreateScheduleNotificationRequest request,

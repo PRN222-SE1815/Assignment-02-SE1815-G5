@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BusinessObject.Entities;
 
+[Index("GradeBookId", "RequestAt", Name = "IX_GradeBookApprovals_GradeBookId_RequestAt")]
+[Index("Outcome", Name = "IX_GradeBookApprovals_Outcome")]
 public partial class GradeBookApproval
 {
     [Key]
@@ -31,4 +33,16 @@ public partial class GradeBookApproval
 
     [StringLength(20)]
     public string? Outcome { get; set; }
+
+    [ForeignKey("GradeBookId")]
+    [InverseProperty("GradeBookApprovals")]
+    public virtual GradeBook GradeBook { get; set; } = null!;
+
+    [ForeignKey("RequestBy")]
+    [InverseProperty("GradeBookApprovalRequestByNavigations")]
+    public virtual User RequestByNavigation { get; set; } = null!;
+
+    [ForeignKey("ResponseBy")]
+    [InverseProperty("GradeBookApprovalResponseByNavigations")]
+    public virtual User? ResponseByNavigation { get; set; }
 }

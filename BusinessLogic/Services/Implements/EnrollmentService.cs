@@ -700,6 +700,7 @@ public sealed class EnrollmentService : IEnrollmentService
         var dtoItems = items.Select(e => new MyCourseItemDto
         {
             EnrollmentId = e.EnrollmentId,
+            ClassSectionId = e.ClassSectionId,
             CourseCode = e.Course.CourseCode,
             CourseName = e.Course.CourseName,
             Credits = e.CreditsSnapshot,

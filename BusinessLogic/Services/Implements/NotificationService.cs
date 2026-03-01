@@ -2,10 +2,12 @@ using System.Text.Json;
 using BusinessLogic.DTOs.Request;
 using BusinessLogic.DTOs.Response;
 using BusinessLogic.Services.Interfaces;
+using BusinessLogic.Settings;
 using BusinessObject.Entities;
 using BusinessObject.Enum;
 using DataAccess.Repositories.Interfaces;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace BusinessLogic.Services.Implements;
 
@@ -16,18 +18,92 @@ public sealed class NotificationService : INotificationService
     private readonly INotificationRepository _notificationRepository;
     private readonly IUserRepository _userRepository;
     private readonly INotificationRealtimePublisher _realtimePublisher;
+    private readonly ReliabilitySettings _reliability;
     private readonly ILogger<NotificationService> _logger;
 
     public NotificationService(
         INotificationRepository notificationRepository,
         IUserRepository userRepository,
         INotificationRealtimePublisher realtimePublisher,
+        IOptions<ReliabilitySettings> reliabilityOptions,
         ILogger<NotificationService> logger)
     {
         _notificationRepository = notificationRepository;
         _userRepository = userRepository;
         _realtimePublisher = realtimePublisher;
+        _reliability = reliabilityOptions.Value;
         _logger = logger;
+    }
+
+    public async Task<ServiceResult<bool>> SendAsync(
+        string notificationType,
+        string title,
+        string message,
+        string? deepLink,
+        IReadOnlyCollection<int> recipientUserIds,
+        CancellationToken ct = default)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(notificationType) || string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(message))
+            {
+                return ServiceResult<bool>.Fail("INVALID_INPUT", "Notification type, title, and message are required.");
+            }
+
+            var distinctRecipients = (recipientUserIds ?? Array.Empty<int>())
+                .Where(id => id > 0)
+                .Distinct()
+                .ToList();
+
+            if (distinctRecipients.Count == 0)
+            {
+                return ServiceResult<bool>.Fail("INVALID_INPUT", "Recipient list cannot be empty.");
+            }
+
+            var payload = new GenericNotificationPayload
+            {
+                Title = title.Trim(),
+                Message = message.Trim(),
+                DeepLink = deepLink
+            };
+
+            var notification = new Notification
+            {
+                NotificationType = notificationType.Trim(),
+                PayloadJson = JsonSerializer.Serialize(payload),
+                Status = NotificationStatus.SENT.ToString(),
+                CreatedAt = DateTime.UtcNow,
+                SentAt = DateTime.UtcNow
+            };
+
+            var created = await _notificationRepository.CreateNotificationAsync(notification, distinctRecipients, ct);
+
+            var item = new NotificationItemDto
+            {
+                NotificationId = created.NotificationId,
+                NotificationType = created.NotificationType,
+                Title = payload.Title,
+                Message = payload.Message,
+                CreatedAtUtc = created.CreatedAt,
+                IsRead = false,
+                DeepLink = payload.DeepLink
+            };
+
+            await PublishWithRetryAsync(distinctRecipients, item, ct);
+
+            _logger.LogInformation(
+                "Notification sent. Type={NotificationType}, NotificationId={NotificationId}, Recipients={RecipientCount}",
+                notificationType,
+                created.NotificationId,
+                distinctRecipients.Count);
+
+            return ServiceResult<bool>.Success(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "SendAsync failed. NotificationType={NotificationType}", notificationType);
+            return ServiceResult<bool>.Fail("INTERNAL_ERROR", "Unable to send notification.");
+        }
     }
 
     public async Task<ServiceResult<bool>> CreateScheduleNotificationAsync(
@@ -96,7 +172,7 @@ public sealed class NotificationService : INotificationService
                 DeepLink = payload.DeepLink
             };
 
-            await _realtimePublisher.PublishToUsersAsync(recipientUserIds, item, ct);
+            await PublishWithRetryAsync(recipientUserIds, item, ct);
 
             _logger.LogInformation(
                 "Schedule notification created and pushed. NotificationId={NotificationId}, ScheduleEventId={ScheduleEventId}, Recipients={RecipientCount}",
@@ -279,5 +355,44 @@ public sealed class NotificationService : INotificationService
         public string Message { get; set; } = string.Empty;
         public string? DeepLink { get; set; }
         public object? Payload { get; set; }
+    }
+
+    private sealed class GenericNotificationPayload
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+        public string? DeepLink { get; set; }
+    }
+
+    private async Task PublishWithRetryAsync(
+        IReadOnlyCollection<int> userIds,
+        NotificationItemDto item,
+        CancellationToken ct)
+    {
+        var maxRetries = Math.Max(1, _reliability.NotificationRetryCount);
+        var baseDelay = Math.Max(50, _reliability.NotificationRetryBaseDelayMs);
+
+        for (var attempt = 0; attempt < maxRetries; attempt++)
+        {
+            try
+            {
+                await _realtimePublisher.PublishToUsersAsync(userIds, item, ct);
+                return;
+            }
+            catch (Exception ex) when (attempt < maxRetries - 1)
+            {
+                var delay = baseDelay * (int)Math.Pow(2, attempt);
+                _logger.LogWarning(ex,
+                    "Realtime push failed, retry {Attempt}/{MaxRetries} in {Delay}ms. NotificationId={NotificationId}",
+                    attempt + 1, maxRetries, delay, item.NotificationId);
+                await Task.Delay(delay, ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,
+                    "Realtime push failed after {MaxRetries} retries. NotificationId={NotificationId}. DB notification saved successfully.",
+                    maxRetries, item.NotificationId);
+            }
+        }
     }
 }

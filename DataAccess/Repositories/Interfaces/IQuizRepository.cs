@@ -90,6 +90,21 @@ public interface IQuizRepository
     /// </summary>
     Task<bool> HasAttemptAsync(int quizId, int enrollmentId);
 
+    /// <summary>
+    /// Get graded attempt context for syncing score to gradebook.
+    /// </summary>
+    Task<QuizAttempt?> GetAttemptForGradeSyncAsync(int attemptId, CancellationToken ct = default);
+
+    /// <summary>
+    /// Get latest graded attempt by quiz and enrollment.
+    /// </summary>
+    Task<QuizAttempt?> GetLatestGradedAttemptByQuizAndEnrollmentAsync(int quizId, int enrollmentId, CancellationToken ct = default);
+
+    /// <summary>
+    /// Find grade item mapped to quiz by convention: ItemName = "QUIZ:{quizId}".
+    /// </summary>
+    Task<GradeItem?> FindGradeItemForQuizAsync(int gradeBookId, int quizId, CancellationToken ct = default);
+
     // ==================== Create/Update ====================
     
     Task<Quiz> CreateQuizAsync(Quiz quiz);

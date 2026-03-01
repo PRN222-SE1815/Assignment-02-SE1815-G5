@@ -10,4 +10,5 @@ public class SubmitAttemptResponse
     public int CorrectCount { get; set; }
     public int TotalCount { get; set; }
     public DateTime SubmittedAt { get; set; }
+    public string? WarningMessage { get; set; }
 }

@@ -40,4 +40,9 @@ public interface IEnrollmentRepository
     /// Check if a student (by UserId) is enrolled (ENROLLED) in any class section of a course.
     /// </summary>
     Task<bool> IsStudentEnrolledInCourseAsync(int studentUserId, int courseId);
+
+    /// <summary>
+    /// Get all enrolled student UserIds for a class section.
+    /// </summary>
+    Task<IReadOnlyList<int>> GetEnrolledStudentUserIdsAsync(int classSectionId, CancellationToken ct = default);
 }
