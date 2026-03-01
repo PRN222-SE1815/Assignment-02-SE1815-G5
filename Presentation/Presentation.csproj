@@ -16,8 +16,6 @@
     <Folder Include="Areas\Admin\Pages\ClassManagement\" />
     <Folder Include="Areas\Admin\Pages\ScheduleManagement\" />
     <Folder Include="Areas\Admin\Pages\UserManagement\" />
-    <Folder Include="Areas\Student\Pages\CourseRegistration\" />
-    <Folder Include="Areas\Student\Pages\Wallet\" />
     <Folder Include="Areas\Student\Pages\StudentGrade\" />
     <Folder Include="Areas\Student\Pages\StudentQuiz\" />
     <Folder Include="Areas\Student\Pages\StudentSchedule\" />

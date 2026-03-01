@@ -79,7 +79,7 @@
             }
             else if (isStudent)
             {
-                <a asp-area="Student" asp-page="/CourseRegistration/MyCourses" class="nav-link">
+                <a asp-area="Student" asp-page="/MyCourses/Index" class="nav-link">
                     <span class="nav-icon"><i class="fas fa-book-open"></i></span>
                     <span class="nav-text">My Courses</span>
                 </a>
@@ -103,6 +103,8 @@
         </div>
 
         <div class="navbar-user">
+            @await Component.InvokeAsync("WalletBadge")
+
             <!-- Notification Bell -->
             <div class="notification-bell" id="notificationBell">
                 <button type="button" class="bell-btn" onclick="toggleNotificationPanel()">
