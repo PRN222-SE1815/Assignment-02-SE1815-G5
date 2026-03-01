@@ -32,4 +32,19 @@ public sealed class ClassSectionRepository : IClassSectionRepository
             .Include(cs => cs.Semester)
             .SingleOrDefaultAsync(cs => cs.ClassSectionId == classSectionId);
     }
+
+    public async Task<bool> IsTeacherAssignedAsync(int teacherUserId, int classSectionId)
+    {
+        // ClassSections.TeacherId = Teachers.TeacherId = Users.UserId
+        return await _context.ClassSections
+            .AsNoTracking()
+            .AnyAsync(cs => cs.ClassSectionId == classSectionId && cs.TeacherId == teacherUserId);
+    }
+
+    public async Task<bool> IsTeacherAssignedToCourseAsync(int teacherUserId, int courseId)
+    {
+        return await _context.ClassSections
+            .AsNoTracking()
+            .AnyAsync(cs => cs.CourseId == courseId && cs.TeacherId == teacherUserId);
+    }
 }

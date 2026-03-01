@@ -1,0 +1,220 @@
+﻿@page
+@model Presentation.Areas.Student.Pages.Quiz.AttemptModel
+@{
+    ViewBag.Title = Model.AttemptData != null ? $"Quiz: {Model.AttemptData.QuizTitle}" : "Quiz Attempt";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Student/quiz.css" asp-append-version="true" />
+}
+
+<div class="quiz-container">
+
+    @* ===== ERROR STATE ===== *@
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage) && Model.Result == null && Model.AttemptData == null)
+    {
+        <div class="quiz-error-state">
+            @if (Model.ErrorCode == "ALREADY_ATTEMPTED")
+            {
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                    <h3>Already Attempted</h3>
+                    <p>@Model.ErrorMessage</p>
+                    <p>You can only attempt each quiz once.</p>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage
+                </div>
+            }
+            <a href="javascript:history.back()" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Go Back
+            </a>
+        </div>
+    }
+
+    @* ===== SUBMISSION RESULT ===== *@
+    @if (Model.Result != null)
+    {
+        var percentage = Model.Result.TotalCount > 0
+            ? Math.Round((double)Model.Result.CorrectCount / Model.Result.TotalCount * 100, 1)
+            : 0;
+        var scoreClass = percentage >= 80 ? "score-excellent" : percentage >= 50 ? "score-pass" : "score-fail";
+
+        <div class="result-container">
+            <div class="result-header">
+                <i class="fas fa-check-circle fa-3x @scoreClass"></i>
+                <h2>Quiz Submitted!</h2>
+            </div>
+
+            <div class="result-card @scoreClass">
+                <div class="result-score">
+                    <span class="score-number">@Model.Result.Score.ToString("F1")</span>
+                    <span class="score-label">Score</span>
+                </div>
+                <div class="result-details">
+                    <div class="result-detail">
+                        <span class="detail-label">Correct Answers</span>
+                        <span class="detail-value">@Model.Result.CorrectCount / @Model.Result.TotalCount</span>
+                    </div>
+                    <div class="result-detail">
+                        <span class="detail-label">Percentage</span>
+                        <span class="detail-value">@percentage%</span>
+                    </div>
+                    <div class="result-detail">
+                        <span class="detail-label">Submitted At</span>
+                        <span class="detail-value">@Model.Result.SubmittedAt.ToString("MMM dd, yyyy HH:mm:ss")</span>
+                    </div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-warning mt-3">
+                    <i class="fas fa-exclamation-triangle"></i> @Model.ErrorMessage
+                </div>
+            }
+        </div>
+    }
+
+    @* ===== QUIZ QUESTIONS FORM ===== *@
+    @if (Model.AttemptData != null && Model.Result == null)
+    {
+        <div class="attempt-header">
+            <h1>@Model.AttemptData.QuizTitle</h1>
+            <div class="attempt-meta">
+                <span><i class="fas fa-hashtag"></i> Attempt #@Model.AttemptData.AttemptId</span>
+                <span><i class="fas fa-question-circle"></i> @Model.AttemptData.Questions.Count questions</span>
+                @if (Model.AttemptData.TimeLimitMin.HasValue)
+                {
+                    <span class="timer-badge" id="timerBadge">
+                        <i class="fas fa-clock"></i>
+                        <span id="timerDisplay">@Model.AttemptData.TimeLimitMin:00</span>
+                    </span>
+                }
+                @if (Model.AttemptData.EndAt.HasValue)
+                {
+                    <span><i class="fas fa-calendar-times"></i> Deadline: @Model.AttemptData.EndAt.Value.ToString("MMM dd, HH:mm")</span>
+                }
+            </div>
+            @if (!string.IsNullOrEmpty(Model.AttemptData.ShuffleNote))
+            {
+                <div class="alert alert-info alert-sm">
+                    <i class="fas fa-info-circle"></i> @Model.AttemptData.ShuffleNote
+                </div>
+            }
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage
+            </div>
+        }
+
+        <form method="post">
+            <input type="hidden" asp-for="AttemptId" value="@Model.AttemptData.AttemptId" />
+            <input type="hidden" asp-for="QuizId" value="@Model.AttemptData.QuizId" />
+
+            <div class="questions-list">
+                @for (var i = 0; i < Model.AttemptData.Questions.Count; i++)
+                {
+                    var question = Model.AttemptData.Questions[i];
+                    <div class="question-card" id="question-@question.QuestionId">
+                        <div class="question-header">
+                            <span class="question-number">Question @(i + 1)</span>
+                            <span class="question-points">@question.Points pts</span>
+                            <span class="question-type-badge">@question.QuestionType</span>
+                        </div>
+                        <div class="question-text">
+                            @question.QuestionText
+                        </div>
+                        <div class="answer-options">
+                            <input type="hidden"
+                                   name="SubmittedAnswers[@i].QuestionId"
+                                   value="@question.QuestionId" />
+                            @foreach (var answer in question.Answers)
+                            {
+                                <label class="answer-option">
+                                    <input type="radio"
+                                           name="SubmittedAnswers[@i].SelectedAnswerId"
+                                           value="@answer.AnswerId"
+                                           required />
+                                    <span class="answer-radio"></span>
+                                    <span class="answer-text">@answer.AnswerText</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="submit-section">
+                <button type="submit" class="btn btn-primary btn-lg" id="btnSubmit">
+                    <i class="fas fa-paper-plane"></i> Submit Quiz
+                </button>
+                <p class="submit-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    You can only submit once. Make sure you've answered all questions.
+                </p>
+            </div>
+        </form>
+    }
+</div>
+
+@section Scripts {
+    @if (Model.AttemptData != null && Model.Result == null && Model.AttemptData.TimeLimitMin.HasValue)
+    {
+        <script>
+            (function () {
+                const timeLimitMin = @Model.AttemptData.TimeLimitMin.Value;
+                const startedAtUtc = new Date("@Model.AttemptData.StartedAt.ToString("o")");
+                const timerDisplay = document.getElementById('timerDisplay');
+                const timerBadge = document.getElementById('timerBadge');
+                const submitBtn = document.getElementById('btnSubmit');
+
+                function updateTimer() {
+                    const now = new Date();
+                    const elapsedMs = now - startedAtUtc;
+                    const limitMs = timeLimitMin * 60 * 1000;
+                    const remainMs = limitMs - elapsedMs;
+
+                    if (remainMs <= 0) {
+                        timerDisplay.textContent = "0:00";
+                        timerBadge.classList.add('timer-expired');
+                        // Auto-submit
+                        if (submitBtn) {
+                            submitBtn.click();
+                        }
+                        return;
+                    }
+
+                    const mins = Math.floor(remainMs / 60000);
+                    const secs = Math.floor((remainMs % 60000) / 1000);
+                    timerDisplay.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+
+                    if (remainMs < 60000) {
+                        timerBadge.classList.add('timer-warning');
+                    }
+
+                    setTimeout(updateTimer, 1000);
+                }
+
+                updateTimer();
+            })();
+
+            // Confirm before submit
+            document.querySelector('form')?.addEventListener('submit', function (e) {
+                const unanswered = document.querySelectorAll('.question-card').length -
+                    document.querySelectorAll('input[type="radio"]:checked').length;
+                if (unanswered > 0) {
+                    if (!confirm('You have ' + unanswered + ' unanswered question(s). Submit anyway?')) {
+                        e.preventDefault();
+                    }
+                }
+            });
+        </script>
+    }
+}

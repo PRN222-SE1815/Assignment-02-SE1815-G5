@@ -1,0 +1,104 @@
+﻿@page
+@model Presentation.Areas.Student.Pages.Quiz.IndexModel
+@{
+    ViewBag.Title = "Quizzes";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Student/quiz.css" asp-append-version="true" />
+}
+
+<div class="quiz-container">
+    <div class="quiz-header">
+        <h1><i class="fas fa-clipboard-list"></i> Published Quizzes</h1>
+        @if (Model.ClassSectionId > 0)
+        {
+            <p class="text-muted">Class Section #@Model.ClassSectionId</p>
+        }
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage
+        </div>
+    }
+
+    @if (Model.Quizzes.Count == 0 && string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="empty-state">
+            <i class="fas fa-clipboard-check fa-3x"></i>
+            <h3>No Quizzes Available</h3>
+            <p>There are no published quizzes available for you at this time.</p>
+        </div>
+    }
+    else
+    {
+        <div class="quiz-list">
+            @foreach (var quiz in Model.Quizzes)
+            {
+                var now = DateTime.UtcNow;
+                var isActive = (!quiz.StartAt.HasValue || now >= quiz.StartAt.Value)
+                               && (!quiz.EndAt.HasValue || now <= quiz.EndAt.Value);
+                var hasEnded = quiz.EndAt.HasValue && now > quiz.EndAt.Value;
+                var notStarted = quiz.StartAt.HasValue && now < quiz.StartAt.Value;
+
+                <div class="quiz-card @(isActive ? "quiz-active" : hasEnded ? "quiz-ended" : "quiz-pending")">
+                    <div class="quiz-card-header">
+                        <h3>@quiz.QuizTitle</h3>
+                        <span class="quiz-badge @(isActive ? "badge-active" : hasEnded ? "badge-ended" : "badge-pending")">
+                            @(isActive ? "Open" : hasEnded ? "Ended" : "Not Started")
+                        </span>
+                    </div>
+
+                    @if (!string.IsNullOrEmpty(quiz.Description))
+                    {
+                        <p class="quiz-description">@quiz.Description</p>
+                    }
+
+                    <div class="quiz-meta">
+                        @if (!string.IsNullOrEmpty(quiz.ClassSectionCode))
+                        {
+                            <span><i class="fas fa-bookmark"></i> @quiz.ClassSectionCode</span>
+                        }
+                        <span><i class="fas fa-question-circle"></i> @quiz.TotalQuestions questions</span>
+                        @if (quiz.TimeLimitMin.HasValue)
+                        {
+                            <span><i class="fas fa-clock"></i> @quiz.TimeLimitMin min</span>
+                        }
+                        @if (quiz.StartAt.HasValue)
+                        {
+                            <span><i class="fas fa-play"></i> Start: @quiz.StartAt.Value.ToString("MMM dd, yyyy HH:mm")</span>
+                        }
+                        @if (quiz.EndAt.HasValue)
+                        {
+                            <span><i class="fas fa-stop"></i> End: @quiz.EndAt.Value.ToString("MMM dd, yyyy HH:mm")</span>
+                        }
+                    </div>
+
+                    <div class="quiz-actions">
+                        @if (isActive)
+                        {
+                            <a asp-area="Student" asp-page="/Quiz/Attempt" asp-route-quizId="@quiz.QuizId"
+                               class="btn btn-primary">
+                                <i class="fas fa-play-circle"></i> Start Quiz
+                            </a>
+                        }
+                        else if (notStarted)
+                        {
+                            <button class="btn btn-secondary" disabled>
+                                <i class="fas fa-hourglass-start"></i> Not Available Yet
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-secondary" disabled>
+                                <i class="fas fa-ban"></i> Closed
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

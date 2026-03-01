@@ -1,0 +1,518 @@
+Changed database context to 'SchoolManagementDb'.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 12
+There is already an object named 'Users' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'UQ_Users_Username' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_Users_Role' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'Programs' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'UQ_Programs_ProgramCode' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'Semesters' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'UQ_Semesters_SemesterCode' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_Semesters_DateRange' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'Students' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_Students_Users' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_Students_Programs' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_Students_CurrentSemester' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'UQ_Students_StudentCode' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'Teachers' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_Teachers_Users' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'UQ_Teachers_TeacherCode' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'Courses' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'UQ_Courses_CourseCode' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_Courses_Credits' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CoursePrerequisites' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_CoursePrerequisites_Course' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_CoursePrerequisites_Prereq' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_CoursePrerequisites_NoSelf' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 6
+There is already an object named 'ClassSections' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_ClassSections_Semesters' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ClassSections_Courses' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ClassSections_Teachers' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'UQ_ClassSections_Sem_Course_Section' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_ClassSections_Capacity' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'Enrollments' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_Enrollments_Students' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_Enrollments_ClassSections' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_Enrollments_Semesters' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_Enrollments_Courses' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_Enrollments_Status' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_Enrollments_CreditsSnapshot' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 1913, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 3
+The operation failed because an index or statistics with name 'UX_Enrollments_Student_Course_Sem_Active' already exists on table 'dbo.Enrollments'.
+Msg 1913, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+The operation failed because an index or statistics with name 'IX_Enrollments_ClassSection' already exists on table 'dbo.Enrollments'.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 6
+There is already an object named 'GradeBooks' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_GradeBooks_ClassSections' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'UQ_GradeBooks_ClassSection' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_GradeBooks_Status' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 3
+There is already an object named 'GradeBookApprovals' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_GradeItems_GradeBooks' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_GradeItems_MaxScore' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_GradeItems_Weight' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'GradeEntries' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_GradeEntries_GradeItems' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_GradeEntries_Enrollments' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_GradeEntries_UpdatedBy' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_GradeEntries_Score' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'UQ_GradeEntries_Item_Enrollment' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'GradeAuditLogs' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_GradeAuditLogs_GradeEntries' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_GradeAuditLogs_Actor' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 6
+There is already an object named 'ChatRooms' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_ChatRooms_Courses' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ChatRooms_ClassSections' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ChatRooms_CreatedBy' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_ChatRooms_RoomType' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'CK_ChatRooms_Status' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'ChatRoomMembers' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_ChatRoomMembers_Room' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ChatRoomMembers_User' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_ChatRoomMembers_Role' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'CK_ChatRoomMembers_Status' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'ChatMessages' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_ChatMessages_Room' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ChatMessages_Sender' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_ChatMessages_Type' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 1913, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+The operation failed because an index or statistics with name 'IX_ChatMessages_Room_CreatedAt' already exists on table 'dbo.ChatMessages'.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'ChatMessageAttachments' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_ChatMessageAttachments_Message' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'ChatModerationLogs' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_ChatModerationLogs_Room' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ChatModerationLogs_Actor' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ChatModerationLogs_TargetUser' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ChatModerationLogs_TargetMessage' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 6
+There is already an object named 'Recurrences' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_Recurrences_DateRange' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'ScheduleEvents' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_ScheduleEvents_ClassSection' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ScheduleEvents_Recurrence' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ScheduleEvents_Teacher' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ScheduleEvents_CreatedBy' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ScheduleEvents_UpdatedBy' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_ScheduleEvents_Time' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_ScheduleEvents_Status' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 1913, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+The operation failed because an index or statistics with name 'IX_ScheduleEvents_ClassSection_StartAt' already exists on table 'dbo.ScheduleEvents'.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'ScheduleEventOverrides' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_ScheduleEventOverrides_Recurrence' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ScheduleEventOverrides_Teacher' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_ScheduleEventOverrides_Type' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'ScheduleChangeLogs' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_ScheduleChangeLogs_Event' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_ScheduleChangeLogs_Actor' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 6
+There is already an object named 'Notifications' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_Notifications_Status' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'NotificationRecipients' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_NotificationRecipients_Notification' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_NotificationRecipients_User' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 6
+There is already an object named 'AIChatSessions' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_AIChatSessions_User' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'AIChatMessages' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_AIChatMessages_Session' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'CK_AIChatMessages_SenderType' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'AIToolCalls' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_AIToolCalls_Session' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'CK_AIToolCalls_Status' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 3, Server DESKTOP-I5207PI\SQLEXPRESS, Procedure vw_ClassSectionSummary, Line 6
+There is already an object named 'vw_ClassSectionSummary' in the database.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'Quizzes' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_Quizzes_ClassSection' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 4
+There is already an object named 'QuizQuestions' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_QuizQuestions_Quiz' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'QuizAnswers' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_QuizAnswers_Question' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'QuizAttempts' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_QuizAttempts_Quiz' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 4
+There is already an object named 'QuizAttemptAnswers' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_QAA_Attempt' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 15
+There is already an object named 'StudentWallets' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_StudentWallets_Students' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'UQ_StudentWallets_Student' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 6
+There is already an object named 'TuitionFees' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_TuitionFees_Students' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_TuitionFees_Semesters' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'CK_TuitionFees_Status' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'UQ_TuitionFees_Student_Semester' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 5
+There is already an object named 'PaymentTransactions' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_PaymentTransactions_Students' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 1913, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+The operation failed because an index or statistics with name 'UX_PaymentTransactions_MoMoOrderId' already exists on table 'dbo.PaymentTransactions'.
+Msg 2714, Level 16, State 6, Server DESKTOP-I5207PI\SQLEXPRESS, Line 6
+There is already an object named 'WalletTransactions' in the database.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+There is already an object named 'FK_WalletTransactions_Wallet' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 2
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_WalletTransactions_Payment' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2714, Level 16, State 5, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+There is already an object named 'FK_WalletTransactions_Fee' in the database.
+Msg 1750, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 1
+Could not create constraint or index. See previous errors.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 5
+Violation of UNIQUE KEY constraint 'UQ_Programs_ProgramCode'. Cannot insert duplicate key in object 'dbo.Programs'. The duplicate key value is (SE).
+The statement has been terminated.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 3
+Violation of UNIQUE KEY constraint 'UQ_Semesters_SemesterCode'. Cannot insert duplicate key in object 'dbo.Semesters'. The duplicate key value is (SP26).
+The statement has been terminated.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 3
+Violation of UNIQUE KEY constraint 'UQ_Courses_CourseCode'. Cannot insert duplicate key in object 'dbo.Courses'. The duplicate key value is (PRN211).
+The statement has been terminated.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 9
+Violation of UNIQUE KEY constraint 'UQ_Users_Username'. Cannot insert duplicate key in object 'dbo.Users'. The duplicate key value is (admin).
+The statement has been terminated.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 13
+Violation of UNIQUE KEY constraint 'UQ_Users_Username'. Cannot insert duplicate key in object 'dbo.Users'. The duplicate key value is (teacher1).
+The statement has been terminated.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 21
+Violation of UNIQUE KEY constraint 'UQ_Users_Username'. Cannot insert duplicate key in object 'dbo.Users'. The duplicate key value is (student1).
+The statement has been terminated.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 7
+Violation of PRIMARY KEY constraint 'PK_Teachers'. Cannot insert duplicate key in object 'dbo.Teachers'. The duplicate key value is (2).
+The statement has been terminated.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 7
+Violation of PRIMARY KEY constraint 'PK_Students'. Cannot insert duplicate key in object 'dbo.Students'. The duplicate key value is (7).
+The statement has been terminated.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 11
+Violation of UNIQUE KEY constraint 'UQ_ClassSections_Sem_Course_Section'. Cannot insert duplicate key in object 'dbo.ClassSections'. The duplicate key value is (1, 2, SE1801).
+The statement has been terminated.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 13
+Violation of UNIQUE KEY constraint 'UQ_Users_Username'. Cannot insert duplicate key in object 'dbo.Users'. The duplicate key value is (teacher6).
+The statement has been terminated.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 3
+Violation of UNIQUE KEY constraint 'UQ_Users_Username'. Cannot insert duplicate key in object 'dbo.Users'. The duplicate key value is (student15).
+The statement has been terminated.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 5
+Violation of UNIQUE KEY constraint 'UQ_Programs_ProgramCode'. Cannot insert duplicate key in object 'dbo.Programs'. The duplicate key value is (IS).
+The statement has been terminated.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 5
+Violation of UNIQUE KEY constraint 'UQ_Semesters_SemesterCode'. Cannot insert duplicate key in object 'dbo.Semesters'. The duplicate key value is (FA22).
+The statement has been terminated.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 5
+Violation of UNIQUE KEY constraint 'UQ_Courses_CourseCode'. Cannot insert duplicate key in object 'dbo.Courses'. The duplicate key value is (MAE101).
+The statement has been terminated.
+Msg 2627, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 5
+Violation of UNIQUE KEY constraint 'UQ_ClassSections_Sem_Course_Section'. Cannot insert duplicate key in object 'dbo.ClassSections'. The duplicate key value is (1, 1, PRN211-S01).
+The statement has been terminated.
+Msg 2601, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 7
+Cannot insert duplicate key row in object 'dbo.Enrollments' with unique index 'UX_Enrollments_Student_Course_Sem_Active'. The duplicate key value is (7, 1, 1).
+The statement has been terminated.
+Msg 2601, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 5
+Cannot insert duplicate key row in object 'dbo.PaymentTransactions' with unique index 'UX_PaymentTransactions_MoMoOrderId'. The duplicate key value is (ORD-701).
+The statement has been terminated.
+Msg 2601, Level 14, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 5
+Cannot insert duplicate key row in object 'dbo.QuizAttempts' with unique index 'UX_QuizAttempts_OnePerStudent'. The duplicate key value is (5, 4).
+The statement has been terminated.
+Msg 207, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 28
+Invalid column name 'UserId'.
+Msg 207, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 36
+Invalid column name 'UserId'.
+Msg 207, Level 16, State 1, Server DESKTOP-I5207PI\SQLEXPRESS, Line 8
+Invalid column name 'UserId'.
+Seed data inserted successfully!
