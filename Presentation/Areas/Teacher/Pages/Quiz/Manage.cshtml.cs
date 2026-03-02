@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+﻿﻿using System.Security.Claims;
 using BusinessLogic.DTOs.Requests.Quiz;
 using BusinessLogic.Exceptions;
 using BusinessLogic.Services.Interfaces;
@@ -35,6 +35,7 @@ public class ManageModel : PageModel
     public DateTime? PublishEndAt { get; set; }
 
     public List<QuizQuestion> Questions { get; set; } = new();
+    public string QuizStatus { get; set; } = "DRAFT";
 
     public async Task<IActionResult> OnGetAsync(int quizId)
     {
@@ -162,7 +163,11 @@ public class ManageModel : PageModel
         {
             var userId = GetUserId();
             if (userId > 0)
+            {
                 Questions = await _quizService.GetQuizQuestionsAsync(userId, nameof(UserRole.TEACHER), QuizId);
+                var quiz = await _quizService.GetQuizSummaryAsync(userId, nameof(UserRole.TEACHER), QuizId);
+                if (quiz != null) QuizStatus = quiz.Status;
+            }
         }
         catch (Exception ex)
         {

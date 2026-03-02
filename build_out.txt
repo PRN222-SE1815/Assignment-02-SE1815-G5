@@ -1,0 +1,23 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  BusinessObject -> D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\BusinessObject\bin\Debug\net8.0\BusinessObject.dll
+  DataAccess -> D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\DataAccess\bin\Debug\net8.0\DataAccess.dll
+D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\BusinessLogic\Services\Implements\CourseManagementService.cs(188,34): warning CS8602: Dereference of a possibly null reference. [D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\BusinessLogic\BusinessLogic.csproj]
+  BusinessLogic -> D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\BusinessLogic\bin\Debug\net8.0\BusinessLogic.dll
+D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\Presentation\Areas\Admin\Pages\ScheduleManagement\Index.cshtml.cs(30,16): warning CS0108: 'IndexModel.Page' hides inherited member 'PageModel.Page()'. Use the new keyword if hiding was intended. [D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\Presentation\Presentation.csproj]
+D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\Presentation\Pages\Notifications\Index.cshtml.cs(58,6): warning MVC1001: 'ValidateAntiForgeryTokenAttribute' cannot be applied to Razor Page handler methods. It may be applied either to the Razor Page model or applied globally. [D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\Presentation\Presentation.csproj]
+D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\Presentation\Pages\Notifications\Index.cshtml.cs(77,6): warning MVC1001: 'ValidateAntiForgeryTokenAttribute' cannot be applied to Razor Page handler methods. It may be applied either to the Razor Page model or applied globally. [D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\Presentation\Presentation.csproj]
+  Presentation -> D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\Presentation\bin\Debug\net8.0\Presentation.dll
+
+Build succeeded.
+
+D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\BusinessLogic\Services\Implements\CourseManagementService.cs(188,34): warning CS8602: Dereference of a possibly null reference. [D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\BusinessLogic\BusinessLogic.csproj]
+D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\Presentation\Areas\Admin\Pages\ScheduleManagement\Index.cshtml.cs(30,16): warning CS0108: 'IndexModel.Page' hides inherited member 'PageModel.Page()'. Use the new keyword if hiding was intended. [D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\Presentation\Presentation.csproj]
+D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\Presentation\Pages\Notifications\Index.cshtml.cs(58,6): warning MVC1001: 'ValidateAntiForgeryTokenAttribute' cannot be applied to Razor Page handler methods. It may be applied either to the Razor Page model or applied globally. [D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\Presentation\Presentation.csproj]
+D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\Presentation\Pages\Notifications\Index.cshtml.cs(77,6): warning MVC1001: 'ValidateAntiForgeryTokenAttribute' cannot be applied to Razor Page handler methods. It may be applied either to the Razor Page model or applied globally. [D:\SEMESTER07\PRN222\Assignment-02-SE1815-G5\Presentation\Presentation.csproj]
+    4 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:10.77
+
+Workload updates are available. Run `dotnet workload list` for more information.

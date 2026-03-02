@@ -3,7 +3,9 @@ using BusinessLogic.DTOs.Requests.Quiz;
 using BusinessLogic.DTOs.Responses.Quiz;
 using BusinessLogic.Exceptions;
 using BusinessLogic.Services.Interfaces;
+using BusinessObject.Entities;
 using BusinessObject.Enum;
+using DataAccess.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,11 +16,13 @@ namespace Presentation.Areas.Teacher.Pages.Quiz;
 public class IndexModel : PageModel
 {
     private readonly IQuizService _quizService;
+    private readonly IClassSectionRepository _classSectionRepository;
     private readonly ILogger<IndexModel> _logger;
 
-    public IndexModel(IQuizService quizService, ILogger<IndexModel> logger)
+    public IndexModel(IQuizService quizService, IClassSectionRepository classSectionRepository, ILogger<IndexModel> logger)
     {
         _quizService = quizService;
+        _classSectionRepository = classSectionRepository;
         _logger = logger;
     }
 
@@ -34,8 +38,15 @@ public class IndexModel : PageModel
     [BindProperty]
     public CreateQuizRequest CreateRequest { get; set; } = new();
 
-    public IActionResult OnGet()
+    public IReadOnlyList<ClassSection> TeacherClasses { get; set; } = new List<ClassSection>();
+
+    public async Task<IActionResult> OnGetAsync()
     {
+        var userId = GetUserId();
+        if (userId != 0)
+        {
+            TeacherClasses = await _classSectionRepository.GetByTeacherIdAsync(userId);
+        }
         return Page();
     }
 
@@ -79,6 +90,7 @@ public class IndexModel : PageModel
             ErrorMessage = "An unexpected error occurred.";
         }
 
+        TeacherClasses = await _classSectionRepository.GetByTeacherIdAsync(userId);
         return Page();
     }
 

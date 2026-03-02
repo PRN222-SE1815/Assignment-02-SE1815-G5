@@ -1,4 +1,4 @@
-﻿using BusinessLogic.DTOs.Requests.Quiz;
+﻿﻿using BusinessLogic.DTOs.Requests.Quiz;
 using BusinessLogic.DTOs.Responses.Quiz;
 using BusinessObject.Entities;
 
@@ -52,6 +52,11 @@ public interface IQuizService
     Task<List<QuizSummaryResponse>> ListQuizzesForTeacherAsync(int teacherUserId, string actorRole);
 
     /// <summary>
+    /// Get the list of class sections taught by the teacher for quiz filter dropdown.
+    /// </summary>
+    Task<List<ClassSectionSummary>> GetTeacherClassSectionsForQuizFilterAsync(int teacherUserId, string actorRole);
+
+    /// <summary>
     /// Delete a quiz and all associated data. Only DRAFT quizzes can be deleted.
     /// </summary>
     Task DeleteQuizAsync(int teacherUserId, string actorRole, int quizId);
@@ -72,6 +77,16 @@ public interface IQuizService
     /// Get all questions with answers for a quiz (teacher view).
     /// </summary>
     Task<List<QuizQuestion>> GetQuizQuestionsAsync(int teacherUserId, string actorRole, int quizId);
+
+    /// <summary>
+    /// Get a single quiz summary by ID (teacher view). Returns null if not found or not authorized.
+    /// </summary>
+    Task<QuizSummaryResponse?> GetQuizSummaryAsync(int teacherUserId, string actorRole, int quizId);
+
+    /// <summary>
+    /// Get all quiz attempts for a specific quiz (teacher view).
+    /// </summary>
+    Task<List<QuizAttempt>> GetQuizAttemptsAsync(int teacherUserId, string actorRole, int quizId);
 
     // ==================== STUDENT Operations ====================
 

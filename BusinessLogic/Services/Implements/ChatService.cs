@@ -1,4 +1,4 @@
-﻿using BusinessLogic.DTOs.Requests.Chat;
+﻿﻿using BusinessLogic.DTOs.Requests.Chat;
 using BusinessLogic.DTOs.Response;
 using BusinessLogic.DTOs.Responses.Chat;
 using BusinessLogic.Services.Interfaces;
@@ -553,7 +553,8 @@ public sealed class ChatService : IChatService
         FileUrl = a.FileUrl,
         FileType = a.FileType,
         FileSizeBytes = a.FileSizeBytes,
-        CreatedAt = a.CreatedAt
+        CreatedAt = a.CreatedAt,
+        OriginalName = Path.GetFileName(a.FileUrl)
     };
 
     #endregion

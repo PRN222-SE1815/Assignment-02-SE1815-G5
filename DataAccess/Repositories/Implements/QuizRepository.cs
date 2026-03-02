@@ -196,6 +196,20 @@ public class QuizRepository : IQuizRepository
             .FirstOrDefaultAsync(ct);
     }
 
+    public async Task<List<QuizAttempt>> GetAttemptsForQuizAsync(int quizId)
+    {
+        return await _context.QuizAttempts
+            .AsNoTracking()
+            .Include(a => a.Quiz)
+                .ThenInclude(q => q.ClassSection)
+            .Include(a => a.Enrollment)
+                .ThenInclude(e => e.Student)
+                    .ThenInclude(s => s.StudentNavigation)
+            .Where(a => a.QuizId == quizId)
+            .OrderByDescending(a => a.StartedAt)
+            .ToListAsync();
+    }
+
     public async Task<GradeItem?> FindGradeItemForQuizAsync(int gradeBookId, int quizId, CancellationToken ct = default)
     {
         var mappingName = $"QUIZ:{quizId}";

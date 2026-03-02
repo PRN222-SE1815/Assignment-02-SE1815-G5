@@ -43,9 +43,21 @@
     <div class="form-card">
         <form method="post" asp-page-handler="Create">
             <div class="form-group">
-                <label asp-for="CreateRequest.ClassSectionId" class="form-label">Class Section ID *</label>
-                <input asp-for="CreateRequest.ClassSectionId" class="form-input" type="number" min="1"
-                       value="@(Model.ClassSectionId ?? 0)" required />
+                <label asp-for="CreateRequest.ClassSectionId" class="form-label">Class Section *</label>
+                <select asp-for="CreateRequest.ClassSectionId" class="form-input" required>
+                    <option value="">-- Select a Class Section --</option>
+                    @foreach (var cls in Model.TeacherClasses)
+                    {
+                        if (Model.ClassSectionId == cls.ClassSectionId)
+                        {
+                            <option value="@cls.ClassSectionId" selected>@cls.Course.CourseCode - @cls.SectionCode</option>
+                        }
+                        else
+                        {
+                            <option value="@cls.ClassSectionId">@cls.Course.CourseCode - @cls.SectionCode</option>
+                        }
+                    }
+                </select>
                 <span asp-validation-for="CreateRequest.ClassSectionId" class="field-validation-error"></span>
             </div>
 

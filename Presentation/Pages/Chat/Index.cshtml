@@ -134,9 +134,21 @@
                                         <div class="message-attachments">
                                             @foreach (var att in msg.Attachments)
                                             {
-                                                <a href="@att.FileUrl" target="_blank" class="attachment-link">
-                                                    <i class="fas fa-paperclip"></i> @att.FileType
-                                                </a>
+                                                var imgExts = new[] { "jpg", "jpeg", "png", "gif", "webp" };
+                                                var isImage = imgExts.Contains(att.FileType.ToLower());
+                                                @if (isImage)
+                                                {
+                                                    <a href="@att.FileUrl" target="_blank" class="attachment-image-link">
+                                                        <img src="@att.FileUrl" alt="@att.OriginalName" class="attachment-thumbnail" />
+                                                    </a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="@att.FileUrl" target="_blank" class="attachment-file-link">
+                                                        <i class="fas fa-file"></i>
+                                                        <span>@(string.IsNullOrEmpty(att.OriginalName) ? att.FileType : att.OriginalName)</span>
+                                                    </a>
+                                                }
                                             }
                                         </div>
                                     }
@@ -183,13 +195,15 @@
                         <i class="fas fa-times"></i> Cancel
                     </button>
                 </div>
-                <div class="attachment-preview-area" id="attachmentPreviewArea" style="display:none;"></div>
+                <!-- File previews -->
+                <div class="attachment-preview-bar" id="attachmentPreviewBar" style="display:none;"></div>
                 <form id="messageForm" onsubmit="return handleSendMessage(event);">
                     <input type="file" id="chatFileInput" multiple style="display:none;" onchange="handleFileSelect(event)" />
                     <div class="input-row">
-                        <button type="button" class="btn-attach" id="btnAttach" title="Attach files" onclick="document.getElementById('chatFileInput').click()">
+                        <label class="btn-attach" for="fileInput" title="Attach file">
                             <i class="fas fa-paperclip"></i>
-                        </button>
+                        </label>
+                        <input type="file" id="fileInput" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.zip,.mp4,.mp3" style="display:none;" onchange="handleFileSelected(event)" />
                         <input type="text" id="messageInput" placeholder="Type a message..."
                                autocomplete="off" maxlength="2000" />
                         <button type="submit" class="btn-send" id="btnSend" title="Send">

@@ -6,6 +6,7 @@
 public class QuizSummaryResponse
 {
     public int QuizId { get; set; }
+    public int ClassSectionId { get; set; }
     public string QuizTitle { get; set; } = string.Empty;
     public string? Description { get; set; }
     public int TotalQuestions { get; set; }

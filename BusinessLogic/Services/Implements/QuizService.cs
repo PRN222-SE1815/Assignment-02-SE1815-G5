@@ -1,4 +1,4 @@
-﻿using BusinessLogic.DTOs.Requests.Quiz;
+﻿﻿using BusinessLogic.DTOs.Requests.Quiz;
 using BusinessLogic.DTOs.Requests.Gradebook;
 using BusinessLogic.DTOs.Responses.Quiz;
 using BusinessLogic.Exceptions;
@@ -389,6 +389,42 @@ public class QuizService : IQuizService
         return await _quizRepo.GetQuestionsWithAnswersAsync(quizId);
     }
 
+    public async Task<QuizSummaryResponse?> GetQuizSummaryAsync(int teacherUserId, string actorRole, int quizId)
+    {
+        EnsureTeacherRole(actorRole);
+
+        var quiz = await _quizRepo.GetQuizWithClassSectionAsync(quizId);
+        if (quiz == null || quiz.ClassSection.TeacherId != teacherUserId)
+            return null;
+
+        return new QuizSummaryResponse
+        {
+            QuizId = quiz.QuizId,
+            ClassSectionId = quiz.ClassSectionId,
+            QuizTitle = quiz.QuizTitle,
+            Description = quiz.Description,
+            TotalQuestions = quiz.TotalQuestions,
+            TimeLimitMin = quiz.TimeLimitMin,
+            StartAt = quiz.StartAt,
+            EndAt = quiz.EndAt,
+            Status = quiz.Status,
+            CreatedAt = quiz.CreatedAt,
+            ClassSectionCode = quiz.ClassSection?.SectionCode ?? ""
+        };
+    }
+
+    public async Task<List<QuizAttempt>> GetQuizAttemptsAsync(int teacherUserId, string actorRole, int quizId)
+    {
+        EnsureTeacherRole(actorRole);
+
+        var quiz = await _quizRepo.GetQuizWithClassSectionAsync(quizId);
+        if (quiz == null) throw new NotFoundException("Quiz", quizId);
+        if (quiz.ClassSection.TeacherId != teacherUserId)
+            throw new ForbiddenException("You are not the teacher of this quiz's class section.");
+
+        return await _quizRepo.GetAttemptsForQuizAsync(quizId);
+    }
+
     // ==================== STUDENT Operations ====================
 
     public async Task<List<QuizSummaryResponse>> ListQuizzesForTeacherAsync(
@@ -401,6 +437,7 @@ public class QuizService : IQuizService
         return quizzes.Select(q => new QuizSummaryResponse
         {
             QuizId = q.QuizId,
+            ClassSectionId = q.ClassSectionId,
             QuizTitle = q.QuizTitle,
             Description = q.Description,
             TotalQuestions = q.TotalQuestions,
@@ -411,6 +448,23 @@ public class QuizService : IQuizService
             CreatedAt = q.CreatedAt,
             ClassSectionCode = q.ClassSection?.SectionCode ?? ""
         }).ToList();
+    }
+
+    public async Task<List<ClassSectionSummary>> GetTeacherClassSectionsForQuizFilterAsync(
+        int teacherUserId, string actorRole)
+    {
+        EnsureTeacherRole(actorRole);
+
+        return await _dbContext.ClassSections
+            .AsNoTracking()
+            .Where(cs => cs.TeacherId == teacherUserId)
+            .OrderBy(cs => cs.SectionCode)
+            .Select(cs => new ClassSectionSummary
+            {
+                ClassSectionId = cs.ClassSectionId,
+                SectionCode = cs.SectionCode
+            })
+            .ToListAsync();
     }
 
     public async Task<List<QuizSummaryResponse>> ListPublishedQuizzesForClassAsync(

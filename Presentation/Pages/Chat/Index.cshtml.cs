@@ -89,45 +89,48 @@ public class IndexModel : PageModel
         return new JsonResult(users);
     }
 
-    [HttpPost]
-    [IgnoreAntiforgeryToken]
-    public async Task<IActionResult> OnPostUploadFilesAsync(IFormFileCollection files)
+    /// <summary>AJAX endpoint: upload a file attachment and return its URL.</summary>
+    public async Task<IActionResult> OnPostUploadFileAsync(IFormFile? file)
     {
         var userId = GetUserId();
         if (userId == 0) return Unauthorized();
 
-        if (files is null || files.Count == 0)
-            return BadRequest("No files found.");
+        if (file is null || file.Length == 0)
+            return BadRequest(new { error = "No file provided." });
 
-        var uploadPath = Path.Combine(_env.WebRootPath, "uploads", "chat");
-        if (!Directory.Exists(uploadPath))
-            Directory.CreateDirectory(uploadPath);
+        // 20 MB limit
+        const long maxSize = 20 * 1024 * 1024;
+        if (file.Length > maxSize)
+            return BadRequest(new { error = "File exceeds the 20 MB limit." });
 
-        var result = new List<ChatAttachmentInput>();
+        // Allowed extensions
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        var allowed = new HashSet<string> { ".jpg", ".jpeg", ".png", ".gif", ".webp", ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".zip", ".mp4", ".mp3" };
+        if (!allowed.Contains(ext))
+            return BadRequest(new { error = $"File type '{ext}' is not allowed." });
 
-        foreach (var file in files)
+        // Save to wwwroot/uploads/chat/
+        var uploadsDir = Path.Combine(_env.WebRootPath, "uploads", "chat");
+        Directory.CreateDirectory(uploadsDir);
+
+        var uniqueName = $"{Guid.NewGuid()}{ext}";
+        var filePath = Path.Combine(uploadsDir, uniqueName);
+
+        await using var stream = new FileStream(filePath, FileMode.Create);
+        await file.CopyToAsync(stream);
+
+        var fileUrl = $"/uploads/chat/{uniqueName}";
+        var fileType = ext.TrimStart('.');
+
+        _logger.LogInformation("User {UserId} uploaded chat file {FileName} -> {FileUrl}", userId, file.FileName, fileUrl);
+
+        return new JsonResult(new
         {
-            if (file.Length == 0) continue;
-
-            // Generate a unique filename
-            var ext = Path.GetExtension(file.FileName);
-            var newFileName = $"{Guid.NewGuid()}{ext}";
-            var filePath = Path.Combine(uploadPath, newFileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            result.Add(new ChatAttachmentInput
-            {
-                FileUrl = $"/uploads/chat/{newFileName}",
-                FileType = Path.GetFileName(file.FileName), // Store original name as type or you could just store extension
-                FileSizeBytes = file.Length
-            });
-        }
-
-        return new JsonResult(result);
+            fileUrl,
+            fileType,
+            fileSizeBytes = file.Length,
+            originalName = file.FileName
+        });
     }
 
     private int GetUserId()

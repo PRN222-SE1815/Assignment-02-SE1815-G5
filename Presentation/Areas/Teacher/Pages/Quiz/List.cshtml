@@ -29,23 +29,60 @@
     }
 
     <!-- Filter Bar -->
-    <div class="filter-bar">
-        <a asp-area="Teacher" asp-page="/Quiz/List"
-           class="filter-chip @(string.IsNullOrEmpty(Model.StatusFilter) ? "active" : "")">
-            All
-        </a>
-        <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="DRAFT"
-           class="filter-chip @(Model.StatusFilter == "DRAFT" ? "active" : "")">
-            <i class="fas fa-pencil-alt"></i> Draft
-        </a>
-        <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="PUBLISHED"
-           class="filter-chip @(Model.StatusFilter == "PUBLISHED" ? "active" : "")">
-            <i class="fas fa-rocket"></i> Published
-        </a>
-        <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="CLOSED"
-           class="filter-chip @(Model.StatusFilter == "CLOSED" ? "active" : "")">
-            <i class="fas fa-lock"></i> Closed
-        </a>
+    <div class="filter-bar" style="flex-wrap: wrap; gap: 0.5rem;">
+        <!-- Status Filter -->
+        <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+            <a asp-area="Teacher" asp-page="/Quiz/List"
+               asp-route-classSectionFilter="@Model.ClassSectionFilter"
+               class="filter-chip @(string.IsNullOrEmpty(Model.StatusFilter) ? "active" : "")">
+                All Status
+            </a>
+            <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="DRAFT"
+               asp-route-classSectionFilter="@Model.ClassSectionFilter"
+               class="filter-chip @(Model.StatusFilter == "DRAFT" ? "active" : "")">
+                <i class="fas fa-pencil-alt"></i> Draft
+            </a>
+            <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="PUBLISHED"
+               asp-route-classSectionFilter="@Model.ClassSectionFilter"
+               class="filter-chip @(Model.StatusFilter == "PUBLISHED" ? "active" : "")">
+                <i class="fas fa-rocket"></i> Published
+            </a>
+            <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="CLOSED"
+               asp-route-classSectionFilter="@Model.ClassSectionFilter"
+               class="filter-chip @(Model.StatusFilter == "CLOSED" ? "active" : "")">
+                <i class="fas fa-lock"></i> Closed
+            </a>
+        </div>
+
+        <!-- Class Section Filter -->
+        @if (Model.ClassSections.Any())
+        {
+            <form method="get" style="display:flex; align-items:center; gap:0.5rem; margin-left:auto;
+                                      background:#f8f9fa; border:1px solid #e0e0e0; border-radius:10px;
+                                      padding:6px 12px;">
+                @if (!string.IsNullOrEmpty(Model.StatusFilter))
+                {
+                    <input type="hidden" name="statusFilter" value="@Model.StatusFilter" />
+                }
+                <label style="font-weight:600; white-space:nowrap; color:#495057; font-size:0.9rem; margin:0;">
+                    <i class="fas fa-chalkboard" style="color:#6c5ce7;"></i> Class:
+                </label>
+                <select name="classSectionFilter" onchange="this.form.submit()" class="cls-filter-select">
+                    <option value="">— All Classes —</option>
+                    @foreach (var cls in Model.ClassSections)
+                    {
+                        if (Model.ClassSectionFilter == cls.ClassSectionId)
+                        {
+                            <option value="@cls.ClassSectionId" selected>@cls.SectionCode</option>
+                        }
+                        else
+                        {
+                            <option value="@cls.ClassSectionId">@cls.SectionCode</option>
+                        }
+                    }
+                </select>
+            </form>
+        }
     </div>
 
     <!-- Quiz Stats -->
@@ -78,9 +115,9 @@
             <i class="fas fa-clipboard fa-3x"></i>
             <h3>No quizzes found</h3>
             <p>
-                @if (!string.IsNullOrEmpty(Model.StatusFilter))
+                @if (!string.IsNullOrEmpty(Model.StatusFilter) || Model.ClassSectionFilter.HasValue)
                 {
-                    <span>No quizzes with status "@Model.StatusFilter". </span>
+                    <span>No quizzes match the selected filters. </span>
                     <a asp-area="Teacher" asp-page="/Quiz/List">View all quizzes</a>
                 }
                 else
@@ -173,10 +210,11 @@
                                             <i class="fas fa-lock"></i>
                                         </a>
                                     }
-                                    else
-                                    {
-                                        <span class="text-muted"><i class="fas fa-ban"></i></span>
-                                    }
+                                    <!-- View Scores: available for ALL statuses -->
+                                    <a asp-area="Teacher" asp-page="/Quiz/Scores" asp-route-quizId="@quiz.QuizId"
+                                       class="btn btn-sm btn-info" title="View Student Scores">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -186,3 +224,29 @@
         </div>
     }
 </div>
+
+<style>
+    .cls-filter-select {
+        min-width: 180px;
+        padding: 5px 32px 5px 12px;
+        border: 1px solid #d0d0d0;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        color: #333;
+        background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%23666' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E") no-repeat right 10px center / 10px 6px;
+        appearance: none;
+        -webkit-appearance: none;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0,0,0,.06);
+        transition: border-color .2s, box-shadow .2s;
+        outline: none;
+    }
+    .cls-filter-select:focus {
+        border-color: #6c5ce7;
+        box-shadow: 0 0 0 3px rgba(108,92,231,.15);
+    }
+    .cls-filter-select:hover {
+        border-color: #aaa;
+    }
+</style>
+

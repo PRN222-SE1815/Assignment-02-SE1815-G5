@@ -1,0 +1,192 @@
+@page "{quizId:int}"
+@model Presentation.Areas.Teacher.Pages.Quiz.ScoresModel
+@{
+    ViewBag.Title = "Quiz Scores";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/Teacher/quiz.css" asp-append-version="true" />
+    <style>
+        .scores-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .score-stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+        .score-stat-number {
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .score-stat-label {
+            font-size: 0.78rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-top: 0.2rem;
+        }
+        .stat-total    { border-top: 4px solid #6c757d; }
+        .stat-graded   { border-top: 4px solid #28a745; color: #28a745; }
+        .stat-avg      { border-top: 4px solid #0d6efd; color: #0d6efd; }
+        .stat-high     { border-top: 4px solid #198754; color: #198754; }
+        .stat-low      { border-top: 4px solid #dc3545; color: #dc3545; }
+
+        .scores-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .scores-table th, .scores-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .scores-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+        .scores-table tr:hover { background-color: #fafafa; }
+        .score-high { color: #198754; font-weight: bold; }
+        .score-low  { color: #dc3545; font-weight: bold; }
+        .score-normal { font-weight: bold; }
+    </style>
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h2><i class="fas fa-chart-bar text-primary"></i> Quiz Scores</h2>
+            <div class="text-muted">
+                <strong>@(Model.QuizTitle ?? "Unknown Quiz")</strong>
+                @if (!string.IsNullOrEmpty(Model.ClassSectionCode))
+                {
+                    <span class="ms-2 badge bg-secondary">@Model.ClassSectionCode</span>
+                }
+                <span class="ms-2">· @Model.TotalQuestions Questions</span>
+            </div>
+        </div>
+        <a asp-page="/Quiz/List" asp-area="Teacher" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Quizzes
+        </a>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            <i class="fas fa-exclamation-circle"></i> @Model.ErrorMessage
+        </div>
+    }
+
+    <!-- Statistics Cards -->
+    <div class="scores-stats">
+        <div class="score-stat-card stat-total">
+            <div class="score-stat-number text-secondary">@Model.TotalAttempts</div>
+            <div class="score-stat-label">Total Attempts</div>
+        </div>
+        <div class="score-stat-card stat-graded">
+            <div class="score-stat-number">@Model.GradedCount</div>
+            <div class="score-stat-label">Graded</div>
+        </div>
+        <div class="score-stat-card stat-avg">
+            <div class="score-stat-number">
+                @(Model.AverageScore.HasValue ? Model.AverageScore.Value.ToString("F2") : "—")
+            </div>
+            <div class="score-stat-label">Avg Score</div>
+        </div>
+        <div class="score-stat-card stat-high">
+            <div class="score-stat-number">
+                @(Model.HighestScore.HasValue ? Model.HighestScore.Value.ToString("F1") : "—")
+            </div>
+            <div class="score-stat-label">Highest</div>
+        </div>
+        <div class="score-stat-card stat-low">
+            <div class="score-stat-number">
+                @(Model.LowestScore.HasValue ? Model.LowestScore.Value.ToString("F1") : "—")
+            </div>
+            <div class="score-stat-label">Lowest</div>
+        </div>
+    </div>
+
+    @if (Model.Attempts.Any())
+    {
+        <div class="table-responsive">
+            <table class="scores-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Student Name</th>
+                        <th>Student Code</th>
+                        <th>Started At</th>
+                        <th>Submitted At</th>
+                        <th>Status</th>
+                        <th class="text-center">Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int rank = 1;
+                    }
+                    @foreach (var attempt in Model.Attempts)
+                    {
+                        <tr>
+                            <td class="text-muted">@rank</td>
+                            <td><strong>@(attempt.Enrollment?.Student?.StudentNavigation?.FullName ?? "Unknown")</strong></td>
+                            <td><code>@(attempt.Enrollment?.Student?.StudentCode ?? "N/A")</code></td>
+                            <td>@attempt.StartedAt.ToString("MMM dd, yyyy HH:mm")</td>
+                            <td>
+                                @(attempt.SubmittedAt.HasValue
+                                    ? attempt.SubmittedAt.Value.ToString("MMM dd, yyyy HH:mm")
+                                    : "—")
+                            </td>
+                            <td>
+                                @if (attempt.Status == "GRADED")
+                                {
+                                    <span class="badge bg-success">Graded</span>
+                                }
+                                else if (attempt.Status == "IN_PROGRESS")
+                                {
+                                    <span class="badge bg-warning text-dark">In Progress</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">@attempt.Status</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                @if (attempt.Status == "GRADED" && attempt.Score.HasValue)
+                                {
+                                    var scoreClass = attempt.Score == Model.HighestScore ? "score-high"
+                                                   : attempt.Score == Model.LowestScore ? "score-low"
+                                                   : "score-normal";
+                                    <span class="@scoreClass">@attempt.Score.Value.ToString("F1") pts</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+                        </tr>
+                        rank++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if (string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> No attempts have been made for this quiz yet.
+        </div>
+    }
+</div>
