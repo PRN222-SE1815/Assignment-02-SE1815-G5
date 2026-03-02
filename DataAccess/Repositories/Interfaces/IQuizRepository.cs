@@ -101,6 +101,11 @@ public interface IQuizRepository
     Task<QuizAttempt?> GetLatestGradedAttemptByQuizAndEnrollmentAsync(int quizId, int enrollmentId, CancellationToken ct = default);
 
     /// <summary>
+    /// Get all attempts for a specific quiz (for teacher view).
+    /// </summary>
+    Task<List<QuizAttempt>> GetAttemptsForQuizAsync(int quizId);
+
+    /// <summary>
     /// Find grade item mapped to quiz by convention: ItemName = "QUIZ:{quizId}".
     /// </summary>
     Task<GradeItem?> FindGradeItemForQuizAsync(int gradeBookId, int quizId, CancellationToken ct = default);

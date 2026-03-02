@@ -73,6 +73,11 @@ public interface IQuizService
     /// </summary>
     Task<List<QuizQuestion>> GetQuizQuestionsAsync(int teacherUserId, string actorRole, int quizId);
 
+    /// <summary>
+    /// Get all quiz attempts for a specific quiz (teacher view).
+    /// </summary>
+    Task<List<QuizAttempt>> GetQuizAttemptsAsync(int teacherUserId, string actorRole, int quizId);
+
     // ==================== STUDENT Operations ====================
 
     /// <summary>

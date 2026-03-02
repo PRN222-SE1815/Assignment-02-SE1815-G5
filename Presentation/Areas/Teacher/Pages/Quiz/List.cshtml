@@ -172,6 +172,17 @@
                                            class="btn btn-sm btn-danger" title="Close Quiz">
                                             <i class="fas fa-lock"></i>
                                         </a>
+                                        <a asp-area="Teacher" asp-page="/Quiz/Scores" asp-route-quizId="@quiz.QuizId"
+                                           class="btn btn-sm btn-info" title="View Scores">
+                                            <i class="fas fa-chart-bar"></i>
+                                        </a>
+                                    }
+                                    else if (quiz.Status == "CLOSED")
+                                    {
+                                        <a asp-area="Teacher" asp-page="/Quiz/Scores" asp-route-quizId="@quiz.QuizId"
+                                           class="btn btn-sm btn-info" title="View Scores">
+                                            <i class="fas fa-chart-bar"></i>
+                                        </a>
                                     }
                                     else
                                     {

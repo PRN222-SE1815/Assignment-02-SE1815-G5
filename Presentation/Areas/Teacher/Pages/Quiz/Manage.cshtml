@@ -12,6 +12,13 @@
     <div class="quiz-header">
         <h1><i class="fas fa-cog"></i> Manage Quiz #@Model.QuizId</h1>
         <div class="header-actions">
+            @if (Model.QuizStatus != "DRAFT")
+            {
+                <a asp-area="Teacher" asp-page="/Quiz/Scores" asp-route-quizId="@Model.QuizId"
+                   class="btn btn-info btn-sm" style="background-color: #17a2b8; color: white;">
+                    <i class="fas fa-chart-bar"></i> View Scores
+                </a>
+            }
             <a asp-area="Teacher" asp-page="/Quiz/Questions" asp-route-quizId="@Model.QuizId"
                class="btn btn-secondary btn-sm">
                 <i class="fas fa-plus"></i> Add More Questions

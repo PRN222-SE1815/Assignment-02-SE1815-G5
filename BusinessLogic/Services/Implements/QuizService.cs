@@ -389,6 +389,18 @@ public class QuizService : IQuizService
         return await _quizRepo.GetQuestionsWithAnswersAsync(quizId);
     }
 
+    public async Task<List<QuizAttempt>> GetQuizAttemptsAsync(int teacherUserId, string actorRole, int quizId)
+    {
+        EnsureTeacherRole(actorRole);
+
+        var quiz = await _quizRepo.GetQuizWithClassSectionAsync(quizId);
+        if (quiz == null) throw new NotFoundException("Quiz", quizId);
+        if (quiz.ClassSection.TeacherId != teacherUserId)
+            throw new ForbiddenException("You are not the teacher of this quiz's class section.");
+
+        return await _quizRepo.GetAttemptsForQuizAsync(quizId);
+    }
+
     // ==================== STUDENT Operations ====================
 
     public async Task<List<QuizSummaryResponse>> ListQuizzesForTeacherAsync(
