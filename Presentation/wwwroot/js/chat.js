@@ -13,6 +13,7 @@ let oldestLoadedMessageId = null;     // cursor for "load older" paging
 let searchDebounceTimer = null;
 let groupSearchDebounceTimer = null;
 const selectedGroupMembers = new Map(); // userId → { userId, fullName, role }
+let selectedFiles = []; // For storing attachments before sending
 
 // ==================== SignalR Connection ====================
 const connection = new signalR.HubConnectionBuilder()
@@ -125,24 +126,98 @@ function showSidebar() {
 
 // ==================== Sending Messages ====================
 
-function handleSendMessage(e) {
+async function handleSendMessage(e) {
     e.preventDefault();
     const input = document.getElementById("messageInput");
     const content = input.value.trim();
-    if (!content || selectedRoomId === 0) return false;
+    if ((!content && selectedFiles.length === 0) || selectedRoomId === 0) return false;
 
-    if (editingMessageId) {
-        // Edit mode
-        connection.invoke("EditMessage", selectedRoomId, editingMessageId, content).catch(logError);
-        cancelEdit();
-    } else {
-        // New message
-        connection.invoke("SendMessage", selectedRoomId, content).catch(logError);
+    const btnSend = document.getElementById("btnSend");
+    if (btnSend) btnSend.disabled = true;
+
+    try {
+        let attachments = null;
+
+        if (selectedFiles.length > 0) {
+            const formData = new FormData();
+            selectedFiles.forEach(file => formData.append("files", file));
+
+            const response = await fetch('/Chat?handler=UploadFiles', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error("File upload failed: " + text);
+            }
+
+            attachments = await response.json();
+            selectedFiles = [];
+            renderAttachmentPreviews();
+        }
+
+        if (editingMessageId) {
+            if (attachments && attachments.length > 0) {
+                showToast("Cannot attach new files when editing a message.", "warning");
+                if (btnSend) btnSend.disabled = false;
+                return false;
+            }
+            await connection.invoke("EditMessage", selectedRoomId, editingMessageId, content);
+            cancelEdit();
+        } else {
+            await connection.invoke("SendMessage", selectedRoomId, content, attachments);
+        }
+
+        input.value = "";
+        input.focus();
+    } catch (err) {
+        logError(err);
+        showToast(err.message || "Error sending message", "error");
+    } finally {
+        if (btnSend) btnSend.disabled = false;
     }
 
-    input.value = "";
-    input.focus();
     return false;
+}
+
+function handleFileSelect(e) {
+    const files = Array.from(e.target.files);
+    if (!files || files.length === 0) return;
+    
+    selectedFiles = selectedFiles.concat(files);
+    e.target.value = ""; // reset input
+    renderAttachmentPreviews();
+}
+
+function removeAttachment(index) {
+    selectedFiles.splice(index, 1);
+    renderAttachmentPreviews();
+}
+
+function renderAttachmentPreviews() {
+    const container = document.getElementById("attachmentPreviewArea");
+    if (!container) return;
+    
+    if (selectedFiles.length === 0) {
+        container.style.display = "none";
+        container.innerHTML = "";
+        return;
+    }
+    
+    container.style.display = "flex";
+    
+    let html = "";
+    selectedFiles.forEach((file, index) => {
+        html += `<div class="attachment-chip">
+            <span><i class="fas fa-file"></i> ${escapeHtml(file.name)}</span>
+            <button type="button" class="btn-remove-attachment" onclick="removeAttachment(${index})">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>`;
+    });
+    
+    container.innerHTML = html;
 }
 
 // ==================== Edit / Delete ====================

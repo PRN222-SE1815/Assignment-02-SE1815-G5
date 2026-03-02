@@ -428,6 +428,56 @@
     background: #fff;
 }
 
+.btn-attach {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #65676b;
+    padding: 8px;
+    transition: color 0.2s;
+    flex-shrink: 0;
+}
+
+.btn-attach:hover {
+    color: var(--chat-primary);
+}
+
+.attachment-preview-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding-bottom: 8px;
+}
+
+.attachment-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #e4e6eb;
+    color: #1c1e21;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    max-width: 200px;
+}
+
+.attachment-chip span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-remove-attachment {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--chat-danger);
+    font-size: 0.8rem;
+    padding: 0;
+    line-height: 1;
+}
+
 .btn-send {
     width: 40px;
     height: 40px;

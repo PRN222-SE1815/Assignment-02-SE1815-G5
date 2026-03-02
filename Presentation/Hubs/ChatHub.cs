@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using BusinessLogic.DTOs.Requests.Chat;
 using BusinessLogic.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -80,13 +81,13 @@ public sealed class ChatHub : Hub
 
     // ==================== Send Message ====================
 
-    /// <summary>Send a text message to a room. Persists first, then broadcasts.</summary>
-    public async Task SendMessage(int roomId, string? content)
+    /// <summary>Send a text/attachment message to a room. Persists first, then broadcasts.</summary>
+    public async Task SendMessage(int roomId, string? content, List<ChatAttachmentInput>? attachments = null)
     {
         var userId = GetUserId();
         if (userId == 0) return;
 
-        var result = await _chatService.SendMessageAsync(roomId, userId, content, null);
+        var result = await _chatService.SendMessageAsync(roomId, userId, content, attachments);
         if (!result.Success)
         {
             await SendToCaller("Error", result.Message!);

@@ -5,6 +5,8 @@ using BusinessLogic.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Hosting;
+using BusinessLogic.DTOs.Requests.Chat;
 
 namespace Presentation.Pages.Chat;
 
@@ -13,11 +15,13 @@ public class IndexModel : PageModel
 {
     private readonly IChatService _chatService;
     private readonly ILogger<IndexModel> _logger;
+    private readonly IWebHostEnvironment _env;
 
-    public IndexModel(IChatService chatService, ILogger<IndexModel> logger)
+    public IndexModel(IChatService chatService, ILogger<IndexModel> logger, IWebHostEnvironment env)
     {
         _chatService = chatService;
         _logger = logger;
+        _env = env;
     }
 
     /// <summary>All chat rooms the current user belongs to.</summary>
@@ -83,6 +87,47 @@ public class IndexModel : PageModel
 
         var users = await _chatService.GetAvailableUsersForChatAsync(userId, search);
         return new JsonResult(users);
+    }
+
+    [HttpPost]
+    [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> OnPostUploadFilesAsync(IFormFileCollection files)
+    {
+        var userId = GetUserId();
+        if (userId == 0) return Unauthorized();
+
+        if (files is null || files.Count == 0)
+            return BadRequest("No files found.");
+
+        var uploadPath = Path.Combine(_env.WebRootPath, "uploads", "chat");
+        if (!Directory.Exists(uploadPath))
+            Directory.CreateDirectory(uploadPath);
+
+        var result = new List<ChatAttachmentInput>();
+
+        foreach (var file in files)
+        {
+            if (file.Length == 0) continue;
+
+            // Generate a unique filename
+            var ext = Path.GetExtension(file.FileName);
+            var newFileName = $"{Guid.NewGuid()}{ext}";
+            var filePath = Path.Combine(uploadPath, newFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            result.Add(new ChatAttachmentInput
+            {
+                FileUrl = $"/uploads/chat/{newFileName}",
+                FileType = Path.GetFileName(file.FileName), // Store original name as type or you could just store extension
+                FileSizeBytes = file.Length
+            });
+        }
+
+        return new JsonResult(result);
     }
 
     private int GetUserId()
