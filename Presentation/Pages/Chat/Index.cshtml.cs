@@ -5,6 +5,8 @@ using BusinessLogic.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Hosting;
+using BusinessLogic.DTOs.Requests.Chat;
 
 namespace Presentation.Pages.Chat;
 

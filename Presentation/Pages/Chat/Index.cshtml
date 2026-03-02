@@ -198,6 +198,7 @@
                 <!-- File previews -->
                 <div class="attachment-preview-bar" id="attachmentPreviewBar" style="display:none;"></div>
                 <form id="messageForm" onsubmit="return handleSendMessage(event);">
+                    <input type="file" id="chatFileInput" multiple style="display:none;" onchange="handleFileSelect(event)" />
                     <div class="input-row">
                         <label class="btn-attach" for="fileInput" title="Attach file">
                             <i class="fas fa-paperclip"></i>

@@ -126,7 +126,7 @@ function showSidebar() {
 
 // ==================== Sending Messages ====================
 
-function handleSendMessage(e) {
+async function handleSendMessage(e) {
     e.preventDefault();
     const input = document.getElementById("messageInput");
     const content = input.value.trim();
@@ -147,8 +147,6 @@ function handleSendMessage(e) {
         connection.invoke("SendMessage", selectedRoomId, content).catch(logError);
     }
 
-    input.value = "";
-    input.focus();
     return false;
 }
 
