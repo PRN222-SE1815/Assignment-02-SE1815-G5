@@ -60,11 +60,22 @@ public sealed class ChatService : IChatService
     public async Task<List<ChatRoomDto>> GetMyRoomsAsync(int userId)
     {
         var rooms = await _roomRepo.ListRoomsForUserAsync(userId);
+        
+        var dmRoomIds = rooms.Where(r => r.RoomType == "DM").Select(r => r.RoomId).ToList();
+        var dmNames = await _memberRepo.GetOtherMemberNamesForDmsAsync(dmRoomIds, userId);
+
         var result = new List<ChatRoomDto>();
         foreach(var room in rooms)
         {
             var membership = await _memberRepo.GetMembershipAsync(room.RoomId, userId);
-            result.Add(MapRoom(room, membership));
+            var mapped = MapRoom(room, membership);
+            
+            if (mapped.RoomType == "DM" && dmNames.TryGetValue(room.RoomId, out var otherName))
+            {
+                mapped.RoomName = otherName;
+            }
+
+            result.Add(mapped);
         }
         return result;
     }
@@ -76,7 +87,18 @@ public sealed class ChatService : IChatService
             return null;
 
         var room = await _roomRepo.GetRoomByIdAsync(roomId);
-        return room is null ? null : MapRoom(room, membership);
+        if (room is null) return null;
+        
+        var mapped = MapRoom(room, membership);
+        if (mapped.RoomType == "DM")
+        {
+            var dmNames = await _memberRepo.GetOtherMemberNamesForDmsAsync(new[] { roomId }, userId);
+            if (dmNames.TryGetValue(roomId, out var otherName))
+            {
+                mapped.RoomName = otherName;
+            }
+        }
+        return mapped;
     }
 
     #endregion
@@ -306,14 +328,18 @@ public sealed class ChatService : IChatService
         if (userId == otherUserId)
             return OperationResult.Fail<ChatRoomDto>("Cannot create a DM room with yourself.", "VALIDATION_ERROR");
 
-        // Return existing DM if one already exists between the two users
-        var existing = await _roomRepo.GetDmRoomAsync(userId, otherUserId);
-        if (existing is not null)
-            return OperationResult.Ok(MapRoom(existing));
-
         var otherUser = await _userRepo.GetUserByIdAsync(otherUserId);
         if (otherUser is null || !otherUser.IsActive)
             return OperationResult.Fail<ChatRoomDto>("Other user not found or inactive.", "NOT_FOUND");
+
+        // Return existing DM if one already exists between the two users
+        var existing = await _roomRepo.GetDmRoomAsync(userId, otherUserId);
+        if (existing is not null)
+        {
+            var existingMapped = MapRoom(existing);
+            existingMapped.RoomName = otherUser.FullName;
+            return OperationResult.Ok(existingMapped);
+        }
 
         var room = new ChatRoom
         {
@@ -330,7 +356,10 @@ public sealed class ChatService : IChatService
         await _memberRepo.UpsertMembershipAsync(room.RoomId, otherUserId, "MEMBER", "JOINED");
 
         _logger.LogInformation("User {UserId} created DM room {RoomId} with user {OtherUserId}", userId, room.RoomId, otherUserId);
-        return OperationResult.Ok(MapRoom(room));
+        
+        var mapped = MapRoom(room);
+        mapped.RoomName = otherUser.FullName;
+        return OperationResult.Ok(mapped);
     }
 
     #endregion

@@ -68,4 +68,26 @@ public sealed class ChatRoomMemberRepository : IChatRoomMemberRepository
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task<Dictionary<int, string>> GetOtherMemberNamesForDmsAsync(IEnumerable<int> dmRoomIds, int currentUserId)
+    {
+        var dict = new Dictionary<int, string>();
+        if (!dmRoomIds.Any()) return dict;
+
+        var otherMembers = await _context.ChatRoomMembers
+            .Include(m => m.User)
+            .Where(m => dmRoomIds.Contains(m.RoomId) && m.UserId != currentUserId)
+            .ToListAsync();
+
+        foreach (var m in otherMembers)
+        {
+            if (m.User != null)
+            {
+                // In case of multiple other members unexpectedly, we take the first one
+                dict.TryAdd(m.RoomId, m.User.FullName);
+            }
+        }
+
+        return dict;
+    }
 }
