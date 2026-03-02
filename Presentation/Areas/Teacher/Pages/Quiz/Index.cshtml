@@ -50,11 +50,11 @@
                     {
                         if (Model.ClassSectionId == cls.ClassSectionId)
                         {
-                            <option value="@cls.ClassSectionId" selected>@cls.Course.CourseCode - @cls.SectionName</option>
+                            <option value="@cls.ClassSectionId" selected>@cls.Course.CourseCode - @cls.SectionCode</option>
                         }
                         else
                         {
-                            <option value="@cls.ClassSectionId">@cls.Course.CourseCode - @cls.SectionName</option>
+                            <option value="@cls.ClassSectionId">@cls.Course.CourseCode - @cls.SectionCode</option>
                         }
                     }
                 </select>

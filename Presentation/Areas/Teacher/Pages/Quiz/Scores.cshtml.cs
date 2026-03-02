@@ -23,8 +23,16 @@ public class ScoresModel : PageModel
 
     public List<QuizAttempt> Attempts { get; set; } = new();
     public string? QuizTitle { get; set; }
+    public string? ClassSectionCode { get; set; }
     public int TotalQuestions { get; set; }
     public string? ErrorMessage { get; set; }
+
+    // Statistics
+    public int TotalAttempts { get; set; }
+    public int GradedCount { get; set; }
+    public decimal? AverageScore { get; set; }
+    public decimal? HighestScore { get; set; }
+    public decimal? LowestScore { get; set; }
 
     public async Task<IActionResult> OnGetAsync(int quizId)
     {
@@ -34,12 +42,26 @@ public class ScoresModel : PageModel
             if (userId == 0) return RedirectToPage("/Auth/Login", new { area = "" });
 
             Attempts = await _quizService.GetQuizAttemptsAsync(userId, "TEACHER", quizId);
-            
+
             if (Attempts.Any())
             {
                 var firstAttempt = Attempts.First();
                 QuizTitle = firstAttempt.Quiz?.QuizTitle;
                 TotalQuestions = firstAttempt.Quiz?.TotalQuestions ?? 0;
+                ClassSectionCode = firstAttempt.Quiz?.ClassSection?.SectionCode;
+            }
+
+            // Compute statistics
+            TotalAttempts = Attempts.Count;
+            var graded = Attempts.Where(a => a.Status == "GRADED" && a.Score.HasValue).ToList();
+            GradedCount = graded.Count;
+
+            if (graded.Any())
+            {
+                var scores = graded.Select(a => a.Score!.Value).ToList();
+                AverageScore = Math.Round(scores.Average(), 2);
+                HighestScore = scores.Max();
+                LowestScore = scores.Min();
             }
         }
         catch (ForbiddenException ex)

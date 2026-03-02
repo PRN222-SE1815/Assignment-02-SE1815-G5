@@ -8,11 +8,13 @@
 // ==================== State ====================
 const currentUserId = parseInt(document.getElementById("currentUserId").value, 10);
 let selectedRoomId = parseInt(document.getElementById("selectedRoomId").value, 10) || 0;
-let editingMessageId = null;          // currently editing message id (null = new msg mode)
-let oldestLoadedMessageId = null;     // cursor for "load older" paging
+let editingMessageId = null;
+let oldestLoadedMessageId = null;
 let searchDebounceTimer = null;
 let groupSearchDebounceTimer = null;
-const selectedGroupMembers = new Map(); // userId → { userId, fullName, role }
+const selectedGroupMembers = new Map();
+// Pending file attachments: array of { fileUrl, fileType, fileSizeBytes, originalName }
+let pendingAttachments = [];
 
 // ==================== SignalR Connection ====================
 const connection = new signalR.HubConnectionBuilder()
@@ -129,20 +131,123 @@ function handleSendMessage(e) {
     e.preventDefault();
     const input = document.getElementById("messageInput");
     const content = input.value.trim();
-    if (!content || selectedRoomId === 0) return false;
+
+    if (!content && pendingAttachments.length === 0) return false;
+    if (selectedRoomId === 0) return false;
 
     if (editingMessageId) {
-        // Edit mode
+        // Edit mode — no attachments in edit
         connection.invoke("EditMessage", selectedRoomId, editingMessageId, content).catch(logError);
         cancelEdit();
+    } else if (pendingAttachments.length > 0) {
+        // Send with attachments
+        connection.invoke("SendMessageWithAttachments", selectedRoomId, content || null, pendingAttachments).catch(logError);
+        clearPendingAttachments();
     } else {
-        // New message
+        // Plain text
         connection.invoke("SendMessage", selectedRoomId, content).catch(logError);
     }
 
     input.value = "";
     input.focus();
     return false;
+}
+
+// ==================== File Upload ====================
+
+async function handleFileSelected(event) {
+    const files = Array.from(event.target.files);
+    if (!files.length) return;
+
+    // Reset input so same file can be re-selected
+    event.target.value = "";
+
+    for (const file of files) {
+        await uploadFile(file);
+    }
+}
+
+async function uploadFile(file) {
+    const maxSize = 20 * 1024 * 1024;
+    if (file.size > maxSize) {
+        showToast(`"${file.name}" exceeds the 20 MB limit.`, "error");
+        return;
+    }
+
+    const previewBar = document.getElementById("attachmentPreviewBar");
+    previewBar.style.display = "flex";
+
+    // Add a loading chip
+    const chipId = `chip-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const chip = document.createElement("div");
+    chip.className = "attach-chip loading";
+    chip.id = chipId;
+    chip.innerHTML = `<i class="fas fa-spinner fa-spin"></i><span>${escapeHtml(file.name)}</span>`;
+    previewBar.appendChild(chip);
+
+    try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+        const headers = {};
+        if (token) headers["RequestVerificationToken"] = token;
+
+        const resp = await fetch("/Chat?handler=UploadFile", {
+            method: "POST",
+            headers,
+            body: formData
+        });
+
+        if (!resp.ok) {
+            const err = await resp.json().catch(() => ({ error: "Upload failed." }));
+            showToast(err.error || "Upload failed.", "error");
+            chip.remove();
+            if (previewBar.children.length === 0) previewBar.style.display = "none";
+            return;
+        }
+
+        const data = await resp.json();
+        pendingAttachments.push({
+            fileUrl: data.fileUrl,
+            fileType: data.fileType,
+            fileSizeBytes: data.fileSizeBytes,
+            originalName: data.originalName
+        });
+
+        // Update chip to success
+        const isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(data.fileType.toLowerCase());
+        chip.className = "attach-chip";
+        chip.innerHTML = isImage
+            ? `<img src="${escapeHtml(data.fileUrl)}" class="chip-thumb" alt="${escapeHtml(data.originalName)}" />
+               <span>${escapeHtml(data.originalName)}</span>
+               <button type="button" onclick="removePendingAttachment('${escapeHtml(data.fileUrl)}','${chipId}')"><i class="fas fa-times"></i></button>`
+            : `<i class="fas fa-file"></i>
+               <span>${escapeHtml(data.originalName)}</span>
+               <button type="button" onclick="removePendingAttachment('${escapeHtml(data.fileUrl)}','${chipId}')"><i class="fas fa-times"></i></button>`;
+
+    } catch (err) {
+        showToast("Upload error: " + err.message, "error");
+        chip.remove();
+        if (previewBar.children.length === 0) previewBar.style.display = "none";
+    }
+}
+
+function removePendingAttachment(fileUrl, chipId) {
+    pendingAttachments = pendingAttachments.filter(a => a.fileUrl !== fileUrl);
+    const chip = document.getElementById(chipId);
+    if (chip) chip.remove();
+    const previewBar = document.getElementById("attachmentPreviewBar");
+    if (previewBar && previewBar.children.length === 0) previewBar.style.display = "none";
+}
+
+function clearPendingAttachments() {
+    pendingAttachments = [];
+    const previewBar = document.getElementById("attachmentPreviewBar");
+    if (previewBar) {
+        previewBar.innerHTML = "";
+        previewBar.style.display = "none";
+    }
 }
 
 // ==================== Edit / Delete ====================
@@ -165,6 +270,7 @@ function cancelEdit() {
     editingMessageId = null;
     document.getElementById("messageInput").value = "";
     document.getElementById("editIndicator").style.display = "none";
+    clearPendingAttachments();
 }
 
 function deleteMessage(messageId) {
@@ -243,7 +349,18 @@ function buildMessageElement(msg) {
         if (msg.attachments && msg.attachments.length > 0) {
             bubbleHtml += `<div class="message-attachments">`;
             msg.attachments.forEach(function (att) {
-                bubbleHtml += `<a href="${escapeHtml(att.fileUrl)}" target="_blank" class="attachment-link"><i class="fas fa-paperclip"></i> ${escapeHtml(att.fileType)}</a>`;
+                const imgExts = ["jpg", "jpeg", "png", "gif", "webp"];
+                const isImage = imgExts.includes((att.fileType || "").toLowerCase());
+                const displayName = att.originalName || att.fileType || "file";
+                if (isImage) {
+                    bubbleHtml += `<a href="${escapeHtml(att.fileUrl)}" target="_blank" class="attachment-image-link">
+                        <img src="${escapeHtml(att.fileUrl)}" class="attachment-thumbnail" alt="${escapeHtml(displayName)}" />
+                    </a>`;
+                } else {
+                    bubbleHtml += `<a href="${escapeHtml(att.fileUrl)}" target="_blank" class="attachment-file-link">
+                        <i class="fas fa-file"></i> <span>${escapeHtml(displayName)}</span>
+                    </a>`;
+                }
             });
             bubbleHtml += `</div>`;
         }

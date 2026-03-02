@@ -200,9 +200,11 @@ public class QuizRepository : IQuizRepository
     {
         return await _context.QuizAttempts
             .AsNoTracking()
+            .Include(a => a.Quiz)
+                .ThenInclude(q => q.ClassSection)
             .Include(a => a.Enrollment)
                 .ThenInclude(e => e.Student)
-                    .ThenInclude(s => s.User)
+                    .ThenInclude(s => s.StudentNavigation)
             .Where(a => a.QuizId == quizId)
             .OrderByDescending(a => a.StartedAt)
             .ToListAsync();

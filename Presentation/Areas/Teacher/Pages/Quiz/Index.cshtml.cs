@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using BusinessLogic.DTOs.Requests.Quiz;
 using BusinessLogic.DTOs.Responses.Quiz;
+using BusinessLogic.Exceptions;
 using BusinessLogic.Services.Interfaces;
 using BusinessObject.Entities;
 using BusinessObject.Enum;

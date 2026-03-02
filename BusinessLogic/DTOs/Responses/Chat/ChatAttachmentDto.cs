@@ -1,4 +1,4 @@
-﻿namespace BusinessLogic.DTOs.Responses.Chat;
+﻿﻿namespace BusinessLogic.DTOs.Responses.Chat;
 
 public class ChatAttachmentDto
 {
@@ -8,4 +8,6 @@ public class ChatAttachmentDto
     public string FileType { get; set; } = null!;
     public long? FileSizeBytes { get; set; }
     public DateTime CreatedAt { get; set; }
+    /// <summary>Display name shown to users. Derived from the FileUrl filename if not set.</summary>
+    public string OriginalName { get; set; } = string.Empty;
 }

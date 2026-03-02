@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using BusinessLogic.DTOs.Requests.Chat;
 using BusinessLogic.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -93,8 +94,26 @@ public sealed class ChatHub : Hub
             return;
         }
 
-        // Fetch the latest message we just inserted to get the full DTO.
-        // Guard against race condition: verify the message belongs to this sender.
+        var message = await _chatService.GetLatestMessageAsync(roomId, userId);
+        if (message is not null && message.SenderId == userId)
+        {
+            await SendToGroup($"room:{roomId}", "ReceiveMessage", message);
+        }
+    }
+
+    /// <summary>Send a message with file attachments. Persists first, then broadcasts.</summary>
+    public async Task SendMessageWithAttachments(int roomId, string? content, List<ChatAttachmentInput> attachments)
+    {
+        var userId = GetUserId();
+        if (userId == 0) return;
+
+        var result = await _chatService.SendMessageAsync(roomId, userId, content, attachments);
+        if (!result.Success)
+        {
+            await SendToCaller("Error", result.Message!);
+            return;
+        }
+
         var message = await _chatService.GetLatestMessageAsync(roomId, userId);
         if (message is not null && message.SenderId == userId)
         {

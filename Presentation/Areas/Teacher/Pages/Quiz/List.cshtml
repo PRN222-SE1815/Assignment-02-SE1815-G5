@@ -29,23 +29,59 @@
     }
 
     <!-- Filter Bar -->
-    <div class="filter-bar">
-        <a asp-area="Teacher" asp-page="/Quiz/List"
-           class="filter-chip @(string.IsNullOrEmpty(Model.StatusFilter) ? "active" : "")">
-            All
-        </a>
-        <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="DRAFT"
-           class="filter-chip @(Model.StatusFilter == "DRAFT" ? "active" : "")">
-            <i class="fas fa-pencil-alt"></i> Draft
-        </a>
-        <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="PUBLISHED"
-           class="filter-chip @(Model.StatusFilter == "PUBLISHED" ? "active" : "")">
-            <i class="fas fa-rocket"></i> Published
-        </a>
-        <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="CLOSED"
-           class="filter-chip @(Model.StatusFilter == "CLOSED" ? "active" : "")">
-            <i class="fas fa-lock"></i> Closed
-        </a>
+    <div class="filter-bar" style="flex-wrap: wrap; gap: 0.5rem;">
+        <!-- Status Filter -->
+        <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+            <a asp-area="Teacher" asp-page="/Quiz/List"
+               asp-route-classSectionFilter="@Model.ClassSectionFilter"
+               class="filter-chip @(string.IsNullOrEmpty(Model.StatusFilter) ? "active" : "")">
+                All Status
+            </a>
+            <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="DRAFT"
+               asp-route-classSectionFilter="@Model.ClassSectionFilter"
+               class="filter-chip @(Model.StatusFilter == "DRAFT" ? "active" : "")">
+                <i class="fas fa-pencil-alt"></i> Draft
+            </a>
+            <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="PUBLISHED"
+               asp-route-classSectionFilter="@Model.ClassSectionFilter"
+               class="filter-chip @(Model.StatusFilter == "PUBLISHED" ? "active" : "")">
+                <i class="fas fa-rocket"></i> Published
+            </a>
+            <a asp-area="Teacher" asp-page="/Quiz/List" asp-route-statusFilter="CLOSED"
+               asp-route-classSectionFilter="@Model.ClassSectionFilter"
+               class="filter-chip @(Model.StatusFilter == "CLOSED" ? "active" : "")">
+                <i class="fas fa-lock"></i> Closed
+            </a>
+        </div>
+
+        <!-- Class Section Filter -->
+        @if (Model.ClassSections.Any())
+        {
+            <form method="get" style="display:flex; align-items:center; gap:0.5rem; margin-left:auto;">
+                @if (!string.IsNullOrEmpty(Model.StatusFilter))
+                {
+                    <input type="hidden" name="statusFilter" value="@Model.StatusFilter" />
+                }
+                <label style="font-weight:600; white-space:nowrap; color:#495057;">
+                    <i class="fas fa-chalkboard"></i> Class:
+                </label>
+                <select name="classSectionFilter" onchange="this.form.submit()"
+                        class="form-select form-select-sm" style="min-width:160px;">
+                    <option value="">— All Classes —</option>
+                    @foreach (var cls in Model.ClassSections)
+                    {
+                        if (Model.ClassSectionFilter == cls.ClassSectionId)
+                        {
+                            <option value="@cls.ClassSectionId" selected>@cls.SectionCode</option>
+                        }
+                        else
+                        {
+                            <option value="@cls.ClassSectionId">@cls.SectionCode</option>
+                        }
+                    }
+                </select>
+            </form>
+        }
     </div>
 
     <!-- Quiz Stats -->
@@ -78,9 +114,9 @@
             <i class="fas fa-clipboard fa-3x"></i>
             <h3>No quizzes found</h3>
             <p>
-                @if (!string.IsNullOrEmpty(Model.StatusFilter))
+                @if (!string.IsNullOrEmpty(Model.StatusFilter) || Model.ClassSectionFilter.HasValue)
                 {
-                    <span>No quizzes with status "@Model.StatusFilter". </span>
+                    <span>No quizzes match the selected filters. </span>
                     <a asp-area="Teacher" asp-page="/Quiz/List">View all quizzes</a>
                 }
                 else
@@ -172,22 +208,12 @@
                                            class="btn btn-sm btn-danger" title="Close Quiz">
                                             <i class="fas fa-lock"></i>
                                         </a>
-                                        <a asp-area="Teacher" asp-page="/Quiz/Scores" asp-route-quizId="@quiz.QuizId"
-                                           class="btn btn-sm btn-info" title="View Scores">
-                                            <i class="fas fa-chart-bar"></i>
-                                        </a>
                                     }
-                                    else if (quiz.Status == "CLOSED")
-                                    {
-                                        <a asp-area="Teacher" asp-page="/Quiz/Scores" asp-route-quizId="@quiz.QuizId"
-                                           class="btn btn-sm btn-info" title="View Scores">
-                                            <i class="fas fa-chart-bar"></i>
-                                        </a>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-muted"><i class="fas fa-ban"></i></span>
-                                    }
+                                    <!-- View Scores: available for ALL statuses -->
+                                    <a asp-area="Teacher" asp-page="/Quiz/Scores" asp-route-quizId="@quiz.QuizId"
+                                       class="btn btn-sm btn-info" title="View Student Scores">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
