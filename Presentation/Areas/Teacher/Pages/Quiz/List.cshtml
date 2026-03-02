@@ -57,16 +57,17 @@
         <!-- Class Section Filter -->
         @if (Model.ClassSections.Any())
         {
-            <form method="get" style="display:flex; align-items:center; gap:0.5rem; margin-left:auto;">
+            <form method="get" style="display:flex; align-items:center; gap:0.5rem; margin-left:auto;
+                                      background:#f8f9fa; border:1px solid #e0e0e0; border-radius:10px;
+                                      padding:6px 12px;">
                 @if (!string.IsNullOrEmpty(Model.StatusFilter))
                 {
                     <input type="hidden" name="statusFilter" value="@Model.StatusFilter" />
                 }
-                <label style="font-weight:600; white-space:nowrap; color:#495057;">
-                    <i class="fas fa-chalkboard"></i> Class:
+                <label style="font-weight:600; white-space:nowrap; color:#495057; font-size:0.9rem; margin:0;">
+                    <i class="fas fa-chalkboard" style="color:#6c5ce7;"></i> Class:
                 </label>
-                <select name="classSectionFilter" onchange="this.form.submit()"
-                        class="form-select form-select-sm" style="min-width:160px;">
+                <select name="classSectionFilter" onchange="this.form.submit()" class="cls-filter-select">
                     <option value="">— All Classes —</option>
                     @foreach (var cls in Model.ClassSections)
                     {
@@ -223,3 +224,29 @@
         </div>
     }
 </div>
+
+<style>
+    .cls-filter-select {
+        min-width: 180px;
+        padding: 5px 32px 5px 12px;
+        border: 1px solid #d0d0d0;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        color: #333;
+        background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%23666' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E") no-repeat right 10px center / 10px 6px;
+        appearance: none;
+        -webkit-appearance: none;
+        cursor: pointer;
+        box-shadow: 0 1px 3px rgba(0,0,0,.06);
+        transition: border-color .2s, box-shadow .2s;
+        outline: none;
+    }
+    .cls-filter-select:focus {
+        border-color: #6c5ce7;
+        box-shadow: 0 0 0 3px rgba(108,92,231,.15);
+    }
+    .cls-filter-select:hover {
+        border-color: #aaa;
+    }
+</style>
+

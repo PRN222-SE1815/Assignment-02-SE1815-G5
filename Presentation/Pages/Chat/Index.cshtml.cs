@@ -88,12 +88,12 @@ public class IndexModel : PageModel
     }
 
     /// <summary>AJAX endpoint: upload a file attachment and return its URL.</summary>
-    public async Task<IActionResult> OnPostUploadFileAsync(IFormFile file)
+    public async Task<IActionResult> OnPostUploadFileAsync(IFormFile? file)
     {
         var userId = GetUserId();
         if (userId == 0) return Unauthorized();
 
-        if (file == null || file.Length == 0)
+        if (file is null || file.Length == 0)
             return BadRequest(new { error = "No file provided." });
 
         // 20 MB limit

@@ -28,7 +28,6 @@ const connection = new signalR.HubConnectionBuilder()
 connection.on("ReceiveMessage", function (msg) {
     if (msg.roomId === selectedRoomId) {
         appendMessage(msg);
-        scrollToBottom();
         // Mark as read
         connection.invoke("MarkRead", selectedRoomId, msg.messageId).catch(logError);
     }
@@ -326,6 +325,20 @@ function appendMessage(msg) {
     const container = document.getElementById("chatMessages");
     const el = buildMessageElement(msg);
     container.appendChild(el);
+
+    // Scroll the new message into view after paint
+    requestAnimationFrame(function () {
+        el.scrollIntoView({ behavior: "smooth", block: "end" });
+    });
+}
+
+function scrollToBottom() {
+    requestAnimationFrame(function () {
+        const container = document.getElementById("chatMessages");
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
+    });
 }
 
 function buildMessageElement(msg) {
