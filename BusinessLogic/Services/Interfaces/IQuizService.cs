@@ -57,6 +57,11 @@ public interface IQuizService
     Task<List<ClassSectionSummary>> GetTeacherClassSectionsForQuizFilterAsync(int teacherUserId, string actorRole);
 
     /// <summary>
+    /// Get non-quiz grade items for a class section (teacher view, for linking quiz to grade item).
+    /// </summary>
+    Task<List<GradeItemSummaryDto>> GetGradeItemsForClassSectionAsync(int teacherUserId, string actorRole, int classSectionId);
+
+    /// <summary>
     /// Delete a quiz and all associated data. Only DRAFT quizzes can be deleted.
     /// </summary>
     Task DeleteQuizAsync(int teacherUserId, string actorRole, int quizId);

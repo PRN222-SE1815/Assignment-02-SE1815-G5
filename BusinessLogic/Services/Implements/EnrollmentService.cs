@@ -190,7 +190,9 @@ public sealed class EnrollmentService : IEnrollmentService
                 return ServiceResult<EnrollmentResponse>.Fail("SYSTEM_ERROR", "Không thể khởi tạo học phí.");
             }
 
-            var amountPerCredit = tuitionFee.AmountPerCredit <= 0m ? DefaultAmountPerCredit : tuitionFee.AmountPerCredit;
+            var amountPerCredit = tuitionFee.AmountPerCredit > 0m
+                ? tuitionFee.AmountPerCredit
+                : await GetAmountPerCreditAsync(student.StudentId, classSectionInfo.SemesterId);
             var feeAmount = (classSectionInfo.Course.Credits * amountPerCredit) + DefaultSurcharge;
 
             if (wallet.Balance < feeAmount)
@@ -201,8 +203,9 @@ public sealed class EnrollmentService : IEnrollmentService
             }
 
             tuitionFee.TotalCredits += classSectionInfo.Course.Credits;
-            tuitionFee.AmountPerCredit = amountPerCredit;
-            tuitionFee.TotalAmount = (tuitionFee.TotalCredits * amountPerCredit) + DefaultSurcharge;
+            if (amountPerCredit > 0m)
+                tuitionFee.AmountPerCredit = amountPerCredit;
+            tuitionFee.TotalAmount = (tuitionFee.TotalCredits * tuitionFee.AmountPerCredit) + DefaultSurcharge;
             tuitionFee.PaidAmount += feeAmount;
             tuitionFee.UpdatedAt = DateTime.UtcNow;
             tuitionFee.Status = GetTuitionStatus(tuitionFee.TotalAmount, tuitionFee.PaidAmount);

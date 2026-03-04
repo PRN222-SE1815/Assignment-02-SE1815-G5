@@ -85,6 +85,7 @@ public sealed class CourseManagementService : ICourseManagementService
             var (courses, totalCount) = await _courseRepository.GetPagedCoursesAsync(
                 request.Keyword,
                 request.IsActive,
+                request.SemesterId,
                 page,
                 pageSize,
                 ct);
@@ -206,6 +207,51 @@ public sealed class CourseManagementService : ICourseManagementService
 
             await _courseRepository.AddAsync(course, ct);
             await _courseRepository.SaveChangesAsync(ct);
+
+            // If a semester was selected, create an initial class section
+            if (request.SemesterId.HasValue && request.SemesterId.Value > 0)
+            {
+                var semester = await _dbContext.Semesters
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(s => s.SemesterId == request.SemesterId.Value, ct);
+
+                if (semester is not null)
+                {
+                    var firstTeacher = await _dbContext.Teachers
+                        .AsNoTracking()
+                        .OrderBy(t => t.TeacherId)
+                        .FirstOrDefaultAsync(ct);
+
+                    if (firstTeacher is not null)
+                    {
+                        var sectionCode = $"{normalizedCode}01";
+                        var section = new ClassSection
+                        {
+                            CourseId = course.CourseId,
+                            SemesterId = semester.SemesterId,
+                            TeacherId = firstTeacher.TeacherId,
+                            SectionCode = sectionCode,
+                            IsOpen = false,
+                            MaxCapacity = 30,
+                            CurrentEnrollment = 0,
+                            CreatedAt = DateTime.UtcNow
+                        };
+
+                        _dbContext.ClassSections.Add(section);
+                        await _dbContext.SaveChangesAsync(ct);
+
+                        _logger.LogInformation(
+                            "Created initial ClassSection for new course. CourseId={CourseId}, SemesterId={SemesterId}, SectionCode={SectionCode}",
+                            course.CourseId, semester.SemesterId, sectionCode);
+                    }
+                    else
+                    {
+                        _logger.LogWarning(
+                            "No teacher found to create initial ClassSection. CourseId={CourseId}, SemesterId={SemesterId}",
+                            course.CourseId, request.SemesterId.Value);
+                    }
+                }
+            }
 
             _logger.LogInformation(
                 "CreateCourseAsync success. ActorUserId={ActorUserId}, CourseId={CourseId}, CourseCode={CourseCode}",
@@ -417,11 +463,6 @@ public sealed class CourseManagementService : ICourseManagementService
 
             await SendCourseDeactivatedNotificationsAsync(course, reason, studentUserIds, teacherUserIds, ct);
 
-            var impactedUserIds = studentUserIds
-                .Concat(teacherUserIds)
-                .Distinct()
-                .ToList();
-
             var realtimePayload = new
             {
                 courseId = course.CourseId,
@@ -432,8 +473,7 @@ public sealed class CourseManagementService : ICourseManagementService
                 reason
             };
 
-            await _realtimeEventDispatcher.DispatchToUsersAsync(
-                impactedUserIds,
+            await _realtimeEventDispatcher.DispatchToAllAsync(
                 RealtimeEventCourseDeactivated,
                 realtimePayload,
                 ct);
@@ -586,6 +626,75 @@ public sealed class CourseManagementService : ICourseManagementService
                     course.CourseId,
                     teacherNotifyResult.ErrorCode);
             }
+        }
+    }
+
+    public async Task<ServiceResult<IReadOnlyList<SemesterOptionDto>>> GetAllSemesterOptionsAsync(
+        int actorUserId,
+        string actorRole,
+        CancellationToken ct = default)
+    {
+        try
+        {
+            var authResult = await AuthorizeAdminAsync(actorUserId, actorRole);
+            if (!authResult.IsSuccess)
+            {
+                return ServiceResult<IReadOnlyList<SemesterOptionDto>>.Fail(authResult.ErrorCode!, authResult.Message);
+            }
+
+            var semesters = await _dbContext.Semesters
+                .AsNoTracking()
+                .OrderByDescending(s => s.StartDate)
+                .Select(s => new SemesterOptionDto
+                {
+                    SemesterId = s.SemesterId,
+                    SemesterName = s.SemesterName,
+                    IsActive = s.IsActive,
+                    StartDate = s.StartDate
+                })
+                .ToListAsync(ct);
+
+            return ServiceResult<IReadOnlyList<SemesterOptionDto>>.Success(semesters);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "GetAllSemesterOptionsAsync failed. ActorUserId={ActorUserId}", actorUserId);
+            return ServiceResult<IReadOnlyList<SemesterOptionDto>>.Fail(ErrorCodes.InternalError, "An unexpected error occurred.");
+        }
+    }
+
+    public async Task<ServiceResult<IReadOnlyList<CourseSectionDto>>> GetCourseSectionsAsync(
+        int actorUserId,
+        string actorRole,
+        int courseId,
+        CancellationToken ct = default)
+    {
+        try
+        {
+            var authResult = await AuthorizeAdminAsync(actorUserId, actorRole);
+            if (!authResult.IsSuccess)
+            {
+                return ServiceResult<IReadOnlyList<CourseSectionDto>>.Fail(authResult.ErrorCode!, authResult.Message);
+            }
+
+            var sections = await _classSectionRepository.GetByCourseIdAsync(courseId, false, ct);
+            var result = sections.Select(s => new CourseSectionDto
+            {
+                ClassSectionId = s.ClassSectionId,
+                SectionCode = s.SectionCode,
+                SemesterName = s.Semester?.SemesterName ?? "—",
+                CurrentEnrollment = s.CurrentEnrollment,
+                MaxCapacity = s.MaxCapacity,
+                IsOpen = s.IsOpen,
+                Room = s.Room ?? "—"
+            }).ToList();
+
+            return ServiceResult<IReadOnlyList<CourseSectionDto>>.Success(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "GetCourseSectionsAsync failed. CourseId={CourseId}", courseId);
+            return ServiceResult<IReadOnlyList<CourseSectionDto>>.Fail(ErrorCodes.InternalError, "Failed to load sections.");
         }
     }
 }

@@ -37,7 +37,7 @@
         <div class="quiz-list">
             @foreach (var quiz in Model.Quizzes)
             {
-                var now = DateTime.UtcNow;
+                var now = DateTime.Now;
                 var isActive = (!quiz.StartAt.HasValue || now >= quiz.StartAt.Value)
                                && (!quiz.EndAt.HasValue || now <= quiz.EndAt.Value);
                 var hasEnded = quiz.EndAt.HasValue && now > quiz.EndAt.Value;

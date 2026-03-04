@@ -28,6 +28,13 @@
         </div>
     }
 
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> @Model.SuccessMessage
+        </div>
+    }
+
     <!-- Filter Bar -->
     <div class="filter-bar" style="flex-wrap: wrap; gap: 0.5rem;">
         <!-- Status Filter -->
@@ -192,7 +199,7 @@
                             <td>@quiz.CreatedAt.ToString("MMM dd, yyyy")</td>
                             <td>
                                 <div class="action-btns">
-                                    @if (quiz.Status == "DRAFT")
+                                        @if (quiz.Status == "DRAFT")
                                     {
                                         <a asp-area="Teacher" asp-page="/Quiz/Questions" asp-route-quizId="@quiz.QuizId"
                                            class="btn btn-sm btn-primary" title="Add Questions">
@@ -202,6 +209,10 @@
                                            class="btn btn-sm btn-success" title="Publish">
                                             <i class="fas fa-rocket"></i>
                                         </a>
+                                        <button type="button" class="btn btn-sm btn-danger" title="Delete Quiz"
+                                                onclick="openDeleteModal(@quiz.QuizId, '@quiz.QuizTitle.Replace("'", "\\'")' )">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
                                     }
                                     else if (quiz.Status == "PUBLISHED")
                                     {
@@ -248,5 +259,111 @@
     .cls-filter-select:hover {
         border-color: #aaa;
     }
+
+    /* Delete Modal */
+    .delete-modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.45);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    .delete-modal-overlay.open {
+        display: flex;
+    }
+    .delete-modal {
+        background: #fff;
+        border-radius: 14px;
+        padding: 2rem;
+        max-width: 420px;
+        width: 90%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        text-align: center;
+    }
+    .delete-modal-icon {
+        font-size: 2.5rem;
+        color: #ef4444;
+        margin-bottom: 0.75rem;
+    }
+    .delete-modal h3 {
+        margin: 0 0 0.5rem;
+        font-size: 1.2rem;
+        color: #1a1a2e;
+    }
+    .delete-modal p {
+        color: #6b7280;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+    .delete-modal-actions {
+        display: flex;
+        gap: 0.75rem;
+        justify-content: center;
+    }
+    .btn-cancel-modal {
+        padding: 0.55rem 1.5rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: #fff;
+        color: #374151;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .btn-cancel-modal:hover {
+        background: #f3f4f6;
+    }
+    .btn-confirm-delete {
+        padding: 0.55rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        background: #ef4444;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .btn-confirm-delete:hover {
+        background: #dc2626;
+    }
 </style>
+
+<!-- Delete Confirmation Modal -->
+<div class="delete-modal-overlay" id="deleteModal">
+    <div class="delete-modal">
+        <div class="delete-modal-icon"><i class="fas fa-trash-alt"></i></div>
+        <h3>Delete Quiz</h3>
+        <p>Are you sure you want to delete <strong id="deleteQuizTitle"></strong>? This action cannot be undone.</p>
+        <form method="post" asp-page-handler="Delete" id="deleteForm">
+            <input type="hidden" name="quizId" id="deleteQuizId" />
+            <div class="delete-modal-actions">
+                <button type="button" class="btn-cancel-modal" onclick="closeDeleteModal()">Cancel</button>
+                <button type="submit" class="btn-confirm-delete">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openDeleteModal(quizId, quizTitle) {
+            document.getElementById('deleteQuizId').value = quizId;
+            document.getElementById('deleteQuizTitle').textContent = quizTitle;
+            document.getElementById('deleteModal').classList.add('open');
+        }
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('open');
+        }
+        document.getElementById('deleteModal').addEventListener('click', function (e) {
+            if (e.target === this) closeDeleteModal();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeDeleteModal();
+        });
+    </script>
+}
 

@@ -11,6 +11,7 @@ public interface ICourseRepository
     Task<(IReadOnlyList<Course> Items, int TotalCount)> GetPagedCoursesAsync(
         string? keyword,
         bool? isActive,
+        int? semesterId,
         int page,
         int pageSize,
         CancellationToken ct = default);

@@ -7,4 +7,5 @@ public class ClassSectionSummary
 {
     public int ClassSectionId { get; set; }
     public string SectionCode { get; set; } = string.Empty;
+    public string CourseCode { get; set; } = string.Empty;
 }

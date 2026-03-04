@@ -13,6 +13,22 @@
             </div>
         </div>
 
+        <!-- Semester Filter -->
+        @if (Model.Semesters.Count > 0)
+        {
+            <div class="filter-bar">
+                <form method="get" class="semester-filter-form">
+                    <label class="filter-label"><i class="fas fa-calendar-alt"></i> Semester</label>
+                    <select name="SemesterId" class="filter-select" onchange="this.form.submit()">
+                        @foreach (var sem in Model.Semesters)
+                        {
+                            <option value="@sem.SemesterId" selected="@(Model.SemesterId == sem.SemesterId)">@sem.SemesterName</option>
+                        }
+                    </select>
+                </form>
+            </div>
+        }
+
         @if (!string.IsNullOrEmpty(Model.ErrorMessage))
         {
             <div class="alert alert-error">

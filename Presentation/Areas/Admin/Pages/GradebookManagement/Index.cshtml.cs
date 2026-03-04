@@ -1,6 +1,6 @@
 using System.Security.Claims;
-using BusinessLogic.DTOs.Responses.Gradebook;
 using BusinessLogic.Services.Interfaces;
+using BusinessObject.Entities;
 using BusinessObject.Enum;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +11,8 @@ namespace Presentation.Areas.Admin.Pages.GradebookManagement;
 [Authorize(Roles = nameof(UserRole.ADMIN))]
 public class IndexModel : PageModel
 {
+    private const int DefaultPageSize = 10;
+
     private readonly IGradebookService _gradebookService;
     private readonly ILogger<IndexModel> _logger;
 
@@ -21,9 +23,14 @@ public class IndexModel : PageModel
     }
 
     [BindProperty(SupportsGet = true)]
-    public int? SearchClassSectionId { get; set; }
+    public string? StatusFilter { get; set; }
 
-    public GradebookDetailResponse? SearchResult { get; set; }
+    [BindProperty(SupportsGet = true)]
+    public int CurrentPage { get; set; } = 1;
+
+    public IReadOnlyList<GradeBook> Gradebooks { get; set; } = [];
+    public int TotalCount { get; set; }
+    public int TotalPages { get; set; }
 
     [TempData]
     public string? SuccessMessage { get; set; }
@@ -31,26 +38,43 @@ public class IndexModel : PageModel
     [TempData]
     public string? ErrorMessage { get; set; }
 
-    public async Task<IActionResult> OnGetAsync()
+    public async Task<IActionResult> OnGetAsync(CancellationToken ct)
     {
         var userId = GetUserId();
         if (userId == 0) return RedirectToPage("/Account/Login");
 
-        if (SearchClassSectionId.HasValue && SearchClassSectionId.Value > 0)
+        if (string.IsNullOrEmpty(StatusFilter))
         {
-            var result = await _gradebookService.GetGradebookAsync(
+            StatusFilter = "PENDING_APPROVAL";
+        }
+
+        try
+        {
+            if (CurrentPage <= 0) CurrentPage = 1;
+
+            var result = await _gradebookService.GetPagedGradebooksForAdminAsync(
                 userId,
                 nameof(UserRole.ADMIN),
-                SearchClassSectionId.Value);
+                StatusFilter == "ALL" ? null : StatusFilter,
+                CurrentPage,
+                DefaultPageSize,
+                ct);
 
-            if (result.IsSuccess && result.Data is not null)
+            if (result.IsSuccess)
             {
-                SearchResult = result.Data;
+                Gradebooks = result.Data.Items;
+                TotalCount = result.Data.TotalCount;
+                TotalPages = TotalCount > 0 ? (int)Math.Ceiling((double)TotalCount / DefaultPageSize) : 1;
             }
             else
             {
                 ErrorMessage = result.Message;
             }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error loading gradebooks for admin");
+            ErrorMessage = "An unexpected error occurred while loading gradebooks.";
         }
 
         return Page();

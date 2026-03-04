@@ -7,6 +7,7 @@ public sealed class TeacherClassSectionDto
     public string CourseCode { get; set; } = string.Empty;
     public string CourseName { get; set; } = string.Empty;
     public int Credits { get; set; }
+    public int SemesterId { get; set; }
     public string SemesterName { get; set; } = string.Empty;
     public bool IsOpen { get; set; }
     public int MaxCapacity { get; set; }

@@ -36,5 +36,11 @@ public interface IGradeBookRepository
 
     void UpdateGradeBook(GradeBook entity);
 
+    Task<(IReadOnlyList<GradeBook> Items, int TotalCount)> GetPagedGradebooksAsync(
+        string? statusFilter,
+        int page,
+        int pageSize,
+        CancellationToken ct = default);
+
     Task SaveChangesAsync(CancellationToken ct = default);
 }

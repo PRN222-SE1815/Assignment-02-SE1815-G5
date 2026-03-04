@@ -31,6 +31,53 @@
     margin-top: 0.25rem;
 }
 
+/* Semester Filter */
+.filter-bar {
+    background: #ffffff;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+}
+
+.semester-filter-form {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.filter-label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+.filter-label i {
+    margin-right: 0.35rem;
+    color: #0F766E;
+}
+
+.filter-select {
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    border: 1.5px solid #D1D5DB;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #1F2937;
+    background: #F9FAFB;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    min-width: 200px;
+    appearance: auto;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #0F766E;
+    box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
 /* Alerts */
 .alert {
     padding: 1rem 1.25rem;

@@ -184,6 +184,43 @@ public sealed class GradeBookRepository : IGradeBookRepository
         _context.GradeBooks.Update(entity);
     }
 
+    public async Task<(IReadOnlyList<GradeBook> Items, int TotalCount)> GetPagedGradebooksAsync(
+        string? statusFilter,
+        int page,
+        int pageSize,
+        CancellationToken ct = default)
+    {
+        page = page <= 0 ? 1 : page;
+        pageSize = pageSize <= 0 ? 10 : pageSize;
+
+        var query = _context.GradeBooks
+            .AsNoTracking()
+            .Include(gb => gb.ClassSection)
+                .ThenInclude(cs => cs.Course)
+            .Include(gb => gb.ClassSection)
+                .ThenInclude(cs => cs.Semester)
+            .Include(gb => gb.ClassSection)
+                .ThenInclude(cs => cs.Teacher)
+                    .ThenInclude(t => t.TeacherNavigation)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(statusFilter))
+        {
+            query = query.Where(gb => gb.Status == statusFilter);
+        }
+
+        var totalCount = await query.CountAsync(ct);
+
+        var items = await query
+            .OrderByDescending(gb => gb.UpdatedAt ?? gb.CreatedAt)
+            .ThenByDescending(gb => gb.GradeBookId)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+
+        return (items, totalCount);
+    }
+
     public async Task SaveChangesAsync(CancellationToken ct = default)
     {
         await _context.SaveChangesAsync(ct);

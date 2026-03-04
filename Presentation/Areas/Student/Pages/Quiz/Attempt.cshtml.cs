@@ -54,7 +54,7 @@ public class AttemptModel : PageModel
         {
             var request = new StartAttemptRequest { QuizId = quizId };
             AttemptData = await _quizService.StartAttemptAsync(
-                userId, nameof(UserRole.STUDENT), request, DateTime.UtcNow);
+                userId, nameof(UserRole.STUDENT), request, DateTime.Now);
         }
         catch (ConflictException ex)
         {
@@ -106,7 +106,7 @@ public class AttemptModel : PageModel
             };
 
             Result = await _quizService.SubmitAttemptAsync(
-                userId, nameof(UserRole.STUDENT), submitRequest, DateTime.UtcNow);
+                userId, nameof(UserRole.STUDENT), submitRequest, DateTime.Now);
         }
         catch (ForbiddenException ex)
         {

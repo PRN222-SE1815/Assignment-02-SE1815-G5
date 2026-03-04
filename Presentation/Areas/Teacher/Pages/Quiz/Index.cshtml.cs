@@ -3,9 +3,7 @@ using BusinessLogic.DTOs.Requests.Quiz;
 using BusinessLogic.DTOs.Responses.Quiz;
 using BusinessLogic.Exceptions;
 using BusinessLogic.Services.Interfaces;
-using BusinessObject.Entities;
 using BusinessObject.Enum;
-using DataAccess.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,13 +14,13 @@ namespace Presentation.Areas.Teacher.Pages.Quiz;
 public class IndexModel : PageModel
 {
     private readonly IQuizService _quizService;
-    private readonly IClassSectionRepository _classSectionRepository;
     private readonly ILogger<IndexModel> _logger;
 
-    public IndexModel(IQuizService quizService, IClassSectionRepository classSectionRepository, ILogger<IndexModel> logger)
+    public IndexModel(
+        IQuizService quizService,
+        ILogger<IndexModel> logger)
     {
         _quizService = quizService;
-        _classSectionRepository = classSectionRepository;
         _logger = logger;
     }
 
@@ -38,14 +36,14 @@ public class IndexModel : PageModel
     [BindProperty]
     public CreateQuizRequest CreateRequest { get; set; } = new();
 
-    public IReadOnlyList<ClassSection> TeacherClasses { get; set; } = new List<ClassSection>();
+    public IReadOnlyList<ClassSectionSummary> TeacherClasses { get; set; } = new List<ClassSectionSummary>();
 
     public async Task<IActionResult> OnGetAsync()
     {
         var userId = GetUserId();
         if (userId != 0)
         {
-            TeacherClasses = await _classSectionRepository.GetByTeacherIdAsync(userId);
+            TeacherClasses = await _quizService.GetTeacherClassSectionsForQuizFilterAsync(userId, nameof(UserRole.TEACHER));
         }
         return Page();
     }
@@ -90,7 +88,7 @@ public class IndexModel : PageModel
             ErrorMessage = "An unexpected error occurred.";
         }
 
-        TeacherClasses = await _classSectionRepository.GetByTeacherIdAsync(userId);
+        TeacherClasses = await _quizService.GetTeacherClassSectionsForQuizFilterAsync(userId, nameof(UserRole.TEACHER));
         return Page();
     }
 
@@ -98,5 +96,25 @@ public class IndexModel : PageModel
     {
         var claim = User.FindFirst(ClaimTypes.NameIdentifier);
         return claim is not null && int.TryParse(claim.Value, out var id) ? id : 0;
+    }
+
+    public async Task<IActionResult> OnGetGradeItemsAsync(int classSectionId)
+    {
+        try
+        {
+            var userId = GetUserId();
+            if (userId == 0)
+            {
+                return new JsonResult(new { success = false, message = "Unauthorized" });
+            }
+
+            var data = await _quizService.GetGradeItemsForClassSectionAsync(userId, nameof(UserRole.TEACHER), classSectionId);
+            return new JsonResult(new { success = true, data });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "OnGetGradeItemsAsync error. ClassSectionId={ClassSectionId}", classSectionId);
+            return new JsonResult(new { success = false, message = "Failed to load grade items." });
+        }
     }
 }

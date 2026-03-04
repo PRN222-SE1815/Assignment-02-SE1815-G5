@@ -9,4 +9,7 @@ public sealed class CreateCourseRequest
     public string? ContentHtml { get; set; }
     public string? LearningPathJson { get; set; }
     public bool IsActive { get; set; } = true;
+
+    /// <summary>Optional: planned semester for the new course (future semesters only).</summary>
+    public int? SemesterId { get; set; }
 }

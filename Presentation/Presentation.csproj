@@ -14,8 +14,6 @@
 
   <ItemGroup>
     <Folder Include="Areas\Admin\Pages\UserManagement\" />
-    <Folder Include="Areas\Student\Pages\StudentQuiz\" />
-    <Folder Include="Areas\Teacher\Pages\TeacherQuiz\" />
     <Folder Include="wwwroot\css\Admin\UserManagement\" />
     <Folder Include="wwwroot\css\Chat\" />
     <Folder Include="wwwroot\css\Student\CourseRegistration\" />

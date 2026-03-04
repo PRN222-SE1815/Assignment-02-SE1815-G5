@@ -1,9 +1,8 @@
 using System.Security.Claims;
 using BusinessLogic.DTOs.Responses.Quiz;
+using BusinessLogic.Exceptions;
 using BusinessLogic.Services.Interfaces;
-using BusinessObject.Entities;
 using BusinessObject.Enum;
-using DataAccess.Repositories.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,19 +13,20 @@ namespace Presentation.Areas.Teacher.Pages.Quiz;
 public class ListModel : PageModel
 {
     private readonly IQuizService _quizService;
-    private readonly IClassSectionRepository _classSectionRepository;
     private readonly ILogger<ListModel> _logger;
 
-    public ListModel(IQuizService quizService, IClassSectionRepository classSectionRepository, ILogger<ListModel> logger)
+    public ListModel(IQuizService quizService, ILogger<ListModel> logger)
     {
         _quizService = quizService;
-        _classSectionRepository = classSectionRepository;
         _logger = logger;
     }
 
     public List<QuizSummaryResponse> Quizzes { get; set; } = new();
-    public IReadOnlyList<ClassSection> ClassSections { get; set; } = new List<ClassSection>();
+    public IReadOnlyList<ClassSectionSummary> ClassSections { get; set; } = new List<ClassSectionSummary>();
     public string? ErrorMessage { get; set; }
+
+    [TempData]
+    public string? SuccessMessage { get; set; }
 
     [BindProperty(SupportsGet = true)]
     public string? StatusFilter { get; set; }
@@ -41,19 +41,14 @@ public class ListModel : PageModel
 
         try
         {
-            // Load class sections for dropdown
-            ClassSections = await _classSectionRepository.GetByTeacherIdAsync(userId);
-
-            // Load all quizzes
+            ClassSections = await _quizService.GetTeacherClassSectionsForQuizFilterAsync(userId, nameof(UserRole.TEACHER));
             Quizzes = await _quizService.ListQuizzesForTeacherAsync(userId, nameof(UserRole.TEACHER));
 
-            // Apply class section filter
             if (ClassSectionFilter.HasValue)
             {
                 Quizzes = Quizzes.Where(q => q.ClassSectionId == ClassSectionFilter.Value).ToList();
             }
 
-            // Apply status filter if specified
             if (!string.IsNullOrEmpty(StatusFilter))
             {
                 Quizzes = Quizzes.Where(q => q.Status == StatusFilter).ToList();
@@ -66,6 +61,37 @@ public class ListModel : PageModel
         }
 
         return Page();
+    }
+
+    public async Task<IActionResult> OnPostDeleteAsync(int quizId)
+    {
+        var userId = GetUserId();
+        if (userId == 0) return RedirectToPage("/Account/Login");
+
+        try
+        {
+            await _quizService.DeleteQuizAsync(userId, nameof(UserRole.TEACHER), quizId);
+            SuccessMessage = "Quiz deleted successfully.";
+        }
+        catch (ForbiddenException ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        catch (NotFoundException)
+        {
+            ErrorMessage = "Quiz not found.";
+        }
+        catch (BusinessException ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting quiz {QuizId}", quizId);
+            ErrorMessage = "An unexpected error occurred while deleting the quiz.";
+        }
+
+        return RedirectToPage(new { StatusFilter, ClassSectionFilter });
     }
 
     private int GetUserId()

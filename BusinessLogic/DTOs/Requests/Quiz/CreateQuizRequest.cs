@@ -33,4 +33,9 @@ public class CreateQuizRequest
     public DateTime? StartAt { get; set; }
 
     public DateTime? EndAt { get; set; }
+
+    /// <summary>
+    /// Optional: link to an existing GradeItem for auto-sync after grading.
+    /// </summary>
+    public int? GradeItemId { get; set; }
 }

@@ -326,6 +326,92 @@
     justify-content: center;
 }
 
+/* Expand Button */
+.btn-expand {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: #F1F5F9;
+    color: #475569;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.7rem;
+}
+
+.btn-expand:hover {
+    background: #E2E8F0;
+    color: #1E293B;
+}
+
+/* Expandable Sections Row */
+.sections-row > td {
+    padding: 0 !important;
+    border-top: none !important;
+}
+
+.sections-cell {
+    background: #F8FAFC;
+}
+
+.sections-container {
+    padding: 0.75rem 1.25rem 0.75rem 3rem;
+}
+
+.sections-loading {
+    color: #64748B;
+    font-size: 0.85rem;
+    padding: 0.5rem 0;
+}
+
+.sections-loading i {
+    margin-right: 0.4rem;
+}
+
+.sections-empty {
+    color: #94A3B8;
+    font-size: 0.85rem;
+    margin: 0;
+    padding: 0.25rem 0;
+}
+
+.sections-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.sections-table thead {
+    background: #E2E8F0;
+}
+
+.sections-table th {
+    padding: 0.4rem 0.75rem;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #475569;
+    letter-spacing: 0.5px;
+}
+
+.sections-table td {
+    padding: 0.45rem 0.75rem;
+    border-bottom: 1px solid #E2E8F0;
+    color: #334155;
+}
+
+.sections-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.enrollment-count {
+    font-weight: 600;
+    color: #1E293B;
+}
+
 .btn-edit {
     display: inline-flex;
     align-items: center;

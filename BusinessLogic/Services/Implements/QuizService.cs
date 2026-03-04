@@ -16,6 +16,7 @@ public class QuizService : IQuizService
     private readonly IQuizRepository _quizRepo;
     private readonly IEnrollmentRepository _enrollmentRepo;
     private readonly IGradebookSyncService _gradebookSyncService;
+    private readonly IGradeBookRepository _gradeBookRepository;
     private readonly SchoolManagementDbContext _dbContext;
     private readonly ILogger<QuizService> _logger;
 
@@ -42,12 +43,14 @@ public class QuizService : IQuizService
         IQuizRepository quizRepo,
         IEnrollmentRepository enrollmentRepo,
         IGradebookSyncService gradebookSyncService,
+        IGradeBookRepository gradeBookRepository,
         SchoolManagementDbContext dbContext,
         ILogger<QuizService> logger)
     {
         _quizRepo = quizRepo;
         _enrollmentRepo = enrollmentRepo;
         _gradebookSyncService = gradebookSyncService;
+        _gradeBookRepository = gradeBookRepository;
         _dbContext = dbContext;
         _logger = logger;
     }
@@ -106,6 +109,22 @@ public class QuizService : IQuizService
 
         await _quizRepo.CreateQuizAsync(quiz);
         await _quizRepo.SaveChangesAsync();
+
+        // 6. Link grade item if selected
+        if (request.GradeItemId.HasValue && request.GradeItemId.Value > 0)
+        {
+            var gradeItem = await _gradeBookRepository.GetGradeItemByIdAsync(request.GradeItemId.Value);
+            if (gradeItem is not null)
+            {
+                gradeItem.ItemName = $"QUIZ:{quiz.QuizId}";
+                _gradeBookRepository.UpdateGradeItem(gradeItem);
+                await _gradeBookRepository.SaveChangesAsync();
+
+                _logger.LogInformation(
+                    "Linked GradeItem {GradeItemId} to Quiz {QuizId} (renamed to QUIZ:{QuizId})",
+                    gradeItem.GradeItemId, quiz.QuizId, quiz.QuizId);
+            }
+        }
 
         _logger.LogInformation("Teacher {TeacherId} created draft quiz {QuizId} for ClassSection {ClassSectionId}",
             teacherUserId, quiz.QuizId, request.ClassSectionId);
@@ -462,9 +481,34 @@ public class QuizService : IQuizService
             .Select(cs => new ClassSectionSummary
             {
                 ClassSectionId = cs.ClassSectionId,
-                SectionCode = cs.SectionCode
+                SectionCode = cs.SectionCode,
+                CourseCode = cs.Course.CourseCode
             })
             .ToListAsync();
+    }
+
+    public async Task<List<GradeItemSummaryDto>> GetGradeItemsForClassSectionAsync(
+        int teacherUserId, string actorRole, int classSectionId)
+    {
+        EnsureTeacherRole(actorRole);
+
+        var gradebook = await _gradeBookRepository.GetByClassSectionIdAsync(classSectionId);
+        if (gradebook is null)
+        {
+            return [];
+        }
+
+        var items = await _gradeBookRepository.GetGradeItemsAsync(gradebook.GradeBookId);
+        return items
+            .Where(gi => !gi.ItemName.StartsWith("QUIZ:", StringComparison.OrdinalIgnoreCase))
+            .Select(gi => new GradeItemSummaryDto
+            {
+                GradeItemId = gi.GradeItemId,
+                ItemName = gi.ItemName,
+                MaxScore = gi.MaxScore.ToString("0.##"),
+                Weight = gi.Weight.HasValue ? $"{gi.Weight.Value * 100:0.##}%" : null
+            })
+            .ToList();
     }
 
     public async Task<List<QuizSummaryResponse>> ListPublishedQuizzesForClassAsync(

@@ -1,6 +1,7 @@
 using BusinessLogic.DTOs.Requests.Gradebook;
 using BusinessLogic.DTOs.Response;
 using BusinessLogic.DTOs.Responses.Gradebook;
+using BusinessObject.Entities;
 
 namespace BusinessLogic.Services.Interfaces;
 
@@ -17,4 +18,8 @@ public interface IGradebookService
     Task<ServiceResult<GradebookApprovalResponse>> ApproveGradebookAsync(int adminUserId, string actorRole, ApproveGradebookRequest request, CancellationToken ct = default);
 
     Task<ServiceResult<GradebookApprovalResponse>> RejectGradebookAsync(int adminUserId, string actorRole, RejectGradebookRequest request, CancellationToken ct = default);
+
+    Task<ServiceResult<(IReadOnlyList<GradeBook> Items, int TotalCount)>> GetPagedGradebooksForAdminAsync(int adminUserId, string actorRole, string? statusFilter, int page, int pageSize, CancellationToken ct = default);
+
+    Task<ServiceResult<int?>> GetActiveSemesterIdAsync(CancellationToken ct = default);
 }

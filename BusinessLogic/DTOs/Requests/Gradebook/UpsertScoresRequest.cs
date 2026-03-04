@@ -4,7 +4,7 @@ public sealed class UpsertScoresRequest
 {
     public int ClassSectionId { get; set; }
 
-    public IReadOnlyList<ScoreCellDto> Scores { get; set; } = [];
+    public List<ScoreCellDto> Scores { get; set; } = [];
 }
 
 public sealed class ScoreCellDto

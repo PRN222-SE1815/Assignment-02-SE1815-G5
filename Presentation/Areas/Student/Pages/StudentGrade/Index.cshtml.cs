@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using BusinessLogic.DTOs.Response;
 using BusinessLogic.DTOs.Responses.Gradebook;
 using BusinessLogic.Services.Interfaces;
 using BusinessObject.Enum;
@@ -26,6 +27,8 @@ public class IndexModel : PageModel
     }
 
     public List<StudentGradeViewModel> GradeViewModels { get; set; } = [];
+    public List<SemesterOptionDto> Semesters { get; set; } = [];
+    public int? SelectedSemesterId { get; set; }
 
     [TempData]
     public string? ErrorMessage { get; set; }
@@ -40,7 +43,19 @@ public class IndexModel : PageModel
 
         try
         {
+            // If no semester selected, default to active semester
+            if (!SemesterId.HasValue)
+            {
+                var tempPage = await _enrollmentService.GetMyCoursesAsync(userId, null, 1, 1);
+                var activeSem = tempPage.Semesters.FirstOrDefault(s => s.IsActive);
+                if (activeSem is not null)
+                    SemesterId = activeSem.SemesterId;
+            }
+
             var coursesPage = await _enrollmentService.GetMyCoursesAsync(userId, SemesterId, 1, 100);
+            Semesters = coursesPage.Semesters.ToList();
+            SelectedSemesterId = SemesterId ?? coursesPage.Semesters.FirstOrDefault(s => s.IsActive)?.SemesterId;
+
             var viewModels = new List<StudentGradeViewModel>();
 
             foreach (var course in coursesPage.Items)

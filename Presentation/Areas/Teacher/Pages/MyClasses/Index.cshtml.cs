@@ -14,13 +14,20 @@ public class IndexModel : PageModel
     private readonly IGradebookService _gradebookService;
     private readonly ILogger<IndexModel> _logger;
 
-    public IndexModel(IGradebookService gradebookService, ILogger<IndexModel> logger)
+    public IndexModel(
+        IGradebookService gradebookService,
+        ILogger<IndexModel> logger)
     {
         _gradebookService = gradebookService;
         _logger = logger;
     }
 
     public IReadOnlyList<TeacherClassSectionDto> ClassSections { get; set; } = [];
+
+    public List<SemesterOption> Semesters { get; set; } = [];
+
+    [BindProperty(SupportsGet = true)]
+    public int? SemesterId { get; set; }
 
     [TempData]
     public string? ErrorMessage { get; set; }
@@ -37,7 +44,32 @@ public class IndexModel : PageModel
 
         if (result.IsSuccess && result.Data is not null)
         {
-            ClassSections = result.Data;
+            var allSections = result.Data;
+
+            Semesters = allSections
+                .Select(s => new SemesterOption { SemesterId = s.SemesterId, SemesterName = s.SemesterName })
+                .DistinctBy(s => s.SemesterId)
+                .OrderByDescending(s => s.SemesterName)
+                .ToList();
+
+            if (!SemesterId.HasValue && Semesters.Count > 0)
+            {
+                var activeResult = await _gradebookService.GetActiveSemesterIdAsync(ct);
+                var activeSemesterId = activeResult.IsSuccess ? activeResult.Data : null;
+
+                if (activeSemesterId.HasValue && Semesters.Any(s => s.SemesterId == activeSemesterId.Value))
+                {
+                    SemesterId = activeSemesterId.Value;
+                }
+                else
+                {
+                    SemesterId = Semesters.First().SemesterId;
+                }
+            }
+
+            ClassSections = SemesterId.HasValue
+                ? allSections.Where(s => s.SemesterId == SemesterId.Value).ToList()
+                : allSections;
         }
         else
         {
@@ -51,5 +83,11 @@ public class IndexModel : PageModel
     {
         var claim = User.FindFirst(ClaimTypes.NameIdentifier);
         return claim is not null && int.TryParse(claim.Value, out var id) ? id : 0;
+    }
+
+    public sealed class SemesterOption
+    {
+        public int SemesterId { get; set; }
+        public string SemesterName { get; set; } = string.Empty;
     }
 }

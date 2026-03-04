@@ -212,12 +212,14 @@
             var code = (payload && payload.courseCode) || '';
             showRealtimeToast('info', 'Course Created', 'New course added: ' + code);
             reloadIfOnCoursePage();
+            reloadIfOnMyCoursesPage();
         });
 
         connection.on('CourseUpdated', function (payload) {
             var code = (payload && payload.courseCode) || '';
             showRealtimeToast('info', 'Course Updated', 'Course updated: ' + code);
             reloadIfOnCoursePage();
+            reloadIfOnMyCoursesPage();
         });
 
         connection.on('CourseDeactivated', function (payload) {

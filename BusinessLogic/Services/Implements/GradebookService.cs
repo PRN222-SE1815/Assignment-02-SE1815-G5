@@ -77,6 +77,7 @@ public sealed class GradebookService : IGradebookService
                 CourseCode = cs.Course.CourseCode,
                 CourseName = cs.Course.CourseName,
                 Credits = cs.Course.Credits,
+                SemesterId = cs.SemesterId,
                 SemesterName = cs.Semester.SemesterName,
                 IsOpen = cs.IsOpen,
                 MaxCapacity = cs.MaxCapacity,
@@ -707,5 +708,51 @@ public sealed class GradebookService : IGradebookService
     {
         return string.Equals(status, StatusDraft, StringComparison.OrdinalIgnoreCase)
             || string.Equals(status, StatusRejected, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // ==================== Admin Gradebook Listing ====================
+
+    public async Task<ServiceResult<(IReadOnlyList<GradeBook> Items, int TotalCount)>> GetPagedGradebooksForAdminAsync(
+        int adminUserId,
+        string actorRole,
+        string? statusFilter,
+        int page,
+        int pageSize,
+        CancellationToken ct = default)
+    {
+        try
+        {
+            if (!string.Equals(actorRole, RoleAdmin, StringComparison.OrdinalIgnoreCase))
+            {
+                return ServiceResult<(IReadOnlyList<GradeBook>, int)>.Fail(ErrorCodes.Forbidden, "Only admin can perform this action.");
+            }
+
+            var result = await _gradeBookRepository.GetPagedGradebooksAsync(statusFilter, page, pageSize, ct);
+            return ServiceResult<(IReadOnlyList<GradeBook>, int)>.Success(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "GetPagedGradebooksForAdminAsync failed. AdminUserId={AdminUserId}", adminUserId);
+            return ServiceResult<(IReadOnlyList<GradeBook>, int)>.Fail(ErrorCodes.InternalError, "An unexpected error occurred.");
+        }
+    }
+
+    public async Task<ServiceResult<int?>> GetActiveSemesterIdAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            var active = await _dbContext.Semesters
+                .AsNoTracking()
+                .Where(s => s.IsActive)
+                .Select(s => (int?)s.SemesterId)
+                .FirstOrDefaultAsync(ct);
+
+            return ServiceResult<int?>.Success(active);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "GetActiveSemesterIdAsync failed.");
+            return ServiceResult<int?>.Fail(ErrorCodes.InternalError, "An unexpected error occurred.");
+        }
     }
 }

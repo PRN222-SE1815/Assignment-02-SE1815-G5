@@ -85,6 +85,7 @@ public sealed class CourseRepository : ICourseRepository
     public async Task<(IReadOnlyList<Course> Items, int TotalCount)> GetPagedCoursesAsync(
         string? keyword,
         bool? isActive,
+        int? semesterId,
         int page,
         int pageSize,
         CancellationToken ct = default)
@@ -104,6 +105,11 @@ public sealed class CourseRepository : ICourseRepository
             var normalizedKeyword = keyword.Trim().ToUpper();
             query = query.Where(c => c.CourseCode.ToUpper().Contains(normalizedKeyword)
                                      || c.CourseName.ToUpper().Contains(normalizedKeyword));
+        }
+
+        if (semesterId.HasValue)
+        {
+            query = query.Where(c => c.ClassSections.Any(cs => cs.SemesterId == semesterId.Value));
         }
 
         var totalCount = await query.CountAsync(ct);

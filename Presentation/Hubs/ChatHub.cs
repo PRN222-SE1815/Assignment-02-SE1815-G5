@@ -81,23 +81,31 @@ public sealed class ChatHub : Hub
 
     // ==================== Send Message ====================
 
-    /// <summary>Send a text/attachment message to a room. Persists first, then broadcasts.</summary>
-    public async Task SendMessage(int roomId, string? content, List<ChatAttachmentInput>? attachments = null)
+    /// <summary>Send a text message to a room (no attachments). Persists first, then broadcasts.</summary>
+    public async Task SendMessage(int roomId, string? content)
     {
         var userId = GetUserId();
         if (userId == 0) return;
 
-        var result = await _chatService.SendMessageAsync(roomId, userId, content, attachments);
-        if (!result.Success)
+        try
         {
-            await SendToCaller("Error", result.Message!);
-            return;
-        }
+            var result = await _chatService.SendMessageAsync(roomId, userId, content, null);
+            if (!result.Success)
+            {
+                await SendToCaller("Error", result.Message!);
+                return;
+            }
 
-        var message = await _chatService.GetLatestMessageAsync(roomId, userId);
-        if (message is not null && message.SenderId == userId)
+            var message = await _chatService.GetLatestMessageAsync(roomId, userId);
+            if (message is not null && message.SenderId == userId)
+            {
+                await SendToGroup($"room:{roomId}", "ReceiveMessage", message);
+            }
+        }
+        catch (Exception ex)
         {
-            await SendToGroup($"room:{roomId}", "ReceiveMessage", message);
+            _logger.LogError(ex, "SendMessage failed. RoomId={RoomId}, UserId={UserId}", roomId, userId);
+            await SendToCaller("Error", "Failed to send message. Please try again.");
         }
     }
 
@@ -107,17 +115,25 @@ public sealed class ChatHub : Hub
         var userId = GetUserId();
         if (userId == 0) return;
 
-        var result = await _chatService.SendMessageAsync(roomId, userId, content, attachments);
-        if (!result.Success)
+        try
         {
-            await SendToCaller("Error", result.Message!);
-            return;
-        }
+            var result = await _chatService.SendMessageAsync(roomId, userId, content, attachments);
+            if (!result.Success)
+            {
+                await SendToCaller("Error", result.Message!);
+                return;
+            }
 
-        var message = await _chatService.GetLatestMessageAsync(roomId, userId);
-        if (message is not null && message.SenderId == userId)
+            var message = await _chatService.GetLatestMessageAsync(roomId, userId);
+            if (message is not null && message.SenderId == userId)
+            {
+                await SendToGroup($"room:{roomId}", "ReceiveMessage", message);
+            }
+        }
+        catch (Exception ex)
         {
-            await SendToGroup($"room:{roomId}", "ReceiveMessage", message);
+            _logger.LogError(ex, "SendMessageWithAttachments failed. RoomId={RoomId}, UserId={UserId}", roomId, userId);
+            await SendToCaller("Error", "Failed to send message. Please try again.");
         }
     }
 

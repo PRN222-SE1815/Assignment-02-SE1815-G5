@@ -44,17 +44,17 @@
         <form method="post" asp-page-handler="Create">
             <div class="form-group">
                 <label asp-for="CreateRequest.ClassSectionId" class="form-label">Class Section *</label>
-                <select asp-for="CreateRequest.ClassSectionId" class="form-input" required>
+                <select asp-for="CreateRequest.ClassSectionId" class="form-input" required id="classSectionSelect">
                     <option value="">-- Select a Class Section --</option>
                     @foreach (var cls in Model.TeacherClasses)
                     {
                         if (Model.ClassSectionId == cls.ClassSectionId)
                         {
-                            <option value="@cls.ClassSectionId" selected>@cls.Course.CourseCode - @cls.SectionCode</option>
+                            <option value="@cls.ClassSectionId" selected>@cls.CourseCode - @cls.SectionCode</option>
                         }
                         else
                         {
-                            <option value="@cls.ClassSectionId">@cls.Course.CourseCode - @cls.SectionCode</option>
+                            <option value="@cls.ClassSectionId">@cls.CourseCode - @cls.SectionCode</option>
                         }
                     }
                 </select>
@@ -72,6 +72,16 @@
                 <label asp-for="CreateRequest.Description" class="form-label">Description</label>
                 <textarea asp-for="CreateRequest.Description" class="form-input" rows="3"
                           placeholder="Optional description..."></textarea>
+            </div>
+
+            <div class="form-group" id="gradeItemGroup" style="display:none;">
+                <label class="form-label">
+                    <i class="fas fa-book"></i> Link to Grade Column (optional)
+                </label>
+                <select name="CreateRequest.GradeItemId" id="gradeItemSelect" class="form-input">
+                    <option value="">-- No grade sync --</option>
+                </select>
+                <span class="form-hint">When linked, student scores will auto-fill into this grade column after quiz grading.</span>
             </div>
 
             <div class="form-row">
@@ -128,3 +138,53 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var classSelect = document.getElementById('classSectionSelect');
+            var gradeGroup = document.getElementById('gradeItemGroup');
+            var gradeSelect = document.getElementById('gradeItemSelect');
+
+            if (!classSelect) return;
+
+            classSelect.addEventListener('change', function () {
+                loadGradeItems(this.value);
+            });
+
+            // Load on page init if a class section is already selected
+            if (classSelect.value) {
+                loadGradeItems(classSelect.value);
+            }
+
+            async function loadGradeItems(classSectionId) {
+                gradeSelect.innerHTML = '<option value="">-- No grade sync --</option>';
+                if (!classSectionId) {
+                    gradeGroup.style.display = 'none';
+                    return;
+                }
+
+                try {
+                    var resp = await fetch('?handler=GradeItems&classSectionId=' + classSectionId);
+                    var result = await resp.json();
+
+                    if (result.success && result.data && result.data.length > 0) {
+                        result.data.forEach(function (item) {
+                            var opt = document.createElement('option');
+                            opt.value = item.gradeItemId;
+                            var label = item.itemName;
+                            if (item.weight) label += ' (' + item.weight + ')';
+                            opt.textContent = label;
+                            gradeSelect.appendChild(opt);
+                        });
+                        gradeGroup.style.display = '';
+                    } else {
+                        gradeGroup.style.display = 'none';
+                    }
+                } catch (e) {
+                    gradeGroup.style.display = 'none';
+                }
+            }
+        })();
+    </script>
+}

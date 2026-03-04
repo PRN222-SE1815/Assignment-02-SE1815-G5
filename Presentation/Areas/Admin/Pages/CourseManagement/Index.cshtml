@@ -63,6 +63,18 @@
                     </select>
                 </div>
                 <div class="filter-group">
+                    <label class="filter-label">Semester</label>
+                    <select name="SemesterId" class="filter-select">
+                        <option value="">All Semesters</option>
+                        @foreach (var sem in Model.Semesters)
+                        {
+                            <option value="@sem.SemesterId" selected="@(Model.SemesterId == sem.SemesterId)">
+                                @sem.SemesterName @(sem.IsActive ? "★" : "")
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="filter-group">
                     <label class="filter-label">Per page</label>
                     <select name="PageSize" class="filter-select filter-select-sm">
                         @foreach (var ps in new[] { 10, 20, 50 })
@@ -92,6 +104,7 @@
                 <table class="data-table" id="courseTable">
                     <thead>
                         <tr>
+                            <th style="width:40px"></th>
                             <th>Code</th>
                             <th>Course Name</th>
                             <th class="text-center">Credits</th>
@@ -105,6 +118,15 @@
                         @foreach (var c in items)
                         {
                             <tr data-course-id="@c.CourseId">
+                                <td class="text-center">
+                                    @if (c.ClassSectionCount > 0)
+                                    {
+                                        <button type="button" class="btn-expand" title="View sections"
+                                                onclick="toggleSections(@c.CourseId, this)">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    }
+                                </td>
                                 <td><span class="badge badge-code">@c.CourseCode</span></td>
                                 <td class="course-name-cell">@c.CourseName</td>
                                 <td class="text-center">@c.Credits</td>
@@ -148,6 +170,14 @@
                                     </div>
                                 </td>
                             </tr>
+                            <!-- Expandable Sections Row -->
+                            <tr class="sections-row" id="sections-@c.CourseId" style="display:none;">
+                                <td colspan="8" class="sections-cell">
+                                    <div class="sections-container" id="sections-content-@c.CourseId">
+                                        <div class="sections-loading"><i class="fas fa-spinner fa-spin"></i> Loading sections...</div>
+                                    </div>
+                                </td>
+                            </tr>
                         }
                     </tbody>
                 </table>
@@ -161,6 +191,7 @@
                     {
                         <a asp-page="/CourseManagement/Index" asp-area="Admin"
                            asp-route-Keyword="@Model.Keyword" asp-route-IsActive="@Model.IsActive"
+                           asp-route-SemesterId="@Model.SemesterId"
                            asp-route-CurrentPage="@(currentPage - 1)" asp-route-PageSize="@pageSize"
                            class="page-btn"><i class="fas fa-chevron-left"></i></a>
                     }
@@ -168,6 +199,7 @@
                     {
                         <a asp-page="/CourseManagement/Index" asp-area="Admin"
                            asp-route-Keyword="@Model.Keyword" asp-route-IsActive="@Model.IsActive"
+                           asp-route-SemesterId="@Model.SemesterId"
                            asp-route-CurrentPage="@p" asp-route-PageSize="@pageSize"
                            class="page-btn @(p == currentPage ? "active" : "")">@p</a>
                     }
@@ -175,6 +207,7 @@
                     {
                         <a asp-page="/CourseManagement/Index" asp-area="Admin"
                            asp-route-Keyword="@Model.Keyword" asp-route-IsActive="@Model.IsActive"
+                           asp-route-SemesterId="@Model.SemesterId"
                            asp-route-CurrentPage="@(currentPage + 1)" asp-route-PageSize="@pageSize"
                            class="page-btn"><i class="fas fa-chevron-right"></i></a>
                     }
@@ -214,6 +247,16 @@
                             <option value="false">Inactive</option>
                         </select>
                     </div>
+                </div>
+                <div class="form-group">
+                    <label>Semester</label>
+                    <select name="CreateRequest.SemesterId" class="form-input">
+                        <option value="">— Select semester —</option>
+                        @foreach (var sem in Model.FutureSemesters)
+                        {
+                            <option value="@sem.SemesterId">@sem.SemesterName</option>
+                        }
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Description</label>
@@ -384,5 +427,54 @@
                 }, 6000);
             });
         });
+
+        // Expandable class sections
+        var loadedSections = {};
+        async function toggleSections(courseId, btn) {
+            var row = document.getElementById('sections-' + courseId);
+            var icon = btn.querySelector('i');
+            if (row.style.display === 'none') {
+                row.style.display = '';
+                icon.className = 'fas fa-chevron-down';
+                if (!loadedSections[courseId]) {
+                    try {
+                        var resp = await fetch('?handler=Sections&courseId=' + courseId);
+                        var result = await resp.json();
+                        var container = document.getElementById('sections-content-' + courseId);
+                        if (result.success && result.data && result.data.length > 0) {
+                            var html = '<table class="sections-table">';
+                            html += '<thead><tr><th>Section</th><th>Semester</th><th>Room</th><th class="text-center">Enrolled</th><th class="text-center">Status</th></tr></thead><tbody>';
+                            result.data.forEach(function (s) {
+                                var statusClass = s.isOpen ? 'status-active' : 'status-inactive';
+                                var statusText = s.isOpen ? 'Open' : 'Closed';
+                                html += '<tr>';
+                                html += '<td><strong>' + escapeHtml(s.sectionCode) + '</strong></td>';
+                                html += '<td>' + escapeHtml(s.semesterName) + '</td>';
+                                html += '<td>' + escapeHtml(s.room) + '</td>';
+                                html += '<td class="text-center"><span class="enrollment-count">' + s.currentEnrollment + ' / ' + s.maxCapacity + '</span></td>';
+                                html += '<td class="text-center"><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>';
+                                html += '</tr>';
+                            });
+                            html += '</tbody></table>';
+                            container.innerHTML = html;
+                        } else {
+                            container.innerHTML = '<p class="sections-empty">No class sections found.</p>';
+                        }
+                        loadedSections[courseId] = true;
+                    } catch (e) {
+                        document.getElementById('sections-content-' + courseId).innerHTML = '<p class="sections-empty">Failed to load sections.</p>';
+                    }
+                }
+            } else {
+                row.style.display = 'none';
+                icon.className = 'fas fa-chevron-right';
+            }
+        }
+
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
     </script>
 }
