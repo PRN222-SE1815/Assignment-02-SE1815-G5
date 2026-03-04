@@ -30,17 +30,10 @@ public class WalletBadgeViewComponent : ViewComponent
         }
 
         decimal balance = 0;
-        try
+        var wallet = await _enrollmentService.GetWalletBalanceAsync(userId);
+        if (wallet != null)
         {
-            var wallet = await _enrollmentService.GetWalletBalanceAsync(userId);
-            if (wallet != null)
-            {
-                balance = wallet.Balance;
-            }
-        }
-        catch
-        {
-            // Navbar should not break on error
+            balance = wallet.Balance;
         }
 
         return View(balance);
