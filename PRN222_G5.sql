@@ -1082,12 +1082,6 @@ INSERT INTO dbo.Programs (ProgramCode, ProgramName) VALUES
 ('GD', N'Thiết kế đồ họa');
 GO
 
--- 2. Tạo dữ liệu Học kỳ (Semesters)
-INSERT INTO dbo.Semesters (SemesterCode, SemesterName, StartDate, EndDate, IsActive, RegistrationEndDate, AddDropDeadline) VALUES
-('SP26', N'Spring 2026', '2026-01-05', '2026-04-30', 1, '2025-12-31', '2026-01-15'),
-('SU26', N'Summer 2026', '2026-05-10', '2026-08-30', 0, '2026-05-01', '2026-05-20');
-GO
-
 -- 3. Tạo dữ liệu Môn học (Courses)
 INSERT INTO dbo.Courses (CourseCode, CourseName, Credits, Description) VALUES
 ('PRN211', N'Basic Cross-Platform App Programming', 3, N'C# basic and WinForms'),
@@ -1162,20 +1156,6 @@ SELECT
     @SemesterId
 FROM dbo.Users 
 WHERE Role = 'STUDENT';
-GO
-
--- =============================================================
--- 6. TẠO LỚP HỌC (CLASS SECTIONS) & PHÂN CÔNG GIẢNG DẠY (Tùy chọn thêm để test)
--- =============================================================
-
-DECLARE @SemId INT = (SELECT SemesterId FROM dbo.Semesters WHERE SemesterCode = 'SP26');
-DECLARE @CourseId INT = (SELECT CourseId FROM dbo.Courses WHERE CourseCode = 'PRN222');
-DECLARE @TeacherId INT = (SELECT TOP 1 TeacherId FROM dbo.Teachers);
-
--- Tạo 2 lớp học cho môn PRN222
-INSERT INTO dbo.ClassSections (SemesterId, CourseId, TeacherId, SectionCode, Room, MaxCapacity) VALUES
-(@SemId, @CourseId, @TeacherId, 'SE1801', 'BE-301', 30),
-(@SemId, @CourseId, @TeacherId, 'SE1802', 'BE-302', 30);
 GO
 
 /* =====================================================
@@ -1420,340 +1400,668 @@ INSERT INTO dbo.Programs (ProgramCode, ProgramName, IsActive) VALUES
 ('VR',   N'Thực tế ảo và Thực tế tăng cường', 1);
 GO
 
--- =====================================================
--- SEED: Semesters (98 more => total 100)
--- =====================================================
-INSERT INTO dbo.Semesters (SemesterCode, SemesterName, StartDate, EndDate, IsActive, RegistrationEndDate, AddDropDeadline, WithdrawalDeadline, MaxCredits, MinCredits) VALUES
-('FA22', N'Fall 2022',   '2022-08-15', '2022-12-15', 0, '2022-08-01', '2022-08-25', '2022-09-15', 20, 8),
-('SP23', N'Spring 2023', '2023-01-05', '2023-04-30', 0, '2022-12-25', '2023-01-15', '2023-02-01', 20, 8),
-('SU23', N'Summer 2023', '2023-05-10', '2023-08-10', 0, '2023-05-01', '2023-05-20', '2023-06-01', 12, 6),
-('FA23', N'Fall 2023',   '2023-08-15', '2023-12-15', 0, '2023-08-01', '2023-08-25', '2023-09-15', 20, 8),
-('SP24', N'Spring 2024', '2024-01-05', '2024-04-30', 0, '2023-12-25', '2024-01-15', '2024-02-01', 20, 8),
-('SU24', N'Summer 2024', '2024-05-10', '2024-08-10', 0, '2024-05-01', '2024-05-20', '2024-06-01', 12, 6),
-('FA24', N'Fall 2024',   '2024-08-15', '2024-12-15', 0, '2024-08-01', '2024-08-25', '2024-09-15', 20, 8),
-('SP25', N'Spring 2025', '2025-01-05', '2025-04-30', 0, '2024-12-25', '2025-01-15', '2025-02-01', 20, 8),
-('SU25', N'Summer 2025', '2025-05-10', '2025-08-10', 0, '2025-05-01', '2025-05-20', '2025-06-01', 12, 6),
-('FA25', N'Fall 2025',   '2025-08-15', '2025-12-15', 0, '2025-08-01', '2025-08-25', '2025-09-15', 20, 8),
--- SU26 đã insert ở dòng 977, bỏ qua để tránh duplicate
-('FA26', N'Fall 2026',   '2026-08-15', '2026-12-15', 0, '2026-08-01', '2026-08-25', '2026-09-15', 20, 8),
-('SP27', N'Spring 2027', '2027-01-05', '2027-04-30', 0, '2026-12-25', '2027-01-15', '2027-02-01', 20, 8),
-('SU27', N'Summer 2027', '2027-05-10', '2027-08-10', 0, '2027-05-01', '2027-05-20', '2027-06-01', 12, 6),
-('FA27', N'Fall 2027',   '2027-08-15', '2027-12-15', 0, '2027-08-01', '2027-08-25', '2027-09-15', 20, 8),
-('SP28', N'Spring 2028', '2028-01-05', '2028-04-30', 0, '2027-12-25', '2028-01-15', '2028-02-01', 20, 8),
-('SU28', N'Summer 2028', '2028-05-10', '2028-08-10', 0, '2028-05-01', '2028-05-20', '2028-06-01', 12, 6),
-('FA28', N'Fall 2028',   '2028-08-15', '2028-12-15', 0, '2028-08-01', '2028-08-25', '2028-09-15', 20, 8),
-('SP29', N'Spring 2029', '2029-01-05', '2029-04-30', 0, '2028-12-25', '2029-01-15', '2029-02-01', 20, 8),
-('SU29', N'Summer 2029', '2029-05-10', '2029-08-10', 0, '2029-05-01', '2029-05-20', '2029-06-01', 12, 6),
-('FA19', N'Fall 2019',   '2019-08-15', '2019-12-15', 0, '2019-08-01', '2019-08-25', '2019-09-15', 20, 8),
-('SP20', N'Spring 2020', '2020-01-05', '2020-04-30', 0, '2019-12-25', '2020-01-15', '2020-02-01', 20, 8),
-('SU20', N'Summer 2020', '2020-05-10', '2020-08-10', 0, '2020-05-01', '2020-05-20', '2020-06-01', 12, 6),
-('FA20', N'Fall 2020',   '2020-08-15', '2020-12-15', 0, '2020-08-01', '2020-08-25', '2020-09-15', 20, 8),
-('SP21', N'Spring 2021', '2021-01-05', '2021-04-30', 0, '2020-12-25', '2021-01-15', '2021-02-01', 20, 8),
-('SU21', N'Summer 2021', '2021-05-10', '2021-08-10', 0, '2021-05-01', '2021-05-20', '2021-06-01', 12, 6),
-('FA21', N'Fall 2021',   '2021-08-15', '2021-12-15', 0, '2021-08-01', '2021-08-25', '2021-09-15', 20, 8),
-('SP22', N'Spring 2022', '2022-01-05', '2022-04-30', 0, '2021-12-25', '2022-01-15', '2022-02-01', 20, 8),
-('SU22', N'Summer 2022', '2022-05-10', '2022-08-10', 0, '2022-05-01', '2022-05-20', '2022-06-01', 12, 6),
-('FA30', N'Fall 2030',   '2030-08-15', '2030-12-15', 0, '2030-08-01', '2030-08-25', '2030-09-15', 20, 8),
-('SP31', N'Spring 2031', '2031-01-05', '2031-04-30', 0, '2030-12-25', '2031-01-15', '2031-02-01', 20, 8),
-('SU31', N'Summer 2031', '2031-05-10', '2031-08-10', 0, '2031-05-01', '2031-05-20', '2031-06-01', 12, 6),
-('FA31', N'Fall 2031',   '2031-08-15', '2031-12-15', 0, '2031-08-01', '2031-08-25', '2031-09-15', 20, 8),
-('SP32', N'Spring 2032', '2032-01-05', '2032-04-30', 0, '2031-12-25', '2032-01-15', '2032-02-01', 20, 8),
-('SU32', N'Summer 2032', '2032-05-10', '2032-08-10', 0, '2032-05-01', '2032-05-20', '2032-06-01', 12, 6),
-('FA32', N'Fall 2032',   '2032-08-15', '2032-12-15', 0, '2032-08-01', '2032-08-25', '2032-09-15', 20, 8),
-('SP33', N'Spring 2033', '2033-01-05', '2033-04-30', 0, '2032-12-25', '2033-01-15', '2033-02-01', 20, 8),
-('SU33', N'Summer 2033', '2033-05-10', '2033-08-10', 0, '2033-05-01', '2033-05-20', '2033-06-01', 12, 6),
-('FA33', N'Fall 2033',   '2033-08-15', '2033-12-15', 0, '2033-08-01', '2033-08-25', '2033-09-15', 20, 8),
-('SP34', N'Spring 2034', '2034-01-05', '2034-04-30', 0, '2033-12-25', '2034-01-15', '2034-02-01', 20, 8),
-('SU34', N'Summer 2034', '2034-05-10', '2034-08-10', 0, '2034-05-01', '2034-05-20', '2034-06-01', 12, 6),
-('FA34', N'Fall 2034',   '2034-08-15', '2034-12-15', 0, '2034-08-01', '2034-08-25', '2034-09-15', 20, 8),
-('SP35', N'Spring 2035', '2035-01-05', '2035-04-30', 0, '2034-12-25', '2035-01-15', '2035-02-01', 20, 8),
-('SU35', N'Summer 2035', '2035-05-10', '2035-08-10', 0, '2035-05-01', '2035-05-20', '2035-06-01', 12, 6),
-('FA35', N'Fall 2035',   '2035-08-15', '2035-12-15', 0, '2035-08-01', '2035-08-25', '2035-09-15', 20, 8),
-('SP36', N'Spring 2036', '2036-01-05', '2036-04-30', 0, '2035-12-25', '2036-01-15', '2036-02-01', 20, 8),
-('SU36', N'Summer 2036', '2036-05-10', '2036-08-10', 0, '2036-05-01', '2036-05-20', '2036-06-01', 12, 6),
-('FA36', N'Fall 2036',   '2036-08-15', '2036-12-15', 0, '2036-08-01', '2036-08-25', '2036-09-15', 20, 8),
-('SP37', N'Spring 2037', '2037-01-05', '2037-04-30', 0, '2036-12-25', '2037-01-15', '2037-02-01', 20, 8),
-('SU37', N'Summer 2037', '2037-05-10', '2037-08-10', 0, '2037-05-01', '2037-05-20', '2037-06-01', 12, 6),
-('FA37', N'Fall 2037',   '2037-08-15', '2037-12-15', 0, '2037-08-01', '2037-08-25', '2037-09-15', 20, 8),
-('SP38', N'Spring 2038', '2038-01-05', '2038-04-30', 0, '2037-12-25', '2038-01-15', '2038-02-01', 20, 8),
-('SU38', N'Summer 2038', '2038-05-10', '2038-08-10', 0, '2038-05-01', '2038-05-20', '2038-06-01', 12, 6),
-('FA38', N'Fall 2038',   '2038-08-15', '2038-12-15', 0, '2038-08-01', '2038-08-25', '2038-09-15', 20, 8),
-('SP39', N'Spring 2039', '2039-01-05', '2039-04-30', 0, '2038-12-25', '2039-01-15', '2039-02-01', 20, 8),
-('SU39', N'Summer 2039', '2039-05-10', '2039-08-10', 0, '2039-05-01', '2039-05-20', '2039-06-01', 12, 6),
-('FA39', N'Fall 2039',   '2039-08-15', '2039-12-15', 0, '2039-08-01', '2039-08-25', '2039-09-15', 20, 8),
-('SP40', N'Spring 2040', '2040-01-05', '2040-04-30', 0, '2039-12-25', '2040-01-15', '2040-02-01', 20, 8),
-('SU40', N'Summer 2040', '2040-05-10', '2040-08-10', 0, '2040-05-01', '2040-05-20', '2040-06-01', 12, 6),
-('FA40', N'Fall 2040',   '2040-08-15', '2040-12-15', 0, '2040-08-01', '2040-08-25', '2040-09-15', 20, 8),
-('SP41', N'Spring 2041', '2041-01-05', '2041-04-30', 0, '2040-12-25', '2041-01-15', '2041-02-01', 20, 8),
-('SU41', N'Summer 2041', '2041-05-10', '2041-08-10', 0, '2041-05-01', '2041-05-20', '2041-06-01', 12, 6),
-('FA41', N'Fall 2041',   '2041-08-15', '2041-12-15', 0, '2041-08-01', '2041-08-25', '2041-09-15', 20, 8),
-('SP42', N'Spring 2042', '2042-01-05', '2042-04-30', 0, '2041-12-25', '2042-01-15', '2042-02-01', 20, 8),
-('SU42', N'Summer 2042', '2042-05-10', '2042-08-10', 0, '2042-05-01', '2042-05-20', '2042-06-01', 12, 6),
-('FA42', N'Fall 2042',   '2042-08-15', '2042-12-15', 0, '2042-08-01', '2042-08-25', '2042-09-15', 20, 8),
-('SP43', N'Spring 2043', '2043-01-05', '2043-04-30', 0, '2042-12-25', '2043-01-15', '2043-02-01', 20, 8),
-('SU43', N'Summer 2043', '2043-05-10', '2043-08-10', 0, '2043-05-01', '2043-05-20', '2043-06-01', 12, 6),
-('FA43', N'Fall 2043',   '2043-08-15', '2043-12-15', 0, '2043-08-01', '2043-08-25', '2043-09-15', 20, 8),
-('SP44', N'Spring 2044', '2044-01-05', '2044-04-30', 0, '2043-12-25', '2044-01-15', '2044-02-01', 20, 8),
-('SU44', N'Summer 2044', '2044-05-10', '2044-08-10', 0, '2044-05-01', '2044-05-20', '2044-06-01', 12, 6),
-('FA44', N'Fall 2044',   '2044-08-15', '2044-12-15', 0, '2044-08-01', '2044-08-25', '2044-09-15', 20, 8),
-('SP45', N'Spring 2045', '2045-01-05', '2045-04-30', 0, '2044-12-25', '2045-01-15', '2045-02-01', 20, 8),
-('SU45', N'Summer 2045', '2045-05-10', '2045-08-10', 0, '2045-05-01', '2045-05-20', '2045-06-01', 12, 6),
-('FA45', N'Fall 2045',   '2045-08-15', '2045-12-15', 0, '2045-08-01', '2045-08-25', '2045-09-15', 20, 8),
-('SP46', N'Spring 2046', '2046-01-05', '2046-04-30', 0, '2045-12-25', '2046-01-15', '2046-02-01', 20, 8),
-('SU46', N'Summer 2046', '2046-05-10', '2046-08-10', 0, '2046-05-01', '2046-05-20', '2046-06-01', 12, 6),
-('FA46', N'Fall 2046',   '2046-08-15', '2046-12-15', 0, '2046-08-01', '2046-08-25', '2046-09-15', 20, 8),
-('SP47', N'Spring 2047', '2047-01-05', '2047-04-30', 0, '2046-12-25', '2047-01-15', '2047-02-01', 20, 8),
-('SU47', N'Summer 2047', '2047-05-10', '2047-08-10', 0, '2047-05-01', '2047-05-20', '2047-06-01', 12, 6),
-('FA47', N'Fall 2047',   '2047-08-15', '2047-12-15', 0, '2047-08-01', '2047-08-25', '2047-09-15', 20, 8),
-('SP48', N'Spring 2048', '2048-01-05', '2048-04-30', 0, '2047-12-25', '2048-01-15', '2048-02-01', 20, 8),
-('SU48', N'Summer 2048', '2048-05-10', '2048-08-10', 0, '2048-05-01', '2048-05-20', '2048-06-01', 12, 6),
-('FA48', N'Fall 2048',   '2048-08-15', '2048-12-15', 0, '2048-08-01', '2048-08-25', '2048-09-15', 20, 8),
-('SP49', N'Spring 2049', '2049-01-05', '2049-04-30', 0, '2048-12-25', '2049-01-15', '2049-02-01', 20, 8),
-('SU49', N'Summer 2049', '2049-05-10', '2049-08-10', 0, '2049-05-01', '2049-05-20', '2049-06-01', 12, 6),
-('FA49', N'Fall 2049',   '2049-08-15', '2049-12-15', 0, '2049-08-01', '2049-08-25', '2049-09-15', 20, 8),
-('SP50', N'Spring 2050', '2050-01-05', '2050-04-30', 0, '2049-12-25', '2050-01-15', '2050-02-01', 20, 8),
-('SU50', N'Summer 2050', '2050-05-10', '2050-08-10', 0, '2050-05-01', '2050-05-20', '2050-06-01', 12, 6),
-('FA50', N'Fall 2050',   '2050-08-15', '2050-12-15', 0, '2050-08-01', '2050-08-25', '2050-09-15', 20, 8),
-('SP51', N'Spring 2051', '2051-01-05', '2051-04-30', 0, '2050-12-25', '2051-01-15', '2051-02-01', 20, 8);
+/* -------------------------
+   1) Seed 15 semesters
+   Start from SP25
+   ------------------------- */
+IF OBJECT_ID('tempdb..#SemSeed') IS NOT NULL DROP TABLE #SemSeed;
+CREATE TABLE #SemSeed
+(
+    SemesterCode NVARCHAR(50) NOT NULL PRIMARY KEY,
+    SemesterName NVARCHAR(200) NOT NULL,
+    StartDate DATE NOT NULL,
+    EndDate DATE NOT NULL,
+    IsActive BIT NOT NULL,
+    RegistrationEndDate DATE NULL,
+    AddDropDeadline DATE NULL
+);
+
+INSERT INTO #SemSeed (SemesterCode, SemesterName, StartDate, EndDate, IsActive, RegistrationEndDate, AddDropDeadline) VALUES
+(N'SP25', N'Spring 2025', '2025-01-06', '2025-04-30', 0, '2024-12-31', '2025-01-15'),
+(N'SU25', N'Summer 2025', '2025-05-12', '2025-08-30', 0, '2025-05-01', '2025-05-20'),
+(N'FA25', N'Fall 2025',   '2025-09-08', '2025-12-20', 0, '2025-08-31', '2025-09-20'),
+
+(N'SP26', N'Spring 2026', '2026-01-05', '2026-04-30', 1, '2025-12-31', '2026-01-15'),
+(N'SU26', N'Summer 2026', '2026-05-11', '2026-08-30', 0, '2026-05-01', '2026-05-20'),
+(N'FA26', N'Fall 2026',   '2026-09-07', '2026-12-20', 0, '2026-08-31', '2026-09-20'),
+
+(N'SP27', N'Spring 2027', '2027-01-04', '2027-04-30', 0, '2026-12-31', '2027-01-15'),
+(N'SU27', N'Summer 2027', '2027-05-10', '2027-08-30', 0, '2027-05-01', '2027-05-20'),
+(N'FA27', N'Fall 2027',   '2027-09-06', '2027-12-20', 0, '2027-08-31', '2027-09-20'),
+
+(N'SP28', N'Spring 2028', '2028-01-03', '2028-04-30', 0, '2027-12-31', '2028-01-15'),
+(N'SU28', N'Summer 2028', '2028-05-08', '2028-08-30', 0, '2028-05-01', '2028-05-20'),
+(N'FA28', N'Fall 2028',   '2028-09-04', '2028-12-20', 0, '2028-08-31', '2028-09-20'),
+
+(N'SP29', N'Spring 2029', '2029-01-08', '2029-04-30', 0, '2028-12-31', '2029-01-15'),
+(N'SU29', N'Summer 2029', '2029-05-14', '2029-08-30', 0, '2029-05-01', '2029-05-20'),
+(N'FA29', N'Fall 2029',   '2029-09-10', '2029-12-20', 0, '2029-08-31', '2029-09-20');
+
+MERGE dbo.Semesters AS tgt
+USING #SemSeed AS src
+ON tgt.SemesterCode = src.SemesterCode
+WHEN MATCHED THEN
+    UPDATE SET
+        SemesterName = src.SemesterName,
+        StartDate = src.StartDate,
+        EndDate = src.EndDate,
+        IsActive = src.IsActive,
+        RegistrationEndDate = src.RegistrationEndDate,
+        AddDropDeadline = src.AddDropDeadline
+WHEN NOT MATCHED THEN
+    INSERT (SemesterCode, SemesterName, StartDate, EndDate, IsActive, RegistrationEndDate, AddDropDeadline)
+    VALUES (src.SemesterCode, src.SemesterName, src.StartDate, src.EndDate, src.IsActive, src.RegistrationEndDate, src.AddDropDeadline);
 GO
 
--- =====================================================
--- SEED: Courses (96 more => total 100)
--- =====================================================
-INSERT INTO dbo.Courses (CourseCode, CourseName, Credits, Description) VALUES
-('MAE101', N'Toán cao cấp E1', 3, N'Giải tích một biến'),
-('MAE102', N'Toán cao cấp E2', 3, N'Giải tích nhiều biến'),
-('PHY101', N'Vật lý đại cương 1', 3, N'Cơ học Newton'),
-('PHY102', N'Vật lý đại cương 2', 3, N'Nhiệt học, điện từ học'),
-('CHE101', N'Hóa học đại cương', 3, N'Nguyên tử, liên kết hóa học'),
-('ENG101', N'Tiếng Anh 1', 2, N'Nghe nói đọc viết cơ bản'),
-('ENG102', N'Tiếng Anh 2', 2, N'Giao tiếp học thuật'),
-('ENG201', N'Tiếng Anh chuyên ngành CNTT', 3, N'Từ vựng kỹ thuật'),
-('CEA101', N'Nhập môn kỹ thuật máy tính', 3, N'Logic số, hệ thống số'),
-('CEA201', N'Cấu trúc máy tính', 3, N'CPU, bộ nhớ, bus'),
-('OOP101', N'Lập trình hướng đối tượng', 3, N'Java OOP cơ bản'),
-('DSA201', N'Cấu trúc dữ liệu và giải thuật', 4, N'Stack, Queue, Tree, Sort'),
-('DBI201', N'Nhập môn cơ sở dữ liệu', 3, N'SQL Server cơ bản'),
-('DBI302', N'Cơ sở dữ liệu nâng cao', 3, N'Stored Procedure, Index'),
-('SWE201', N'Nhập môn kỹ thuật phần mềm', 3, N'SDLC, Agile'),
-('SWD391', N'Phát triển ứng dụng web', 4, N'HTML, CSS, JS, Bootstrap'),
-('SWD392', N'Phát triển web nâng cao', 4, N'React, Node.js'),
-('SWR302', N'Kiểm thử phần mềm', 3, N'Unit test, Integration test'),
-('NET101', N'Mạng máy tính cơ bản', 3, N'TCP/IP, OSI model'),
-('SEC201', N'An ninh mạng cơ bản', 3, N'Mã hóa, xác thực'),
-('OSC201', N'Hệ điều hành', 3, N'Process, Thread, Memory'),
-('COT201', N'Lý thuyết tính toán', 3, N'Otomat, ngôn ngữ hình thức'),
-('FIN201', N'Tài chính doanh nghiệp', 3, N'NPV, IRR, định giá'),
-('ACC101', N'Kế toán đại cương', 3, N'Bảng cân đối kế toán'),
-('MAN201', N'Quản trị học', 3, N'Hoạch định, lãnh đạo'),
-('MKT101', N'Marketing căn bản', 3, N'4P, hành vi khách hàng'),
-('ECO101', N'Kinh tế học vi mô', 3, N'Cung cầu, cân bằng thị trường'),
-('ECO102', N'Kinh tế học vĩ mô', 3, N'GDP, lạm phát'),
-('LAW101', N'Pháp luật đại cương', 2, N'Hệ thống pháp luật VN'),
-('SOC101', N'Xã hội học đại cương', 2, N'Cấu trúc xã hội'),
-('AI101',  N'Nhập môn Trí tuệ nhân tạo', 3, N'Tìm kiếm, suy luận cơ bản'),
-('ML201',  N'Học máy', 3, N'Regression, Classification'),
-('DL301',  N'Học sâu', 3, N'Neural Network, CNN, RNN'),
-('CV201',  N'Thị giác máy tính', 3, N'OpenCV, image processing'),
-('NLP201', N'Xử lý ngôn ngữ tự nhiên', 3, N'Tokenization, Transformer'),
-('BDA301', N'Phân tích dữ liệu lớn', 4, N'Hadoop, Spark, Kafka'),
-('CLD301', N'Điện toán đám mây', 3, N'AWS, Azure, GCP'),
-('SEC301', N'An ninh mạng nâng cao', 3, N'Pen testing, OWASP Top 10'),
-('BLC301', N'Công nghệ chuỗi khối', 3, N'Ethereum, Smart Contract'),
-('IOT201', N'Internet vạn vật', 3, N'Arduino, MQTT'),
-('ROB201', N'Robotics cơ bản', 3, N'ROS, kinematics'),
-('UXD201', N'Thiết kế UX/UI', 3, N'User research, wireframe'),
-('PM201',  N'Quản lý dự án phần mềm', 3, N'Scrum, Kanban'),
-('DEV301', N'DevOps và CI/CD', 3, N'Docker, Kubernetes, Jenkins'),
-('MIC301', N'Kiến trúc Microservices', 3, N'API Gateway, Service Mesh'),
-('GRA101', N'Đồ họa máy tính cơ bản', 3, N'OpenGL, rasterization'),
-('ANI201', N'Hoạt hình 2D/3D', 3, N'Blender, Maya cơ bản'),
-('GDE201', N'Thiết kế game cơ bản', 3, N'Unity, C# scripting'),
-('VRA201', N'Thực tế ảo và Tăng cường', 3, N'Oculus SDK, ARKit'),
-('MUS101', N'Âm nhạc đại cương', 2, N'Lý thuyết âm nhạc'),
-('PHT101', N'Nhiếp ảnh kỹ thuật số', 2, N'Bố cục, ánh sáng'),
-('FAD101', N'Thiết kế thời trang cơ bản', 3, N'Vải, màu sắc, phác thảo'),
-('IND201', N'Thiết kế nội thất', 3, N'AutoCAD, SketchUp'),
-('BIO101', N'Sinh học phân tử', 3, N'DNA, RNA, protein synthesis'),
-('CHE201', N'Hóa hữu cơ', 3, N'Alkanes, alkenes, arenes'),
-('FNT101', N'Công nghệ thực phẩm', 3, N'Bảo quản, chế biến thực phẩm'),
-('ENV201', N'Khoa học môi trường', 3, N'Ô nhiễm, biến đổi khí hậu'),
-('NUT101', N'Dinh dưỡng và sức khỏe', 2, N'Chất dinh dưỡng'),
-('NRS101', N'Điều dưỡng cơ bản', 3, N'Chăm sóc bệnh nhân'),
-('MED101', N'Giải phẫu học', 4, N'Hệ xương, hệ cơ, nội tạng'),
-('PHA101', N'Dược học đại cương', 3, N'Phân loại thuốc'),
-('JPT101', N'Tiếng Nhật N5', 3, N'Hiragana, Katakana'),
-('JPT201', N'Tiếng Nhật N4', 3, N'Ngữ pháp trung cấp'),
-('KRT101', N'Tiếng Hàn cơ bản', 3, N'Hangul, hội thoại đơn giản'),
-('KRT201', N'Tiếng Hàn trung cấp', 3, N'TOPIK prep'),
-('SPT101', N'Tiếng Tây Ban Nha A1', 3, N'Phát âm, từ vựng'),
-('FRT101', N'Tiếng Pháp A1', 3, N'Greetings, numbers, colors'),
-('DET101', N'Tiếng Đức A1', 3, N'Bảng chữ cái, từ vựng'),
-('RUT101', N'Tiếng Nga A1', 3, N'Bảng chữ Cyrillic, chào hỏi'),
-('ZHT101', N'Tiếng Trung HSK 1', 3, N'Bính âm, từ vựng 150 từ'),
-('ZHT201', N'Tiếng Trung HSK 2', 3, N'Từ vựng 300 từ, hội thoại'),
-('LOG201', N'Logistics và chuỗi cung ứng', 3, N'Quản lý kho, vận chuyển'),
-('SCM301', N'Chuỗi cung ứng nâng cao', 3, N'JIT, lean, ERP'),
-('ENT201', N'Khởi nghiệp và đổi mới', 3, N'Business model canvas'),
-('TAX201', N'Thuế trong kinh doanh', 3, N'VAT, thuế thu nhập DN'),
-('AUD201', N'Kiểm toán cơ bản', 3, N'Quy trình kiểm toán'),
-('INS201', N'Bảo hiểm và quản lý rủi ro', 3, N'Bảo hiểm nhân thọ'),
-('REL201', N'Bất động sản và pháp lý', 3, N'Thị trường BĐS'),
-('BNK201', N'Nghiệp vụ ngân hàng', 3, N'Tín dụng, thanh toán quốc tế'),
-('SPO101', N'Giáo dục thể chất 1', 1, N'Bóng đá, bóng rổ'),
-('SPO102', N'Giáo dục thể chất 2', 1, N'Bơi lội, võ thuật'),
-('HIS101', N'Lịch sử văn minh thế giới', 2, N'Các nền văn minh cổ đại'),
-('GEO101', N'Địa lý kinh tế', 2, N'Phân bố tài nguyên'),
-('PSY101', N'Tâm lý học đại cương', 3, N'Nhận thức, cảm xúc'),
-('COM101', N'Kỹ năng giao tiếp', 2, N'Thuyết trình, đàm phán'),
-('ETH101', N'Đạo đức nghề nghiệp', 2, N'Trách nhiệm xã hội'),
-('RES201', N'Phương pháp nghiên cứu', 3, N'Thiết kế nghiên cứu'),
-('CAP401', N'Đồ án tốt nghiệp', 10, N'Nghiên cứu và phát triển sản phẩm'),
-('INT301', N'Thực tập doanh nghiệp', 4, N'Thực tập tại công ty'),
-('STA301', N'Thống kê ứng dụng', 3, N'Phân phối xác suất'),
-('OPT301', N'Nghiên cứu vận trù', 3, N'Quy hoạch tuyến tính'),
-('CG201',  N'Đồ họa và xử lý ảnh', 3, N'Bộ lọc ảnh, phân đoạn'),
-('HCI201', N'Tương tác người-máy', 3, N'Usability, UX testing');
+/* ---------------------------------------------------------
+   2) Seed course pools (10 courses each) for allowed semesters
+   Allowed semesters: SP25, SU25, FA25, SP26, SU26, FA26, SP27, SU27
+   --------------------------------------------------------- */
+IF OBJECT_ID('tempdb..#CoursePool') IS NOT NULL DROP TABLE #CoursePool;
+CREATE TABLE #CoursePool
+(
+    SemesterCode NVARCHAR(50) NOT NULL,
+    CourseCode NVARCHAR(50) NOT NULL,
+    CourseName NVARCHAR(200) NOT NULL,
+    Credits INT NOT NULL,
+    Description NVARCHAR(MAX) NULL,
+    PRIMARY KEY (SemesterCode, CourseCode)
+);
+
+/* SP25 - 10 */
+INSERT INTO #CoursePool VALUES
+(N'SP25', N'PRN201', N'Object-Oriented Programming', 3, N'Covers classes, inheritance, polymorphism, interfaces, and clean OOP design in C#.'),
+(N'SP25', N'DBI202', N'Database Systems', 3, N'Introduces relational data modeling, normalization, SQL querying, and transaction basics.'),
+(N'SP25', N'WED201', N'Web Front-End Development', 3, N'Builds responsive web interfaces using HTML, CSS, JavaScript, and UI best practices.'),
+(N'SP25', N'SWT201', N'Software Testing Fundamentals', 3, N'Focuses on test design techniques, unit testing, integration testing, and defect lifecycle.'),
+(N'SP25', N'OSG202', N'Operating Systems Concepts', 3, N'Explains process management, memory, file systems, synchronization, and scheduling.'),
+(N'SP25', N'PRF192', N'Programming Fundamentals', 3, N'Provides foundational programming logic, control flow, functions, and basic data structures.'),
+(N'SP25', N'MAD101', N'Discrete Mathematics', 3, N'Covers logic, sets, combinatorics, graphs, and proofs for computing disciplines.'),
+(N'SP25', N'NET201', N'Computer Networks Basics', 3, N'Introduces network models, routing, switching, TCP/IP, and network troubleshooting basics.'),
+(N'SP25', N'SSL101', N'Study Skills for University', 2, N'Develops time management, effective learning habits, note-taking, and teamwork skills.'),
+(N'SP25', N'PRJ101', N'Project Introduction', 2, N'Guides students through project planning, scope definition, and collaborative execution.');
+
+/* SU25 - 10 */
+INSERT INTO #CoursePool VALUES
+(N'SU25', N'PRN211', N'Basic Cross-Platform App Programming', 3, N'C# basic and WinForms.'),
+(N'SU25', N'DBI203', N'Advanced Database Programming', 3, N'Includes stored procedures, indexing strategies, views, and query performance tuning.'),
+(N'SU25', N'WED202', N'Client-Side Frameworks', 3, N'Builds SPAs with modern JavaScript frameworks and reusable component architecture.'),
+(N'SU25', N'SWE201', N'Software Requirements Engineering', 3, N'Focuses on elicitation, modeling, validation, and requirements management workflows.'),
+(N'SU25', N'PRM301', N'Mobile Application Development', 3, N'Develops mobile applications with app lifecycle, UI patterns, and local data handling.'),
+(N'SU25', N'SWD301', N'Software Design Patterns', 3, N'Applies creational, structural, and behavioral patterns in real-world software design.'),
+(N'SU25', N'JPD123', N'Japanese for IT Professionals', 2, N'Builds practical Japanese communication skills for technical and workplace contexts.'),
+(N'SU25', N'ACC101', N'Principles of Accounting', 2, N'Introduces accounting equations, financial statements, and basic business transactions.'),
+(N'SU25', N'ECO201', N'Microeconomics for Engineers', 2, N'Explains market behavior, pricing, cost structures, and decision-making under constraints.'),
+(N'SU25', N'SKT101', N'Soft Skills and Communication', 2, N'Improves communication, collaboration, presentation, and professional interaction skills.');
+
+/* FA25 - 10 */
+INSERT INTO #CoursePool VALUES
+(N'FA25', N'PRN221', N'Cross-Platform UI Engineering', 3, N'Builds maintainable desktop UI with architecture patterns and reusable components.'),
+(N'FA25', N'DBI204', N'Database Administration', 3, N'Covers backup, recovery, security, monitoring, and operational database maintenance.'),
+(N'FA25', N'WED203', N'Web Accessibility and UX', 3, N'Applies accessibility standards, UX heuristics, and inclusive web design practices.'),
+(N'FA25', N'SWT202', N'Automation Testing', 3, N'Implements automated tests using frameworks, CI integration, and test reporting.'),
+(N'FA25', N'PRM302', N'Cross-Platform Mobile Development', 3, N'Builds cross-platform apps with shared codebase and native integration fundamentals.'),
+(N'FA25', N'SEC201', N'Application Security Basics', 3, N'Introduces secure coding, OWASP risks, authentication, and common mitigation patterns.'),
+(N'FA25', N'BIZ201', N'Business Process Analysis', 2, N'Analyzes workflows, identifies bottlenecks, and models process improvements.'),
+(N'FA25', N'LAW101', N'IT Law and Ethics', 2, N'Discusses legal, ethical, and compliance issues in software and data management.'),
+(N'FA25', N'PMA201', N'Project Management Basics', 2, N'Introduces scope, schedule, risk, stakeholder, and quality management practices.'),
+(N'FA25', N'ENG201', N'Academic English for IT', 2, N'Enhances technical reading, writing, presentation, and documentation in English.');
+
+/* SP26 - 10 */
+INSERT INTO #CoursePool VALUES
+(N'SP26', N'PRN222', N'Advanced Cross-Platform App Programming', 3, N'ASP.NET Core, EF Core, SignalR.'),
+(N'SP26', N'PRN231', N'Building Cross-Platform Web APIs', 3, N'RESTful API, OData, JWT.'),
+(N'SP26', N'SWP391', N'Software Development Project', 4, N'Capstone project for juniors.'),
+(N'SP26', N'DBI205', N'NoSQL and Distributed Data', 3, N'Introduces document stores, key-value systems, consistency models, and scaling strategies.'),
+(N'SP26', N'SWT203', N'Performance Testing', 3, N'Focuses on load, stress, endurance testing, and performance bottleneck diagnostics.'),
+(N'SP26', N'SEC202', N'Secure Web Development', 3, N'Builds secure web applications with advanced authn/authz and defense strategies.'),
+(N'SP26', N'PRF301', N'Algorithm Design and Analysis', 3, N'Covers algorithm paradigms, complexity analysis, and optimization techniques.'),
+(N'SP26', N'PRO301', N'Professional Practice in Software', 2, N'Prepares students for enterprise workflows, agile teamwork, and delivery discipline.'),
+(N'SP26', N'AI201', N'Introduction to Machine Learning', 3, N'Presents core ML concepts, model training, evaluation metrics, and feature engineering.'),
+(N'SP26', N'NET301', N'Cloud Networking Foundations', 3, N'Explains virtual networks, cloud connectivity, load balancing, and traffic security.');
+
+/* SU26 - 10 */
+INSERT INTO #CoursePool VALUES
+(N'SU26', N'PRN223', N'Enterprise Application Development', 3, N'Develops layered enterprise systems with dependency injection and clean architecture.'),
+(N'SU26', N'API301', N'API Integration and Gateway', 3, N'Covers API lifecycle, gateway policies, throttling, observability, and contract governance.'),
+(N'SU26', N'DBI206', N'Data Warehouse Fundamentals', 3, N'Introduces ETL, dimensional modeling, OLAP concepts, and analytical reporting pipelines.'),
+(N'SU26', N'SWT204', N'Quality Assurance Engineering', 3, N'Builds QA strategy across testing levels, quality metrics, and release readiness checks.'),
+(N'SU26', N'SEC301', N'Identity and Access Management', 3, N'Implements identity lifecycle, SSO, MFA, RBAC, and secure session management.'),
+(N'SU26', N'OPS301', N'DevOps Practices', 3, N'Applies CI/CD, infrastructure automation, monitoring, and release reliability principles.'),
+(N'SU26', N'UX301', N'Human-Centered Product Design', 2, N'Uses research-driven design to build usable digital products with measurable outcomes.'),
+(N'SU26', N'BDA201', N'Data Analytics for Business', 2, N'Applies descriptive and diagnostic analytics to business cases and decision support.'),
+(N'SU26', N'CLD201', N'Cloud Computing Essentials', 3, N'Introduces cloud services, deployment models, pricing, and operational best practices.'),
+(N'SU26', N'PMA301', N'Agile Project Delivery', 2, N'Applies agile planning, backlog management, sprint execution, and retrospective improvement.');
+
+/* FA26 - 10 */
+INSERT INTO #CoursePool VALUES
+(N'FA26', N'PRN224', N'Microservices Development', 3, N'Builds service-based systems with resilience, observability, and inter-service communication.'),
+(N'FA26', N'API302', N'Event-Driven Architectures', 3, N'Designs asynchronous workflows with messaging, event sourcing, and eventual consistency.'),
+(N'FA26', N'DBI207', N'Database Performance Engineering', 3, N'Optimizes query plans, indexing, caching, and high-throughput transactional workloads.'),
+(N'FA26', N'SWT205', N'Reliability Testing and SRE', 3, N'Applies reliability engineering, failure analysis, and production readiness validation.'),
+(N'FA26', N'SEC302', N'Application Threat Modeling', 3, N'Identifies attack surfaces, threat scenarios, and mitigation strategies in software systems.'),
+(N'FA26', N'OPS302', N'Containerization and Orchestration', 3, N'Uses containers, orchestration platforms, and deployment automation for scalable systems.'),
+(N'FA26', N'AI301', N'Applied Machine Learning', 3, N'Builds applied ML solutions with practical pipelines, model monitoring, and deployment.'),
+(N'FA26', N'CLD301', N'Cloud Native Development', 3, N'Implements cloud-native patterns for resilient, scalable, and observable applications.'),
+(N'FA26', N'QMS201', N'Quality Management Systems', 2, N'Introduces quality frameworks, process controls, and continuous improvement mechanisms.'),
+(N'FA26', N'PRO302', N'Engineering Leadership Basics', 2, N'Develops technical leadership, mentoring, and decision-making for software teams.');
+
+/* SP27 - 10 */
+INSERT INTO #CoursePool VALUES
+(N'SP27', N'PRN225', N'Distributed Application Engineering', 3, N'Builds distributed systems handling consistency, partitioning, and fault tolerance concerns.'),
+(N'SP27', N'API303', N'High-Scale API Systems', 3, N'Designs APIs for high throughput with caching, rate limiting, and resilience mechanisms.'),
+(N'SP27', N'DBI208', N'Data Governance and Security', 3, N'Covers data governance, lineage, protection policies, and regulatory compliance controls.'),
+(N'SP27', N'SWT206', N'Software Metrics and Quality', 3, N'Uses actionable software metrics to improve maintainability, reliability, and delivery speed.'),
+(N'SP27', N'SEC303', N'Advanced Secure Architecture', 3, N'Architects secure systems with layered controls and robust trust boundaries.'),
+(N'SP27', N'OPS303', N'Observability Engineering', 3, N'Implements logging, tracing, metrics, and alerting for effective production diagnostics.'),
+(N'SP27', N'AI302', N'Intelligent Systems Engineering', 3, N'Combines ML components with software architecture for reliable intelligent applications.'),
+(N'SP27', N'CLD302', N'Multi-Cloud Architecture', 3, N'Designs workloads across multiple cloud providers with portability and resilience strategies.'),
+(N'SP27', N'PMA302', N'Product Delivery Management', 2, N'Coordinates roadmap, delivery planning, and cross-functional execution for product teams.'),
+(N'SP27', N'ENT201', N'Technology Entrepreneurship', 2, N'Explores startup fundamentals, product-market fit, and technology business models.');
+
+/* SU27 - 10 */
+INSERT INTO #CoursePool VALUES
+(N'SU27', N'PRN226', N'Scalable Software Systems', 3, N'Builds scalable applications with performance optimization and distributed design practices.'),
+(N'SU27', N'API304', N'API Security and Compliance', 3, N'Implements secure API ecosystems with policy enforcement and compliance standards.'),
+(N'SU27', N'DBI209', N'Real-Time Data Processing', 3, N'Builds streaming pipelines, event processing, and low-latency analytics workloads.'),
+(N'SU27', N'SWT207', N'Test Strategy and Governance', 3, N'Defines organization-wide testing strategy, governance, and quality risk management.'),
+(N'SU27', N'SEC304', N'DevSecOps Engineering', 3, N'Integrates security controls into CI/CD workflows and operational delivery practices.'),
+(N'SU27', N'OPS304', N'Platform Engineering', 3, N'Builds internal developer platforms to accelerate delivery and improve developer experience.'),
+(N'SU27', N'AI303', N'LLM Application Development', 3, N'Develops AI assistants with tool-calling, grounding, guardrails, and evaluation.'),
+(N'SU27', N'CLD303', N'Cloud Cost Optimization', 2, N'Optimizes cloud architecture and operations for performance-cost efficiency balance.'),
+(N'SU27', N'QMS301', N'Operational Excellence', 2, N'Applies continuous improvement and operational discipline to software organizations.'),
+(N'SU27', N'CAP401', N'Capstone Preparation', 2, N'Prepares students for capstone planning, architecture proposal, and execution readiness.');
+
+MERGE dbo.Courses AS tgt
+USING (
+    SELECT DISTINCT CourseCode, CourseName, Credits, Description
+    FROM #CoursePool
+) AS src
+ON tgt.CourseCode = src.CourseCode
+WHEN MATCHED THEN
+    UPDATE SET
+        CourseName = src.CourseName,
+        Credits = src.Credits,
+        Description = src.Description,
+        IsActive = 1
+WHEN NOT MATCHED THEN
+    INSERT (CourseCode, CourseName, Credits, Description, IsActive)
+    VALUES (src.CourseCode, src.CourseName, src.Credits, src.Description, 1);
 GO
 
--- =====================================================
--- SEED: ClassSections (500 rows)
--- =====================================================
-WITH SectionRows AS (
-    SELECT ROW_NUMBER() OVER (ORDER BY c.CourseId, t.TeacherId) AS rn,
-           c.CourseId, t.TeacherId,
-           c.CourseCode,
-           ROW_NUMBER() OVER (PARTITION BY c.CourseId ORDER BY t.TeacherId) AS sec_num
-    FROM dbo.Courses c
-    CROSS JOIN (SELECT TeacherId FROM dbo.Teachers) t
-    WHERE c.Credits <= 4
+/* ----------------------------------------------
+   3) Seed 3 class sections per course per semester
+   only for allowed semesters in #CoursePool
+   MaxCapacity always = 30
+   ---------------------------------------------- */
+IF OBJECT_ID('tempdb..#SecNums') IS NOT NULL DROP TABLE #SecNums;
+CREATE TABLE #SecNums (N INT NOT NULL PRIMARY KEY);
+INSERT INTO #SecNums(N) VALUES (1),(2),(3);
+
+DECLARE @FallbackTeacherId INT = (SELECT TOP 1 TeacherId FROM dbo.Teachers ORDER BY TeacherId);
+
+;WITH CourseBySemester AS
+(
+    SELECT
+        cp.SemesterCode,
+        s.SemesterId,
+        c.CourseId,
+        cp.CourseCode
+    FROM #CoursePool cp
+    JOIN dbo.Semesters s ON s.SemesterCode = cp.SemesterCode
+    JOIN dbo.Courses c ON c.CourseCode = cp.CourseCode
+),
+TeacherPick AS
+(
+    SELECT
+        t.TeacherId,
+        ROW_NUMBER() OVER (ORDER BY t.TeacherId) AS rn,
+        COUNT(*) OVER() AS total
+    FROM dbo.Teachers t
+),
+ClassTarget AS
+(
+    SELECT
+        cs.SemesterId,
+        cs.CourseId,
+        cs.SemesterCode,
+        cs.CourseCode,
+        sn.N AS SectionNo,
+        -- section code format similar existing style (e.g., SE1801), no semester prefix
+        CONCAT(LEFT(cs.CourseCode, 3), RIGHT('00' + CAST(sn.N AS VARCHAR(2)), 2)) AS SectionCode,
+        COALESCE(tp.TeacherId, @FallbackTeacherId) AS TeacherId
+    FROM CourseBySemester cs
+    CROSS JOIN #SecNums sn
+    OUTER APPLY
+    (
+        SELECT TOP 1 tp2.TeacherId
+        FROM TeacherPick tp2
+        WHERE tp2.rn = ((ABS(CHECKSUM(CONCAT(cs.SemesterCode, '-', cs.CourseCode, '-', sn.N))) % NULLIF(tp2.total,0)) + 1)
+    ) tp
 )
-INSERT INTO dbo.ClassSections (SemesterId, CourseId, TeacherId, SectionCode, IsOpen, MaxCapacity, Room)
-SELECT TOP 500
-    CASE WHEN rn % 4 = 1 THEN (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE SemesterCode = 'SP26')
-         WHEN rn % 4 = 2 THEN (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE SemesterCode = 'SU26')
-         WHEN rn % 4 = 3 THEN (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE SemesterCode = 'FA25')
-         ELSE (SELECT TOP 1 SemesterId FROM dbo.Semesters WHERE SemesterCode = 'SP26') END,
-    CourseId,
-    TeacherId,
-    CourseCode + '-S' + RIGHT('00' + CAST(sec_num AS VARCHAR(3)), 2),
-    1,
-    CASE WHEN rn % 3 = 0 THEN 1000 WHEN rn % 3 = 1 THEN 1500 ELSE 2000 END,
-    'Room-' + CAST((rn % 20) + 101 AS VARCHAR(5))
-FROM SectionRows
-WHERE sec_num <= 5;
+MERGE dbo.ClassSections AS tgt
+USING ClassTarget AS src
+ON tgt.SemesterId = src.SemesterId
+   AND tgt.CourseId = src.CourseId
+   AND tgt.SectionCode = src.SectionCode
+WHEN MATCHED THEN
+    UPDATE SET
+        TeacherId = src.TeacherId,
+        IsOpen = 1,
+        MaxCapacity = 30,
+        Room = CONCAT(N'BE-', RIGHT('000' + CAST((100 + src.SectionNo) AS VARCHAR(3)), 3)),
+        Notes = CONCAT(N'Auto-seeded for ', src.SemesterCode, N' / ', src.CourseCode)
+WHEN NOT MATCHED THEN
+    INSERT
+    (
+        SemesterId,
+        CourseId,
+        TeacherId,
+        SectionCode,
+        IsOpen,
+        MaxCapacity,
+        CurrentEnrollment,
+        Room,
+        OnlineUrl,
+        Notes
+    )
+    VALUES
+    (
+        src.SemesterId,
+        src.CourseId,
+        src.TeacherId,
+        src.SectionCode,
+        1,
+        30,
+        0,
+        CONCAT(N'BE-', RIGHT('000' + CAST((100 + src.SectionNo) AS VARCHAR(3)), 3)),
+        NULL,
+        CONCAT(N'Auto-seeded for ', src.SemesterCode, N' / ', src.CourseCode)
+    );
 GO
 
 -- =====================================================
 -- SEED: Enrollments (Mỗi student học ít nhất 5 lớp)
 -- Dùng SELECT dynamic từ Students x ClassSections
 -- =====================================================
--- Dùng CTE để đảm bảo mỗi (StudentId, CourseId, SemesterId) chỉ xuất hiện 1 lần
-;WITH UniqueEnrollments AS (
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    DELETE FROM dbo.Enrollments;
+    UPDATE dbo.ClassSections SET CurrentEnrollment = 0;
+
+    IF OBJECT_ID('tempdb..#TargetSections') IS NOT NULL DROP TABLE #TargetSections;
+    IF OBJECT_ID('tempdb..#Students') IS NOT NULL DROP TABLE #Students;
+    IF OBJECT_ID('tempdb..#Assigned') IS NOT NULL DROP TABLE #Assigned;
+    IF OBJECT_ID('tempdb..#ClassQueue') IS NOT NULL DROP TABLE #ClassQueue;
+    IF OBJECT_ID('tempdb..#NeedStudents') IS NOT NULL DROP TABLE #NeedStudents;
+
+    /* Target classes */
     SELECT
-        s.StudentId,
         cs.ClassSectionId,
         cs.SemesterId,
+        s.SemesterCode,
         cs.CourseId,
-        CASE WHEN c.Credits > 4 THEN 4 ELSE c.Credits END AS CreditsSnapshot,
-        ROW_NUMBER() OVER (PARTITION BY s.StudentId, cs.CourseId, cs.SemesterId ORDER BY cs.ClassSectionId) AS dup_rn,
-        ROW_NUMBER() OVER (PARTITION BY s.StudentId ORDER BY cs.ClassSectionId) AS student_sec_rn,
-        ROW_NUMBER() OVER (ORDER BY s.StudentId, cs.ClassSectionId) AS global_rn
-    FROM dbo.Students s
-    CROSS JOIN dbo.ClassSections cs
+        c.Credits,
+        cs.MaxCapacity,
+        CASE
+            WHEN s.SemesterCode = N'SU26' THEN 5 + ABS(CHECKSUM(CONCAT(N'SU26-', cs.ClassSectionId))) % 6  -- 5..10
+            ELSE 20 + ABS(CHECKSUM(CONCAT(N'GEN-', cs.ClassSectionId))) % 11                                  -- 20..30
+        END AS TargetCount
+    INTO #TargetSections
+    FROM dbo.ClassSections cs
+    JOIN dbo.Semesters s ON s.SemesterId = cs.SemesterId
     JOIN dbo.Courses c ON c.CourseId = cs.CourseId
-    WHERE cs.IsOpen = 1
-      AND c.Credits <= 4
-      AND cs.SemesterId IS NOT NULL
-)
-INSERT INTO dbo.Enrollments (StudentId, ClassSectionId, SemesterId, CourseId, CreditsSnapshot, Status)
-SELECT
-    StudentId, ClassSectionId, SemesterId, CourseId, CreditsSnapshot,
-    CASE WHEN global_rn % 6 = 0 THEN 'COMPLETED'
-         WHEN global_rn % 6 = 4 THEN 'DROPPED'
-         ELSE 'ENROLLED' END
-FROM UniqueEnrollments
-WHERE dup_rn = 1 AND student_sec_rn <= 10 -- Mỗi student join tối đa 10 lớp
-ORDER BY StudentId, ClassSectionId;
+    WHERE s.SemesterCode IN (N'SP25', N'SU25', N'FA25', N'SP26', N'SU26');
+
+    UPDATE ts
+    SET TargetCount = CASE WHEN TargetCount > MaxCapacity THEN MaxCapacity ELSE TargetCount END
+    FROM #TargetSections ts;
+
+    SELECT StudentId INTO #Students FROM dbo.Students;
+
+    CREATE TABLE #Assigned
+    (
+        StudentId INT NOT NULL,
+        SemesterId INT NOT NULL,
+        CourseId INT NOT NULL,
+        CONSTRAINT PK_Assigned PRIMARY KEY (StudentId, SemesterId, CourseId)
+    );
+
+    CREATE TABLE #ClassQueue
+    (
+        RowNum INT IDENTITY(1,1) PRIMARY KEY,
+        ClassSectionId INT NOT NULL,
+        SemesterId INT NOT NULL,
+        CourseId INT NOT NULL,
+        Credits INT NOT NULL,
+        TargetCount INT NOT NULL,
+        MaxCapacity INT NOT NULL
+    );
+
+    INSERT INTO #ClassQueue (ClassSectionId, SemesterId, CourseId, Credits, TargetCount, MaxCapacity)
+    SELECT ClassSectionId, SemesterId, CourseId, Credits, TargetCount, MaxCapacity
+    FROM #TargetSections
+    ORDER BY
+        CASE WHEN SemesterCode = N'SU26' THEN 1 ELSE 0 END, -- fill regular semesters first
+        SemesterId, CourseId, ClassSectionId;
+
+    DECLARE
+        @i INT = 1,
+        @n INT = (SELECT COUNT(*) FROM #ClassQueue),
+        @ClassSectionId INT,
+        @SemesterId INT,
+        @CourseId INT,
+        @Credits INT,
+        @TargetCount INT,
+        @MaxCapacity INT;
+
+    /* Phase A: fill each class safely one-by-one */
+    WHILE @i <= @n
+    BEGIN
+        SELECT
+            @ClassSectionId = ClassSectionId,
+            @SemesterId = SemesterId,
+            @CourseId = CourseId,
+            @Credits = Credits,
+            @TargetCount = TargetCount,
+            @MaxCapacity = MaxCapacity
+        FROM #ClassQueue
+        WHERE RowNum = @i;
+
+        ;WITH Candidate AS
+        (
+            SELECT
+                s.StudentId,
+                ROW_NUMBER() OVER (
+                    ORDER BY ABS(CHECKSUM(CONCAT(@ClassSectionId, N'-', s.StudentId))), s.StudentId
+                ) AS rn
+            FROM #Students s
+            WHERE NOT EXISTS
+            (
+                SELECT 1
+                FROM #Assigned a
+                WHERE a.StudentId = s.StudentId
+                  AND a.SemesterId = @SemesterId
+                  AND a.CourseId = @CourseId
+            )
+            AND NOT EXISTS
+            (
+                SELECT 1
+                FROM dbo.Enrollments e
+                WHERE e.StudentId = s.StudentId
+                  AND e.SemesterId = @SemesterId
+                  AND e.CourseId = @CourseId
+                  AND e.Status IN (N'ENROLLED', N'WITHDRAWN')
+            )
+        )
+        INSERT INTO dbo.Enrollments
+        (
+            StudentId, ClassSectionId, SemesterId, CourseId, CreditsSnapshot, Status, EnrolledAt
+        )
+        SELECT
+            c.StudentId, @ClassSectionId, @SemesterId, @CourseId, @Credits, N'ENROLLED', SYSUTCDATETIME()
+        FROM Candidate c
+        WHERE c.rn <= @TargetCount;
+
+        INSERT INTO #Assigned (StudentId, SemesterId, CourseId)
+        SELECT e.StudentId, e.SemesterId, e.CourseId
+        FROM dbo.Enrollments e
+        WHERE e.ClassSectionId = @ClassSectionId
+          AND e.SemesterId = @SemesterId
+          AND e.CourseId = @CourseId
+          AND NOT EXISTS
+          (
+              SELECT 1
+              FROM #Assigned a
+              WHERE a.StudentId = e.StudentId
+                AND a.SemesterId = e.SemesterId
+                AND a.CourseId = e.CourseId
+          );
+
+        SET @i += 1;
+    END
+
+    /* Phase B: ensure each student has >= 4 enrollments (best-effort) */
+    SELECT
+        s.StudentId,
+        4 - COUNT(e.EnrollmentId) AS NeedCount
+    INTO #NeedStudents
+    FROM #Students s
+    LEFT JOIN dbo.Enrollments e ON e.StudentId = s.StudentId AND e.Status = N'ENROLLED'
+    GROUP BY s.StudentId
+    HAVING 4 - COUNT(e.EnrollmentId) > 0;
+
+    DECLARE @NeedStudentId INT, @NeedCount INT, @j INT, @m INT;
+    DECLARE curNeed CURSOR LOCAL FAST_FORWARD FOR
+        SELECT StudentId, NeedCount FROM #NeedStudents ORDER BY StudentId;
+    OPEN curNeed;
+    FETCH NEXT FROM curNeed INTO @NeedStudentId, @NeedCount;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        SET @j = 1;
+        SET @m = @NeedCount;
+
+        WHILE @j <= @m
+        BEGIN
+            ;WITH Slot AS
+            (
+                SELECT TOP (1)
+                    q.ClassSectionId,
+                    q.SemesterId,
+                    q.CourseId,
+                    q.Credits
+                FROM #ClassQueue q
+                WHERE (SELECT COUNT(*) FROM dbo.Enrollments e WHERE e.ClassSectionId = q.ClassSectionId) < q.MaxCapacity
+                  AND NOT EXISTS
+                  (
+                      SELECT 1 FROM #Assigned a
+                      WHERE a.StudentId = @NeedStudentId
+                        AND a.SemesterId = q.SemesterId
+                        AND a.CourseId = q.CourseId
+                  )
+                  AND NOT EXISTS
+                  (
+                      SELECT 1 FROM dbo.Enrollments e2
+                      WHERE e2.StudentId = @NeedStudentId
+                        AND e2.SemesterId = q.SemesterId
+                        AND e2.CourseId = q.CourseId
+                        AND e2.Status IN (N'ENROLLED', N'WITHDRAWN')
+                  )
+                ORDER BY ABS(CHECKSUM(CONCAT(@NeedStudentId, N'-', q.ClassSectionId))), q.ClassSectionId
+            )
+            INSERT INTO dbo.Enrollments (StudentId, ClassSectionId, SemesterId, CourseId, CreditsSnapshot, Status, EnrolledAt)
+            SELECT @NeedStudentId, s.ClassSectionId, s.SemesterId, s.CourseId, s.Credits, N'ENROLLED', SYSUTCDATETIME()
+            FROM Slot s;
+
+            IF @@ROWCOUNT = 0 BREAK;
+
+            INSERT INTO #Assigned (StudentId, SemesterId, CourseId)
+            SELECT @NeedStudentId, e.SemesterId, e.CourseId
+            FROM dbo.Enrollments e
+            WHERE e.StudentId = @NeedStudentId
+              AND e.EnrollmentId = SCOPE_IDENTITY()
+              AND NOT EXISTS
+              (
+                  SELECT 1 FROM #Assigned a
+                  WHERE a.StudentId = @NeedStudentId
+                    AND a.SemesterId = e.SemesterId
+                    AND a.CourseId = e.CourseId
+              );
+
+            SET @j += 1;
+        END
+
+        FETCH NEXT FROM curNeed INTO @NeedStudentId, @NeedCount;
+    END
+    CLOSE curNeed;
+    DEALLOCATE curNeed;
+
+    /* Sync CurrentEnrollment */
+    ;WITH Agg AS
+    (
+        SELECT ClassSectionId, COUNT(*) AS Cnt
+        FROM dbo.Enrollments
+        GROUP BY ClassSectionId
+    )
+    UPDATE cs
+    SET cs.CurrentEnrollment = ISNULL(a.Cnt, 0)
+    FROM dbo.ClassSections cs
+    LEFT JOIN Agg a ON a.ClassSectionId = cs.ClassSectionId
+    WHERE cs.ClassSectionId IN (SELECT ClassSectionId FROM #TargetSections);
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
 GO
 
--- Update CurrentEnrollment counts (Bypassed to prevent CHECK constraint error)
--- UPDATE cs SET cs.CurrentEnrollment = sub.cnt
--- FROM dbo.ClassSections cs
--- JOIN (
---     SELECT ClassSectionId, COUNT(*) AS cnt
---     FROM dbo.Enrollments
---     WHERE Status IN ('ENROLLED','COMPLETED')
---     GROUP BY ClassSectionId
--- ) sub ON sub.ClassSectionId = cs.ClassSectionId;
--- GO
-
--- =====================================================
--- SEED: GradeBooks (100 rows) - 1 per ClassSection
--- =====================================================
-INSERT INTO dbo.GradeBooks (ClassSectionId, Status, Version)
-SELECT TOP 100
+/* ---------- 1) GradeBooks ---------- */
+;WITH TargetSections AS
+(
+    SELECT
+        cs.ClassSectionId,
+        s.SemesterCode
+    FROM dbo.ClassSections cs
+    INNER JOIN dbo.Semesters s ON s.SemesterId = cs.SemesterId
+    WHERE s.SemesterCode IN (N'SP25', N'SU25', N'FA25', N'SP26')
+)
+INSERT INTO dbo.GradeBooks
+(
     ClassSectionId,
-    CASE WHEN ROW_NUMBER() OVER (ORDER BY ClassSectionId) % 4 = 0 THEN 'PUBLISHED'
-         WHEN ROW_NUMBER() OVER (ORDER BY ClassSectionId) % 4 = 1 THEN 'DRAFT'
-         WHEN ROW_NUMBER() OVER (ORDER BY ClassSectionId) % 4 = 2 THEN 'LOCKED'
-         ELSE 'DRAFT' END,
-    1
-FROM dbo.ClassSections
-WHERE ClassSectionId NOT IN (SELECT ClassSectionId FROM dbo.GradeBooks)
-ORDER BY ClassSectionId;
+    Status,
+    Version,
+    PublishedAt,
+    LockedAt,
+    CreatedAt,
+    UpdatedAt
+)
+SELECT
+    ts.ClassSectionId,
+    CASE
+        WHEN ts.SemesterCode IN (N'SP25', N'SU25', N'FA25') THEN N'PUBLISHED'
+        WHEN ts.SemesterCode = N'SP26' THEN N'DRAFT'
+    END AS Status,
+    1 AS Version,
+    CASE
+        WHEN ts.SemesterCode IN (N'SP25', N'SU25', N'FA25') THEN SYSUTCDATETIME()
+        ELSE NULL
+    END AS PublishedAt,
+    NULL AS LockedAt,
+    SYSUTCDATETIME(),
+    NULL
+FROM TargetSections ts
+LEFT JOIN dbo.GradeBooks gb ON gb.ClassSectionId = ts.ClassSectionId
+WHERE gb.GradeBookId IS NULL;
 GO
 
--- =====================================================
--- SEED: GradeItems (100 rows)
--- =====================================================
-INSERT INTO dbo.GradeItems (GradeBookId, ItemName, MaxScore, Weight, IsRequired, SortOrder)
-SELECT TOP 100
+/* ---------- 2) GradeItems (4 default columns) ---------- */
+;WITH ItemTemplate AS
+(
+    SELECT 1 AS SortOrder, N'Điểm danh' AS ItemName, CAST(10.00 AS DECIMAL(5,2)) AS MaxScore, CAST(0.10 AS DECIMAL(6,4)) AS Weight
+    UNION ALL
+    SELECT 2, N'15 phút',            CAST(10.00 AS DECIMAL(5,2)), CAST(0.20 AS DECIMAL(6,4))
+    UNION ALL
+    SELECT 3, N'Kiểm tra giữa kỳ',   CAST(10.00 AS DECIMAL(5,2)), CAST(0.30 AS DECIMAL(6,4))
+    UNION ALL
+    SELECT 4, N'Thi cuối kỳ',        CAST(10.00 AS DECIMAL(5,2)), CAST(0.40 AS DECIMAL(6,4))
+)
+INSERT INTO dbo.GradeItems
+(
+    GradeBookId,
+    ItemName,
+    MaxScore,
+    Weight,
+    IsRequired,
+    SortOrder,
+    CreatedAt
+)
+SELECT
     gb.GradeBookId,
-    CASE WHEN rn % 5 = 1 THEN N'Điểm danh'
-         WHEN rn % 5 = 2 THEN N'Kiểm tra giữa kỳ'
-         WHEN rn % 5 = 3 THEN N'Quiz 1'
-         WHEN rn % 5 = 4 THEN N'Bài tập lớn'
-         ELSE N'Thi cuối kỳ' END,
-    CASE WHEN rn % 5 = 1 THEN 10
-         WHEN rn % 5 = 2 THEN 10
-         WHEN rn % 5 = 3 THEN 10
-         WHEN rn % 5 = 4 THEN 10
-         ELSE 10 END,
-    CASE WHEN rn % 5 = 1 THEN 0.1
-         WHEN rn % 5 = 2 THEN 0.3
-         WHEN rn % 5 = 3 THEN 0.1
-         WHEN rn % 5 = 4 THEN 0.1
-         ELSE 0.4 END,
-    CASE WHEN rn % 5 = 5 THEN 1 ELSE 0 END,
-    rn % 5
-FROM (
-    SELECT GradeBookId, ROW_NUMBER() OVER (ORDER BY GradeBookId) AS rn
-    FROM dbo.GradeBooks
-) gb
-ORDER BY gb.GradeBookId;
+    it.ItemName,
+    it.MaxScore,
+    it.Weight,
+    1 AS IsRequired,
+    it.SortOrder,
+    SYSUTCDATETIME()
+FROM dbo.GradeBooks gb
+INNER JOIN dbo.ClassSections cs ON cs.ClassSectionId = gb.ClassSectionId
+INNER JOIN dbo.Semesters s ON s.SemesterId = cs.SemesterId
+CROSS JOIN ItemTemplate it
+LEFT JOIN dbo.GradeItems gi
+    ON gi.GradeBookId = gb.GradeBookId
+   AND gi.ItemName = it.ItemName
+WHERE s.SemesterCode IN (N'SP25', N'SU25', N'FA25', N'SP26')
+  AND gi.GradeItemId IS NULL;
 GO
 
--- =====================================================
--- SEED: GradeEntries (100 rows)
--- =====================================================
-INSERT INTO dbo.GradeEntries (GradeItemId, EnrollmentId, Score)
-SELECT TOP 100
-    gi.GradeItemId,
-    e.EnrollmentId,
-    CAST((5 + (gi.GradeItemId * 13 + e.EnrollmentId * 7) % 50) / 10.0 AS DECIMAL(5,2))
-FROM dbo.GradeItems gi
-CROSS JOIN dbo.Enrollments e
-WHERE NOT EXISTS (
-    SELECT 1 FROM dbo.GradeEntries ge2
-    WHERE ge2.GradeItemId = gi.GradeItemId AND ge2.EnrollmentId = e.EnrollmentId
+/**** ---------- 3) GradeEntries ----------
+   Generate scores for all enrollments belonging to classsections that have gradebooks.
+   For SP26:
+     - only scores for "15 phút" and "Kiểm tra giữa kỳ"
+     - others = NULL
+****/
+;WITH EntrySource AS
+(
+    SELECT
+        gi.GradeItemId,
+        gi.ItemName,
+        e.EnrollmentId,
+        e.StudentId,
+        cs.ClassSectionId,
+        s.SemesterCode
+    FROM dbo.GradeBooks gb
+    INNER JOIN dbo.ClassSections cs ON cs.ClassSectionId = gb.ClassSectionId
+    INNER JOIN dbo.Semesters s ON s.SemesterId = cs.SemesterId
+    INNER JOIN dbo.GradeItems gi ON gi.GradeBookId = gb.GradeBookId
+    INNER JOIN dbo.Enrollments e ON e.ClassSectionId = cs.ClassSectionId
+    WHERE s.SemesterCode IN (N'SP25', N'SU25', N'FA25', N'SP26')
+      AND e.Status IN (N'ENROLLED', N'COMPLETED', N'WITHDRAWN')
+),
+Calculated AS
+(
+    SELECT
+        es.GradeItemId,
+        es.EnrollmentId,
+        CASE
+            WHEN es.SemesterCode = N'SP26'
+                 AND es.ItemName IN (N'Điểm danh', N'Thi cuối kỳ')
+                THEN CAST(NULL AS DECIMAL(5,2))
+            ELSE
+                -- deterministic pseudo-score [5.00 .. 10.00]
+                CAST(
+                    (
+                        5.00
+                        + (
+                            (ABS(CHECKSUM(CONCAT(es.EnrollmentId, N'-', es.GradeItemId))) % 51) / 10.0
+                          )
+                    ) AS DECIMAL(5,2)
+                )
+        END AS Score
+    FROM EntrySource es
 )
-AND EXISTS (
-    SELECT 1 FROM dbo.GradeBooks gb
-    JOIN dbo.ClassSections cs ON cs.ClassSectionId = gb.ClassSectionId
-    WHERE gb.GradeBookId = gi.GradeBookId AND cs.ClassSectionId = e.ClassSectionId
+INSERT INTO dbo.GradeEntries
+(
+    GradeItemId,
+    EnrollmentId,
+    Score,
+    UpdatedBy,
+    UpdatedAt
 )
-ORDER BY gi.GradeItemId, e.EnrollmentId;
+SELECT
+    c.GradeItemId,
+    c.EnrollmentId,
+    c.Score,
+    NULL AS UpdatedBy,
+    SYSUTCDATETIME()
+FROM Calculated c
+LEFT JOIN dbo.GradeEntries ge
+    ON ge.GradeItemId = c.GradeItemId
+   AND ge.EnrollmentId = c.EnrollmentId
+WHERE ge.GradeEntryId IS NULL;
 GO
 
 -- =====================================================
@@ -1812,34 +2120,6 @@ SELECT TOP 100
 FROM dbo.ChatRooms cr
 CROSS JOIN (SELECT TOP 5 UserId FROM dbo.Users ORDER BY UserId) u
 ORDER BY cr.RoomId, u.UserId;
-GO
-
--- =====================================================
--- SEED: Notifications (100 rows)
--- =====================================================
-INSERT INTO dbo.Notifications (NotificationType, PayloadJson, Status)
-SELECT TOP 100
-    CASE WHEN rn % 4 = 0 THEN 'GRADE_PUBLISHED'
-         WHEN rn % 4 = 1 THEN 'SCHEDULE_CHANGED'
-         WHEN rn % 4 = 2 THEN 'CHAT_MENTION'
-         ELSE 'SYSTEM_ALERT' END,
-    '{"message":"Thông báo số ' + CAST(rn AS VARCHAR(10)) + '"}',
-    CASE WHEN rn % 3 = 0 THEN 'DELIVERED' WHEN rn % 3 = 1 THEN 'SENT' ELSE 'PENDING' END
-FROM (SELECT ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS rn FROM dbo.Users) t
-WHERE rn <= 100;
-GO
-
--- NotificationRecipients (100 rows)
-INSERT INTO dbo.NotificationRecipients (NotificationId, UserId)
-SELECT TOP 100
-    n.NotificationId,
-    u.UserId
-FROM dbo.Notifications n
-CROSS JOIN (SELECT TOP 5 UserId FROM dbo.Users ORDER BY UserId) u
-WHERE NOT EXISTS (
-    SELECT 1 FROM dbo.NotificationRecipients nr WHERE nr.NotificationId = n.NotificationId AND nr.UserId = u.UserId
-)
-ORDER BY n.NotificationId, u.UserId;
 GO
 
 -- =====================================================
@@ -2087,421 +2367,245 @@ CROSS JOIN (SELECT 1 AS x UNION ALL SELECT 2) dup
 ORDER BY sw.WalletId;
 GO
 
--- =====================================================
--- SEED: Gán tất cả Students vào lớp SE1801 và SE1802
--- để test Quiz cho role Student
--- =====================================================
-DECLARE @CS1 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1801');
-DECLARE @CS2 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1802');
-DECLARE @SemQ INT = (SELECT TOP 1 SemesterId FROM dbo.ClassSections WHERE ClassSectionId = @CS1);
-DECLARE @CourseQ INT = (SELECT TOP 1 CourseId FROM dbo.ClassSections WHERE ClassSectionId = @CS1);
-DECLARE @CourseQ2 INT = (SELECT TOP 1 CourseId FROM dbo.ClassSections WHERE ClassSectionId = @CS2);
-
--- Enroll nửa đầu students vào SE1801, nửa sau vào SE1802
-INSERT INTO dbo.Enrollments (StudentId, ClassSectionId, SemesterId, CourseId, CreditsSnapshot, Status)
-SELECT s.StudentId, @CS1, @SemQ, @CourseQ, 3, 'ENROLLED'
-FROM dbo.Students s
-WHERE s.StudentId NOT IN (SELECT e.StudentId FROM dbo.Enrollments e WHERE e.ClassSectionId = @CS1)
-  AND s.StudentId % 2 = 1
-  AND NOT EXISTS (SELECT 1 FROM dbo.Enrollments ex WHERE ex.StudentId = s.StudentId AND ex.CourseId = @CourseQ AND ex.SemesterId = @SemQ);
-
-INSERT INTO dbo.Enrollments (StudentId, ClassSectionId, SemesterId, CourseId, CreditsSnapshot, Status)
-SELECT s.StudentId, @CS2, @SemQ, @CourseQ2, 3, 'ENROLLED'
-FROM dbo.Students s
-WHERE s.StudentId NOT IN (SELECT e.StudentId FROM dbo.Enrollments e WHERE e.ClassSectionId = @CS2)
-  AND s.StudentId % 2 = 0
-  AND NOT EXISTS (SELECT 1 FROM dbo.Enrollments ex WHERE ex.StudentId = s.StudentId AND ex.CourseId = @CourseQ2 AND ex.SemesterId = @SemQ);
-GO
-
--- =====================================================
--- SEED: Quizzes cho cả 2 lớp (Teacher quản lý, Student làm bài)
--- =====================================================
-DECLARE @CS1Q INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1801');
-DECLARE @CS2Q INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1802');
-DECLARE @TeacherQ INT = (SELECT TOP 1 TeacherId FROM dbo.ClassSections WHERE ClassSectionId = @CS1Q);
-
--- 10 Quizzes cho SE1801 (teacher quản lý)
-INSERT INTO dbo.Quizzes (ClassSectionId, CreatedBy, QuizTitle, Description, TotalQuestions, TimeLimitMin, ShuffleQuestions, ShuffleAnswers, StartAt, EndAt, Status) VALUES
-(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 1: C# Basics',        N'Bài kiểm tra kiến thức C# cơ bản',         10, 15, 1, 1, '2026-01-10', '2026-04-30', 'PUBLISHED'),
-(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 2: OOP',              N'Bài kiểm tra lập trình hướng đối tượng',   10, 20, 1, 1, '2026-01-15', '2026-04-30', 'PUBLISHED'),
-(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 3: LINQ',             N'Bài kiểm tra LINQ và lambda expressions',  10, 20, 1, 1, '2026-01-20', '2026-04-30', 'PUBLISHED'),
-(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 4: Entity Framework', N'Bài kiểm tra EF Core và migrations',       10, 30, 1, 1, '2026-02-01', '2026-04-30', 'PUBLISHED'),
-(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 5: ASP.NET Core MVC', N'Bài kiểm tra MVC pattern',                 10, 30, 1, 1, '2026-02-10', '2026-04-30', 'PUBLISHED'),
-(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 6: Razor Pages',      N'Bài kiểm tra Razor Pages',                 10, 25, 1, 1, '2026-02-15', '2026-04-30', 'DRAFT'),
-(@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 7: SignalR',          N'Bài kiểm tra SignalR real-time',            10, 20, 1, 1, '2026-02-20', '2026-04-30', 'DRAFT'),
-(@CS1Q, @TeacherQ, N'PRN222 - Giữa kỳ',                             N'Bài kiểm tra giữa kỳ tổng hợp',           30, 60, 1, 1, '2026-03-01', '2026-04-30', 'PUBLISHED'),
-(@CS1Q, @TeacherQ, N'PRN222 - Quiz nhanh: Dependency Injection',     N'Quiz nhanh về DI container',               10, 10, 1, 1, '2026-03-10', '2026-04-30', 'CLOSED'),
-(@CS1Q, @TeacherQ, N'PRN222 - Cuối kỳ',                              N'Bài kiểm tra cuối kỳ',                    30, 90, 1, 1, '2026-04-01', '2026-04-30', 'DRAFT');
-
--- 10 Quizzes cho SE1802
-INSERT INTO dbo.Quizzes (ClassSectionId, CreatedBy, QuizTitle, Description, TotalQuestions, TimeLimitMin, ShuffleQuestions, ShuffleAnswers, StartAt, EndAt, Status) VALUES
-(@CS2Q, @TeacherQ, N'PRN222 - Quiz 1: Biến và kiểu dữ liệu',       N'Kiến thức cơ bản về biến',                 10, 15, 1, 1, '2026-01-10', '2026-04-30', 'PUBLISHED'),
-(@CS2Q, @TeacherQ, N'PRN222 - Quiz 2: Mảng và Collections',         N'Bài kiểm tra về Array, List, Dictionary',  10, 20, 1, 1, '2026-01-15', '2026-04-30', 'PUBLISHED'),
-(@CS2Q, @TeacherQ, N'PRN222 - Quiz 3: Exception Handling',          N'Bài kiểm tra xử lý ngoại lệ',             10, 15, 1, 1, '2026-01-20', '2026-04-30', 'PUBLISHED'),
-(@CS2Q, @TeacherQ, N'PRN222 - Quiz 4: Async/Await',                 N'Bài kiểm tra lập trình bất đồng bộ',      10, 25, 1, 1, '2026-02-01', '2026-04-30', 'PUBLISHED'),
-(@CS2Q, @TeacherQ, N'PRN222 - Quiz 5: Web API',                     N'Bài kiểm tra RESTful API',                 10, 30, 1, 1, '2026-02-10', '2026-04-30', 'PUBLISHED'),
-(@CS2Q, @TeacherQ, N'PRN222 - Quiz 6: Authentication',              N'Bài kiểm tra JWT và Identity',             10, 20, 1, 1, '2026-02-15', '2026-04-30', 'DRAFT'),
-(@CS2Q, @TeacherQ, N'PRN222 - Quiz 7: Unit Testing',                N'Bài kiểm tra xUnit và Moq',               10, 20, 1, 1, '2026-02-20', '2026-04-30', 'DRAFT'),
-(@CS2Q, @TeacherQ, N'PRN222 - Giữa kỳ lớp SE1802',                 N'Bài thi giữa kỳ',                         20, 45, 1, 1, '2026-03-01', '2026-04-30', 'PUBLISHED'),
-(@CS2Q, @TeacherQ, N'PRN222 - Quiz nhanh: Design Patterns',         N'Quiz nhanh về các design patterns',        10, 10, 1, 1, '2026-03-10', '2026-04-30', 'CLOSED'),
-(@CS2Q, @TeacherQ, N'PRN222 - Cuối kỳ lớp SE1802',                  N'Bài thi cuối kỳ',                         30, 90, 1, 1, '2026-04-01', '2026-04-30', 'DRAFT');
-GO
-
--- =====================================================
--- SEED: QuizQuestions (10 câu hỏi cho mỗi Quiz)
--- =====================================================
-INSERT INTO dbo.QuizQuestions (QuizId, QuestionText, QuestionType, Points, SortOrder)
-SELECT 
-    q.QuizId,
-    N'[' + q.QuizTitle + N'] Câu ' + CAST(nums.n AS NVARCHAR(5)) + N': ' +
-    CASE nums.n
-        WHEN 1 THEN N'Đâu là cách khai báo biến đúng trong C#?'
-        WHEN 2 THEN N'Phương thức nào dùng để chuyển đổi kiểu dữ liệu?'
-        WHEN 3 THEN N'Từ khóa nào dùng để kế thừa class?'
-        WHEN 4 THEN N'Interface khác abstract class ở điểm nào?'
-        WHEN 5 THEN N'LINQ query syntax tương đương method syntax nào?'
-        WHEN 6 THEN N'DbContext trong EF Core có vai trò gì?'
-        WHEN 7 THEN N'Middleware trong ASP.NET Core hoạt động thế nào?'
-        WHEN 8 THEN N'Razor Pages khác MVC Controller ở đâu?'
-        WHEN 9 THEN N'SignalR sử dụng transport protocol nào?'
-        ELSE N'Dependency Injection giải quyết vấn đề gì?'
-    END,
-    CASE WHEN nums.n % 3 = 0 THEN 'TRUE_FALSE' ELSE 'MCQ' END,
-    1.00,
-    nums.n
-FROM dbo.Quizzes q
-CROSS JOIN (
-    SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
-    UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10
-) nums;
-GO
-
--- =====================================================
--- SEED: QuizAnswers (4 đáp án cho mỗi câu hỏi, đáp án 1 = đúng)
--- =====================================================
-INSERT INTO dbo.QuizAnswers (QuestionId, AnswerText, IsCorrect)
-SELECT 
-    qq.QuestionId,
-    CASE ans.n
-        WHEN 1 THEN N'Đáp án A (Đúng): ' + LEFT(qq.QuestionText, 30)
-        WHEN 2 THEN N'Đáp án B: Không phải đáp án này'
-        WHEN 3 THEN N'Đáp án C: Câu trả lời sai'
-        ELSE N'Đáp án D: Lựa chọn không chính xác'
-    END,
-    CASE WHEN ans.n = 1 THEN 1 ELSE 0 END
-FROM dbo.QuizQuestions qq
-CROSS JOIN (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4) ans;
-GO
-
--- =====================================================
--- SEED: QuizAttempts (Tất cả students enrolled làm Quiz PUBLISHED/CLOSED)
--- =====================================================
-INSERT INTO dbo.QuizAttempts (QuizId, EnrollmentId, ClassSectionId, StartedAt, SubmittedAt, Score, Status)
-SELECT 
-    q.QuizId,
-    e.EnrollmentId,
-    q.ClassSectionId,
-    DATEADD(HOUR, -2, SYSUTCDATETIME()),
-    CASE WHEN q.Status = 'CLOSED' THEN DATEADD(HOUR, -1, SYSUTCDATETIME()) ELSE NULL END,
-    CASE WHEN q.Status = 'CLOSED' THEN CAST(ABS(CHECKSUM(NEWID())) % 10 + 1 AS DECIMAL(5,2)) ELSE NULL END,
-    CASE WHEN q.Status = 'CLOSED' THEN 'GRADED' ELSE 'IN_PROGRESS' END
-FROM dbo.Quizzes q
-JOIN dbo.Enrollments e ON e.ClassSectionId = q.ClassSectionId
-WHERE q.Status = 'CLOSED'
-  AND e.Status = 'ENROLLED';
-GO
-
--- =====================================================
--- SEED: QuizAttemptAnswers (Submit cho các attempts GRADED)
--- =====================================================
-INSERT INTO dbo.QuizAttemptAnswers (AttemptId, QuestionId, SelectedAnswerId, IsCorrect)
-SELECT 
-    qa.AttemptId,
-    qq.QuestionId,
-    (SELECT TOP 1 AnswerId FROM dbo.QuizAnswers a WHERE a.QuestionId = qq.QuestionId ORDER BY NEWID()),
-    CASE WHEN ABS(CHECKSUM(NEWID())) % 4 = 0 THEN 1 ELSE 0 END
-FROM dbo.QuizAttempts qa
-JOIN dbo.QuizQuestions qq ON qq.QuizId = qa.QuizId
-WHERE qa.Status = 'GRADED';
-GO
-
--- =====================================================
--- SEED: Chat (Tạo phòng chat cho lớp SE1801 và SE1802)
--- =====================================================
-SET NOCOUNT ON;
-GO
-
+/* =====================================================
+   QUIZ + CHATROOM SEED FOR PRN01, PRN02 (FULL BLOCK)
+   Replace old block lines 2116 -> 2507
+   ===================================================== */
 BEGIN TRY
     BEGIN TRANSACTION;
 
-    /* ---------- Resolve core IDs ---------- */
-    DECLARE @AdminUserId INT =
-        (SELECT TOP (1) u.UserId FROM dbo.Users u WHERE u.Role = N'ADMIN' ORDER BY u.UserId);
+    DECLARE @CS1Q INT, @CS2Q INT, @TeacherQ INT;
 
-    DECLARE @Teacher1Id INT =
-        (SELECT TOP (1) t.TeacherId
-         FROM dbo.Teachers t
-         JOIN dbo.Users u ON u.UserId = t.TeacherId
-         WHERE u.Username = N'teacher1'
-         ORDER BY t.TeacherId);
+    SELECT TOP 1
+        @CS1Q = cs.ClassSectionId,
+        @TeacherQ = cs.TeacherId
+    FROM dbo.ClassSections cs
+    WHERE cs.SectionCode = N'PRN01'
+    ORDER BY cs.ClassSectionId;
 
-    IF @Teacher1Id IS NULL
+    SELECT TOP 1
+        @CS2Q = cs.ClassSectionId
+    FROM dbo.ClassSections cs
+    WHERE cs.SectionCode = N'PRN02'
+    ORDER BY cs.ClassSectionId;
+
+    IF @CS1Q IS NULL OR @CS2Q IS NULL
     BEGIN
-        SET @Teacher1Id =
-            (SELECT TOP (1) t.TeacherId FROM dbo.Teachers t ORDER BY t.TeacherId);
+        RAISERROR(N'Không tìm thấy ClassSection PRN01 hoặc PRN02. Hãy seed ClassSections trước.', 16, 1);
     END
 
-    DECLARE @ClassSectionId INT =
-        (SELECT TOP (1) cs.ClassSectionId
-         FROM dbo.ClassSections cs
-         JOIN dbo.Semesters s ON s.SemesterId = cs.SemesterId
-         WHERE s.SemesterCode = N'SP26'
-         ORDER BY cs.ClassSectionId);
-
-    IF @ClassSectionId IS NULL
+    IF @TeacherQ IS NULL
     BEGIN
-        SET @ClassSectionId = (SELECT TOP (1) cs.ClassSectionId FROM dbo.ClassSections cs ORDER BY cs.ClassSectionId);
+        SELECT TOP 1 @TeacherQ = t.TeacherId FROM dbo.Teachers t ORDER BY t.TeacherId;
     END
 
-    DECLARE @CourseId INT =
-        (SELECT TOP (1) cs.CourseId FROM dbo.ClassSections cs WHERE cs.ClassSectionId = @ClassSectionId);
-
-    IF @CourseId IS NULL
+    IF @TeacherQ IS NULL
     BEGIN
-        SET @CourseId = (SELECT TOP (1) c.CourseId FROM dbo.Courses c ORDER BY c.CourseId);
+        RAISERROR(N'Không tìm thấy Teacher để seed quiz/chat.', 16, 1);
     END
 
-    IF @AdminUserId IS NULL OR @Teacher1Id IS NULL OR @ClassSectionId IS NULL OR @CourseId IS NULL
-    BEGIN
-        RAISERROR(N'Chat seed aborted: missing prerequisite Users/Teachers/ClassSections/Courses data.', 16, 1);
-    END
+    /* =========================
+       CLEANUP QUIZ DATA (for rerun safety)
+       ========================= */
+    DELETE qaa
+    FROM dbo.QuizAttemptAnswers qaa
+    JOIN dbo.QuizAttempts qa ON qa.AttemptId = qaa.AttemptId
+    JOIN dbo.Quizzes q ON q.QuizId = qa.QuizId
+    WHERE q.ClassSectionId IN (@CS1Q, @CS2Q);
 
-    /* ---------- Prepare sample students ---------- */
-    IF OBJECT_ID('tempdb..#SeedStudents') IS NOT NULL DROP TABLE #SeedStudents;
-    CREATE TABLE #SeedStudents
+    DELETE qa
+    FROM dbo.QuizAttempts qa
+    JOIN dbo.Quizzes q ON q.QuizId = qa.QuizId
+    WHERE q.ClassSectionId IN (@CS1Q, @CS2Q);
+
+    DELETE a
+    FROM dbo.QuizAnswers a
+    JOIN dbo.QuizQuestions qq ON qq.QuestionId = a.QuestionId
+    JOIN dbo.Quizzes q ON q.QuizId = qq.QuizId
+    WHERE q.ClassSectionId IN (@CS1Q, @CS2Q);
+
+    DELETE qq
+    FROM dbo.QuizQuestions qq
+    JOIN dbo.Quizzes q ON q.QuizId = qq.QuizId
+    WHERE q.ClassSectionId IN (@CS1Q, @CS2Q);
+
+    DELETE FROM dbo.Quizzes
+    WHERE ClassSectionId IN (@CS1Q, @CS2Q);
+
+    /* =========================
+       SEED: Quizzes
+       ========================= */
+    INSERT INTO dbo.Quizzes
     (
-        RowNum INT NOT NULL PRIMARY KEY,
-        StudentUserId INT NOT NULL
-    );
+        ClassSectionId, CreatedBy, QuizTitle, Description,
+        TotalQuestions, TimeLimitMin, ShuffleQuestions, ShuffleAnswers,
+        StartAt, EndAt, Status
+    )
+    VALUES
+    -- 10 Quizzes cho PRN01
+    (@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 1: C# Basics',        N'Bài kiểm tra kiến thức C# cơ bản',         10, 15, 1, 1, '2026-01-10', '2026-04-30', 'PUBLISHED'),
+    (@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 2: OOP',              N'Bài kiểm tra lập trình hướng đối tượng',   10, 20, 1, 1, '2026-01-15', '2026-04-30', 'PUBLISHED'),
+    (@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 3: LINQ',             N'Bài kiểm tra LINQ và lambda expressions',  10, 20, 1, 1, '2026-01-20', '2026-04-30', 'PUBLISHED'),
+    (@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 4: Entity Framework', N'Bài kiểm tra EF Core và migrations',       10, 30, 1, 1, '2026-02-01', '2026-04-30', 'PUBLISHED'),
+    (@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 5: ASP.NET Core MVC', N'Bài kiểm tra MVC pattern',                 10, 30, 1, 1, '2026-02-10', '2026-04-30', 'PUBLISHED'),
+    (@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 6: Razor Pages',      N'Bài kiểm tra Razor Pages',                 10, 25, 1, 1, '2026-02-15', '2026-04-30', 'DRAFT'),
+    (@CS1Q, @TeacherQ, N'PRN222 - Kiểm tra chương 7: SignalR',          N'Bài kiểm tra SignalR real-time',           10, 20, 1, 1, '2026-02-20', '2026-04-30', 'DRAFT'),
+    (@CS1Q, @TeacherQ, N'PRN222 - Giữa kỳ',                             N'Bài kiểm tra giữa kỳ tổng hợp',           30, 60, 1, 1, '2026-03-01', '2026-04-30', 'PUBLISHED'),
+    (@CS1Q, @TeacherQ, N'PRN222 - Quiz nhanh: Dependency Injection',    N'Quiz nhanh về DI container',               10, 10, 1, 1, '2026-03-10', '2026-04-30', 'CLOSED'),
+    (@CS1Q, @TeacherQ, N'PRN222 - Cuối kỳ',                             N'Bài kiểm tra cuối kỳ',                    30, 90, 1, 1, '2026-04-01', '2026-04-30', 'DRAFT'),
 
-    INSERT INTO #SeedStudents (RowNum, StudentUserId)
-    SELECT TOP (8)
-        ROW_NUMBER() OVER (ORDER BY u.UserId) AS RowNum,
-        u.UserId
-    FROM dbo.Users u
-    WHERE u.Role = N'STUDENT'
-    ORDER BY u.UserId;
+    -- 10 Quizzes cho PRN02
+    (@CS2Q, @TeacherQ, N'PRN222 - Quiz 1: Biến và kiểu dữ liệu',        N'Kiến thức cơ bản về biến',                 10, 15, 1, 1, '2026-01-10', '2026-04-30', 'PUBLISHED'),
+    (@CS2Q, @TeacherQ, N'PRN222 - Quiz 2: Mảng và Collections',         N'Bài kiểm tra về Array, List, Dictionary',  10, 20, 1, 1, '2026-01-15', '2026-04-30', 'PUBLISHED'),
+    (@CS2Q, @TeacherQ, N'PRN222 - Quiz 3: Exception Handling',          N'Bài kiểm tra xử lý ngoại lệ',             10, 15, 1, 1, '2026-01-20', '2026-04-30', 'PUBLISHED'),
+    (@CS2Q, @TeacherQ, N'PRN222 - Quiz 4: Async/Await',                 N'Bài kiểm tra lập trình bất đồng bộ',      10, 25, 1, 1, '2026-02-01', '2026-04-30', 'PUBLISHED'),
+    (@CS2Q, @TeacherQ, N'PRN222 - Quiz 5: Web API',                     N'Bài kiểm tra RESTful API',                 10, 30, 1, 1, '2026-02-10', '2026-04-30', 'PUBLISHED'),
+    (@CS2Q, @TeacherQ, N'PRN222 - Quiz 6: Authentication',              N'Bài kiểm tra JWT và Identity',             10, 20, 1, 1, '2026-02-15', '2026-04-30', 'DRAFT'),
+    (@CS2Q, @TeacherQ, N'PRN222 - Quiz 7: Unit Testing',                N'Bài kiểm tra xUnit và Moq',               10, 20, 1, 1, '2026-02-20', '2026-04-30', 'DRAFT'),
+    (@CS2Q, @TeacherQ, N'PRN222 - Giữa kỳ lớp PRN02',                  N'Bài thi giữa kỳ',                         20, 45, 1, 1, '2026-03-01', '2026-04-30', 'PUBLISHED'),
+    (@CS2Q, @TeacherQ, N'PRN222 - Quiz nhanh: Design Patterns',         N'Quiz nhanh về các design patterns',        10, 10, 1, 1, '2026-03-10', '2026-04-30', 'CLOSED'),
+    (@CS2Q, @TeacherQ, N'PRN222 - Cuối kỳ lớp PRN02',                  N'Bài thi cuối kỳ',                         30, 90, 1, 1, '2026-04-01', '2026-04-30', 'DRAFT');
 
-    /* ---------- Idempotent room upsert (by business key) ---------- */
-    DECLARE @ClassRoomName NVARCHAR(200) = N'Class Chat - Section ' + CAST(@ClassSectionId AS NVARCHAR(20));
-    DECLARE @CourseRoomName NVARCHAR(200) = N'Course Chat - Course ' + CAST(@CourseId AS NVARCHAR(20));
+    /* =========================
+       SEED: QuizQuestions
+       ========================= */
+    INSERT INTO dbo.QuizQuestions (QuizId, QuestionText, QuestionType, Points, SortOrder)
+    SELECT
+        q.QuizId,
+        N'[' + q.QuizTitle + N'] Câu ' + CAST(nums.n AS NVARCHAR(5)) + N': ' +
+        CASE nums.n
+            WHEN 1 THEN N'Đâu là cách khai báo biến đúng trong C#?'
+            WHEN 2 THEN N'Phương thức nào dùng để chuyển đổi kiểu dữ liệu?'
+            WHEN 3 THEN N'Từ khóa nào dùng để kế thừa class?'
+            WHEN 4 THEN N'Interface khác abstract class ở điểm nào?'
+            WHEN 5 THEN N'LINQ query syntax tương đương method syntax nào?'
+            WHEN 6 THEN N'DbContext trong EF Core có vai trò gì?'
+            WHEN 7 THEN N'Middleware trong ASP.NET Core hoạt động thế nào?'
+            WHEN 8 THEN N'Razor Pages khác MVC Controller ở đâu?'
+            WHEN 9 THEN N'SignalR sử dụng transport protocol nào?'
+            ELSE N'Dependency Injection giải quyết vấn đề gì?'
+        END,
+        CASE WHEN nums.n % 3 = 0 THEN N'TRUE_FALSE' ELSE N'MCQ' END,
+        1.00,
+        nums.n
+    FROM dbo.Quizzes q
+    CROSS JOIN (
+        SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5
+        UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10
+    ) nums
+    WHERE q.ClassSectionId IN (@CS1Q, @CS2Q);
 
-    DECLARE @ClassRoomId INT;
-    DECLARE @CourseRoomId INT;
-    DECLARE @TeacherDmRoomId INT;
+    /* =========================
+       SEED: QuizAnswers
+       ========================= */
+    INSERT INTO dbo.QuizAnswers (QuestionId, AnswerText, IsCorrect)
+    SELECT
+        qq.QuestionId,
+        CASE ans.n
+            WHEN 1 THEN N'Đáp án A (Đúng): ' + LEFT(qq.QuestionText, 30)
+            WHEN 2 THEN N'Đáp án B: Không phải đáp án này'
+            WHEN 3 THEN N'Đáp án C: Câu trả lời sai'
+            ELSE N'Đáp án D: Lựa chọn không chính xác'
+        END,
+        CASE WHEN ans.n = 1 THEN 1 ELSE 0 END
+    FROM dbo.QuizQuestions qq
+    JOIN dbo.Quizzes q ON q.QuizId = qq.QuizId
+    CROSS JOIN (SELECT 1 AS n UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4) ans
+    WHERE q.ClassSectionId IN (@CS1Q, @CS2Q);
 
-    -- CLASS room
-    SELECT TOP (1) @ClassRoomId = cr.RoomId
-    FROM dbo.ChatRooms cr WITH (UPDLOCK, HOLDLOCK)
+    /* =========================
+       SEED: QuizAttempts (for CLOSED only)
+       ========================= */
+    INSERT INTO dbo.QuizAttempts (QuizId, EnrollmentId, ClassSectionId, StartedAt, SubmittedAt, Score, Status)
+    SELECT
+        q.QuizId,
+        e.EnrollmentId,
+        q.ClassSectionId,
+        DATEADD(HOUR, -2, SYSUTCDATETIME()),
+        DATEADD(HOUR, -1, SYSUTCDATETIME()),
+        CAST(ABS(CHECKSUM(NEWID())) % 10 + 1 AS DECIMAL(5,2)),
+        N'GRADED'
+    FROM dbo.Quizzes q
+    JOIN dbo.Enrollments e ON e.ClassSectionId = q.ClassSectionId
+    WHERE q.Status = N'CLOSED'
+      AND q.ClassSectionId IN (@CS1Q, @CS2Q)
+      AND e.Status = N'ENROLLED';
+
+    /* =========================
+       SEED: QuizAttemptAnswers
+       ========================= */
+    INSERT INTO dbo.QuizAttemptAnswers (AttemptId, QuestionId, SelectedAnswerId, IsCorrect)
+    SELECT
+        qa.AttemptId,
+        qq.QuestionId,
+        (SELECT TOP 1 a.AnswerId FROM dbo.QuizAnswers a WHERE a.QuestionId = qq.QuestionId ORDER BY NEWID()),
+        CASE WHEN ABS(CHECKSUM(NEWID())) % 4 = 0 THEN 1 ELSE 0 END
+    FROM dbo.QuizAttempts qa
+    JOIN dbo.QuizQuestions qq ON qq.QuizId = qa.QuizId
+    JOIN dbo.Quizzes q ON q.QuizId = qa.QuizId
+    WHERE qa.Status = N'GRADED'
+      AND q.ClassSectionId IN (@CS1Q, @CS2Q);
+
+    /* =========================
+       CHATROOM seed PRN01/PRN02
+       ========================= */
+    DECLARE @RoomPRN01 INT, @RoomPRN02 INT;
+
+    -- cleanup old rooms/messages/members for these 2 classes (rerun-safe)
+    DELETE cm
+    FROM dbo.ChatMessages cm
+    JOIN dbo.ChatRooms cr ON cr.RoomId = cm.RoomId
     WHERE cr.RoomType = N'CLASS'
-      AND cr.ClassSectionId = @ClassSectionId
-      AND cr.RoomName = @ClassRoomName
-      AND cr.Status <> N'DELETED'
-    ORDER BY cr.RoomId;
+      AND cr.ClassSectionId IN (@CS1Q, @CS2Q);
 
-    IF @ClassRoomId IS NULL
-    BEGIN
-        INSERT INTO dbo.ChatRooms (RoomType, CourseId, ClassSectionId, RoomName, Status, CreatedBy)
-        VALUES (N'CLASS', NULL, @ClassSectionId, @ClassRoomName, N'ACTIVE', @Teacher1Id);
+    DELETE crm
+    FROM dbo.ChatRoomMembers crm
+    JOIN dbo.ChatRooms cr ON cr.RoomId = crm.RoomId
+    WHERE cr.RoomType = N'CLASS'
+      AND cr.ClassSectionId IN (@CS1Q, @CS2Q);
 
-        SET @ClassRoomId = CAST(SCOPE_IDENTITY() AS INT);
-    END
+    DELETE FROM dbo.ChatRooms
+    WHERE RoomType = N'CLASS'
+      AND ClassSectionId IN (@CS1Q, @CS2Q);
 
-    -- COURSE room
-    SELECT TOP (1) @CourseRoomId = cr.RoomId
-    FROM dbo.ChatRooms cr WITH (UPDLOCK, HOLDLOCK)
-    WHERE cr.RoomType = N'COURSE'
-      AND cr.CourseId = @CourseId
-      AND cr.RoomName = @CourseRoomName
-      AND cr.Status <> N'DELETED'
-    ORDER BY cr.RoomId;
+    -- create rooms
+    INSERT INTO dbo.ChatRooms (RoomType, CourseId, ClassSectionId, RoomName, Status, CreatedBy)
+    SELECT N'CLASS', cs.CourseId, cs.ClassSectionId, N'Class Room - ' + cs.SectionCode, N'ACTIVE', @TeacherQ
+    FROM dbo.ClassSections cs
+    WHERE cs.ClassSectionId IN (@CS1Q, @CS2Q);
 
-    IF @CourseRoomId IS NULL
-    BEGIN
-        INSERT INTO dbo.ChatRooms (RoomType, CourseId, ClassSectionId, RoomName, Status, CreatedBy)
-        VALUES (N'COURSE', @CourseId, NULL, @CourseRoomName, N'ACTIVE', @Teacher1Id);
+    SELECT @RoomPRN01 = RoomId FROM dbo.ChatRooms WHERE RoomType = N'CLASS' AND ClassSectionId = @CS1Q;
+    SELECT @RoomPRN02 = RoomId FROM dbo.ChatRooms WHERE RoomType = N'CLASS' AND ClassSectionId = @CS2Q;
 
-        SET @CourseRoomId = CAST(SCOPE_IDENTITY() AS INT);
-    END
+    -- teacher as owner
+    INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
+    VALUES
+    (@RoomPRN01, @TeacherQ, N'OWNER', N'JOINED'),
+    (@RoomPRN02, @TeacherQ, N'OWNER', N'JOINED');
 
-    -- DM room (teacher <-> admin), deterministic name to avoid duplicate
-    SELECT TOP (1) @TeacherDmRoomId = cr.RoomId
-    FROM dbo.ChatRooms cr WITH (UPDLOCK, HOLDLOCK)
-    WHERE cr.RoomType = N'DM'
-      AND cr.RoomName = N'DM:' + CAST(CASE WHEN @Teacher1Id < @AdminUserId THEN @Teacher1Id ELSE @AdminUserId END AS NVARCHAR(20))
-                     + N'-' + CAST(CASE WHEN @Teacher1Id < @AdminUserId THEN @AdminUserId ELSE @Teacher1Id END AS NVARCHAR(20))
-      AND cr.Status <> N'DELETED'
-    ORDER BY cr.RoomId;
-
-    IF @TeacherDmRoomId IS NULL
-    BEGIN
-        INSERT INTO dbo.ChatRooms (RoomType, CourseId, ClassSectionId, RoomName, Status, CreatedBy)
-        VALUES
-        (
-            N'DM',
-            NULL,
-            NULL,
-            N'DM:' + CAST(CASE WHEN @Teacher1Id < @AdminUserId THEN @Teacher1Id ELSE @AdminUserId END AS NVARCHAR(20))
-                 + N'-' + CAST(CASE WHEN @Teacher1Id < @AdminUserId THEN @AdminUserId ELSE @Teacher1Id END AS NVARCHAR(20)),
-            N'ACTIVE',
-            @Teacher1Id
-        );
-
-        SET @TeacherDmRoomId = CAST(SCOPE_IDENTITY() AS INT);
-    END
-
-    /* ---------- Idempotent ChatRoomMembers ---------- */
-    -- helper: upsert room member
-    -- CLASS room: teacher owner + first 5 students
-    IF NOT EXISTS (SELECT 1 FROM dbo.ChatRoomMembers WHERE RoomId = @ClassRoomId AND UserId = @Teacher1Id)
-    BEGIN
-        INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
-        VALUES (@ClassRoomId, @Teacher1Id, N'OWNER', N'JOINED');
-    END
+    -- enrolled students as members
+    INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
+    SELECT DISTINCT @RoomPRN01, e.StudentId, N'MEMBER', N'JOINED'
+    FROM dbo.Enrollments e
+    WHERE e.ClassSectionId = @CS1Q AND e.Status = N'ENROLLED';
 
     INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
-    SELECT
-        @ClassRoomId,
-        s.StudentUserId,
-        N'MEMBER',
-        N'JOINED'
-    FROM #SeedStudents s
-    WHERE s.RowNum <= 5
-      AND NOT EXISTS
-      (
-          SELECT 1
-          FROM dbo.ChatRoomMembers m
-          WHERE m.RoomId = @ClassRoomId
-            AND m.UserId = s.StudentUserId
-      );
+    SELECT DISTINCT @RoomPRN02, e.StudentId, N'MEMBER', N'JOINED'
+    FROM dbo.Enrollments e
+    WHERE e.ClassSectionId = @CS2Q AND e.Status = N'ENROLLED';
 
-    -- COURSE room: teacher moderator + first 8 students
-    IF NOT EXISTS (SELECT 1 FROM dbo.ChatRoomMembers WHERE RoomId = @CourseRoomId AND UserId = @Teacher1Id)
-    BEGIN
-        INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
-        VALUES (@CourseRoomId, @Teacher1Id, N'MODERATOR', N'JOINED');
-    END
-
-    INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
-    SELECT
-        @CourseRoomId,
-        s.StudentUserId,
-        N'MEMBER',
-        N'JOINED'
-    FROM #SeedStudents s
-    WHERE s.RowNum <= 8
-      AND NOT EXISTS
-      (
-          SELECT 1
-          FROM dbo.ChatRoomMembers m
-          WHERE m.RoomId = @CourseRoomId
-            AND m.UserId = s.StudentUserId
-      );
-
-    -- DM room: teacher + admin
-    IF NOT EXISTS (SELECT 1 FROM dbo.ChatRoomMembers WHERE RoomId = @TeacherDmRoomId AND UserId = @Teacher1Id)
-    BEGIN
-        INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
-        VALUES (@TeacherDmRoomId, @Teacher1Id, N'OWNER', N'JOINED');
-    END
-
-    IF NOT EXISTS (SELECT 1 FROM dbo.ChatRoomMembers WHERE RoomId = @TeacherDmRoomId AND UserId = @AdminUserId)
-    BEGIN
-        INSERT INTO dbo.ChatRoomMembers (RoomId, UserId, RoleInRoom, MemberStatus)
-        VALUES (@TeacherDmRoomId, @AdminUserId, N'MEMBER', N'JOINED');
-    END
-
-    /* ---------- Idempotent ChatMessages seed ---------- */
-    DECLARE @S1 INT = (SELECT StudentUserId FROM #SeedStudents WHERE RowNum = 1);
-    DECLARE @S2 INT = (SELECT StudentUserId FROM #SeedStudents WHERE RowNum = 2);
-
-    -- marker token để không insert lại
-    DECLARE @SeedTag NVARCHAR(50) = N'[SEED_CHAT_V1]';
-
-    IF NOT EXISTS
-    (
-        SELECT 1
-        FROM dbo.ChatMessages
-        WHERE RoomId = @ClassRoomId
-          AND Content = @SeedTag + N' Welcome to class room.'
-    )
-    BEGIN
-        INSERT INTO dbo.ChatMessages (RoomId, SenderId, MessageType, Content)
-        VALUES
-        (@ClassRoomId, @Teacher1Id, N'SYSTEM', @SeedTag + N' Welcome to class room.'),
-        (@ClassRoomId, @Teacher1Id, N'TEXT',   @SeedTag + N' Chào lớp, vui lòng đọc syllabus trước buổi học đầu tiên.'),
-        (@ClassRoomId, @S1,         N'TEXT',   @SeedTag + N' Dạ em đã đọc, thầy cho em hỏi về rubric Lab 1 ạ?'),
-        (@ClassRoomId, @Teacher1Id, N'TEXT',   @SeedTag + N' Rubric sẽ được đăng trong LMS tối nay.');
-    END
-
-    IF NOT EXISTS
-    (
-        SELECT 1
-        FROM dbo.ChatMessages
-        WHERE RoomId = @CourseRoomId
-          AND Content = @SeedTag + N' Course room created.'
-    )
-    BEGIN
-        INSERT INTO dbo.ChatMessages (RoomId, SenderId, MessageType, Content)
-        VALUES
-        (@CourseRoomId, @Teacher1Id, N'SYSTEM', @SeedTag + N' Course room created.'),
-        (@CourseRoomId, @Teacher1Id, N'TEXT',   @SeedTag + N' Đây là phòng chung môn học, các em trao đổi học thuật tại đây.'),
-        (@CourseRoomId, @S2,         N'TEXT',   @SeedTag + N' Em xin tài liệu ôn tập giữa kỳ ạ.');
-    END
-
-    IF NOT EXISTS
-    (
-        SELECT 1
-        FROM dbo.ChatMessages
-        WHERE RoomId = @TeacherDmRoomId
-          AND Content = @SeedTag + N' DM channel opened.'
-    )
-    BEGIN
-        INSERT INTO dbo.ChatMessages (RoomId, SenderId, MessageType, Content)
-        VALUES
-        (@TeacherDmRoomId, @Teacher1Id, N'SYSTEM', @SeedTag + N' DM channel opened.'),
-        (@TeacherDmRoomId, @Teacher1Id, N'TEXT',   @SeedTag + N' Em gửi lịch dự kiến kiểm tra giữa kỳ để admin duyệt.'),
-        (@TeacherDmRoomId, @AdminUserId, N'TEXT',  @SeedTag + N' Đã nhận, tôi sẽ review trong hôm nay.');
-    END
+    -- system + welcome messages
+    INSERT INTO dbo.ChatMessages (RoomId, SenderId, MessageType, Content, CreatedAt)
+    VALUES
+    (@RoomPRN01, @TeacherQ, N'SYSTEM', N'Phòng chat đã được tạo cho lớp PRN01', SYSUTCDATETIME()),
+    (@RoomPRN01, @TeacherQ, N'TEXT',   N'Chào mừng các bạn đến với lớp PRN01.', SYSUTCDATETIME()),
+    (@RoomPRN02, @TeacherQ, N'SYSTEM', N'Phòng chat đ�� được tạo cho lớp PRN02', SYSUTCDATETIME()),
+    (@RoomPRN02, @TeacherQ, N'TEXT',   N'Chào mừng các bạn đến với lớp PRN02.', SYSUTCDATETIME());
 
     COMMIT TRANSACTION;
 END TRY
 BEGIN CATCH
-    IF @@TRANCOUNT > 0
-        ROLLBACK TRANSACTION;
-
-    DECLARE @ErrMsg NVARCHAR(4000) = ERROR_MESSAGE();
-    DECLARE @ErrNo INT = ERROR_NUMBER();
-    DECLARE @ErrState INT = ERROR_STATE();
-
-    RAISERROR(N'Idempotent chat seed failed. %s', 16, 1, @ErrMsg);
+    IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+    THROW;
 END CATCH;
 GO
-
--- =====================================================
--- SEED: Messages (Tự động chat mẫu cho SE1801)
--- =====================================================
-DECLARE @Class1 INT = (SELECT TOP 1 ClassSectionId FROM dbo.ClassSections WHERE SectionCode = 'SE1801');
-DECLARE @Room1 INT = (SELECT TOP 1 RoomId FROM dbo.ChatRooms WHERE ClassSectionId = @Class1);
-DECLARE @TchrUserId INT = (SELECT TOP 1 UserId FROM dbo.Users WHERE Role = 'TEACHER');
-DECLARE @StdUserId INT = (SELECT TOP 1 e.StudentId FROM dbo.Enrollments e WHERE e.ClassSectionId = @Class1);
-
-INSERT INTO dbo.ChatMessages (RoomId, SenderId, MessageType, Content, CreatedAt) VALUES
-(@Room1, @TchrUserId, 'TEXT', N'Chào các em, thầy đã upload quiz chương 1. Các em vào làm nhé.', DATEADD(DAY, -2, SYSUTCDATETIME())),
-(@Room1, @StdUserId,  'TEXT', N'Dạ vâng ạ.', DATEADD(MINUTE, 5, DATEADD(DAY, -2, SYSUTCDATETIME()))),
-(@Room1, @TchrUserId, 'TEXT', N'Hạn chót là cuối tháng nên đừng để quên nhen.', DATEADD(MINUTE, 10, DATEADD(DAY, -2, SYSUTCDATETIME()))),
-(@Room1, @StdUserId,  'TEXT', N'Đề quiz năm nay có ra thi cuối kỳ không thầy?', DATEADD(HOUR, 2,  DATEADD(DAY, -2, SYSUTCDATETIME()))),
-(@Room1, @TchrUserId, 'TEXT', N'Tất nhiên là có! Ôn tập kỹ nhé.', DATEADD(HOUR, 5,  DATEADD(DAY, -2, SYSUTCDATETIME())));
-GO
-
-PRINT 'Seed data inserted successfully!';
