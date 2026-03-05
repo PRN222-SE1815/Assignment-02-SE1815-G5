@@ -2261,40 +2261,135 @@ CROSS JOIN (SELECT 1 AS x UNION ALL SELECT 2) dup
 ORDER BY s.ChatSessionId;
 GO
 
--- =====================================================
--- SEED: Recurrences (100 rows) for ScheduleEvents
--- =====================================================
-INSERT INTO dbo.Recurrences (RRule, StartDate, EndDate)
-SELECT TOP 100
-    CASE WHEN ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) % 3 = 0 
-         THEN 'FREQ=WEEKLY;BYDAY=MO,WE;INTERVAL=1'
-         WHEN ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) % 3 = 1 
-         THEN 'FREQ=WEEKLY;BYDAY=TU,TH;INTERVAL=1'
-         ELSE 'FREQ=WEEKLY;BYDAY=FR;INTERVAL=1' END,
-    '2026-01-05',
-    '2026-04-30'
-FROM dbo.ClassSections
-ORDER BY ClassSectionId;
+/* =============================================================
+   RE-SEED Recurrences + ScheduleEvents
+   Replace old block lines 2264 -> 2298
+   Scope: classes in semesters <= SP26
+   ============================================================= */
+
+SET NOCOUNT ON;
 GO
 
--- =====================================================
--- SEED: ScheduleEvents (100 rows)
--- =====================================================
-INSERT INTO dbo.ScheduleEvents (ClassSectionId, Title, StartAt, EndAt, Location, Status, CreatedBy)
-SELECT TOP 100
-    cs.ClassSectionId,
-    N'Buổi học ' + c.CourseName + N' - Tuần ' + CAST(ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 16 + 1 AS NVARCHAR(5)),
-    DATEADD(DAY, (ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 90), '2026-01-05T07:30:00'),
-    DATEADD(HOUR, 3, DATEADD(DAY, (ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 90), '2026-01-05T07:30:00')),
-    cs.Room,
-    CASE WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 4 = 0 THEN 'COMPLETED'
-         WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 4 = 1 THEN 'PUBLISHED'
-         WHEN ROW_NUMBER() OVER (ORDER BY cs.ClassSectionId) % 4 = 2 THEN 'DRAFT'
-         ELSE 'RESCHEDULED' END,
-    (SELECT TOP 1 UserId FROM dbo.Users WHERE Role = 'ADMIN')
-FROM dbo.ClassSections cs
-JOIN dbo.Courses c ON c.CourseId = cs.CourseId
-ORDER BY cs.ClassSectionId;
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    -- 1) Xác định các class thuộc SP26 trở về trước
+    IF OBJECT_ID('tempdb..#TargetClassSections') IS NOT NULL DROP TABLE #TargetClassSections;
+    SELECT
+        cs.ClassSectionId,
+        cs.TeacherId,
+        cs.SemesterId,
+        s.SemesterCode,
+        s.StartDate,
+        s.EndDate
+    INTO #TargetClassSections
+    FROM dbo.ClassSections cs
+    JOIN dbo.Semesters s ON s.SemesterId = cs.SemesterId
+    WHERE s.SemesterCode IN (N'SP25', N'SU25', N'FA25', N'SP26');
+
+    -- Nếu không có dữ liệu class phù hợp thì dừng
+    IF NOT EXISTS (SELECT 1 FROM #TargetClassSections)
+    BEGIN
+        COMMIT TRANSACTION;
+        RETURN;
+    END
+
+    -- 2) Cleanup old schedule data trong phạm vi target
+    -- Xóa changelog trước
+    DELETE scl
+    FROM dbo.ScheduleChangeLogs scl
+    JOIN dbo.ScheduleEvents se ON se.ScheduleEventId = scl.ScheduleEventId
+    JOIN #TargetClassSections t ON t.ClassSectionId = se.ClassSectionId;
+
+    -- Xóa events
+    DELETE se
+    FROM dbo.ScheduleEvents se
+    JOIN #TargetClassSections t ON t.ClassSectionId = se.ClassSectionId;
+
+    -- 3) Tạo recurrence cho từng class
+    -- Quy ước:
+    --   SP*: MON/WED/FRI
+    --   SU*: TUE/THU
+    --   FA*: MON/WED
+    IF OBJECT_ID('tempdb..#RecurrenceMap') IS NOT NULL DROP TABLE #RecurrenceMap;
+    CREATE TABLE #RecurrenceMap
+    (
+        ClassSectionId INT NOT NULL PRIMARY KEY,
+        RecurrenceId INT NOT NULL
+    );
+
+    DECLARE
+        @ClassSectionId INT,
+        @SemesterCode NVARCHAR(50),
+        @StartDate DATE,
+        @EndDate DATE,
+        @RRule NVARCHAR(500),
+        @RecurrenceId INT;
+
+    DECLARE cur CURSOR LOCAL FAST_FORWARD FOR
+        SELECT ClassSectionId, SemesterCode, StartDate, EndDate
+        FROM #TargetClassSections
+        ORDER BY SemesterCode, ClassSectionId;
+
+    OPEN cur;
+    FETCH NEXT FROM cur INTO @ClassSectionId, @SemesterCode, @StartDate, @EndDate;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        SET @RRule =
+            CASE
+                WHEN @SemesterCode LIKE N'SP%' THEN N'FREQ=WEEKLY;BYDAY=MO,WE,FR'
+                WHEN @SemesterCode LIKE N'SU%' THEN N'FREQ=WEEKLY;BYDAY=TU,TH'
+                WHEN @SemesterCode LIKE N'FA%' THEN N'FREQ=WEEKLY;BYDAY=MO,WE'
+                ELSE N'FREQ=WEEKLY;BYDAY=MO,WE'
+            END;
+
+        INSERT INTO dbo.Recurrences (RRule, StartDate, EndDate, CreatedAt)
+        VALUES (@RRule, @StartDate, @EndDate, SYSUTCDATETIME());
+
+        SET @RecurrenceId = CAST(SCOPE_IDENTITY() AS INT);
+
+        INSERT INTO #RecurrenceMap (ClassSectionId, RecurrenceId)
+        VALUES (@ClassSectionId, @RecurrenceId);
+FETCH NEXT FROM cur INTO @ClassSectionId, @SemesterCode, @StartDate, @EndDate;
+    END
+
+    CLOSE cur;
+    DEALLOCATE cur;
+
+    -- 4) Seed 1 schedule event chuẩn / class
+    -- Time: 08:00-09:30 local style (stored as datetime2)
+    INSERT INTO dbo.ScheduleEvents
+    (
+        ClassSectionId, Title, StartAt, EndAt, Timezone, Location, OnlineUrl,
+        TeacherId, Status, RecurrenceId, CreatedBy, UpdatedBy, CreatedAt, UpdatedAt
+    )
+    SELECT
+        t.ClassSectionId,
+        N'Lecture - ' + cs.SectionCode,
+        DATEADD(HOUR, 8, CAST(t.StartDate AS DATETIME2(0))),      -- 08:00 ngày bắt đầu kỳ
+        DATEADD(MINUTE, 90, DATEADD(HOUR, 8, CAST(t.StartDate AS DATETIME2(0)))), -- 09:30
+        N'Asia/Ho_Chi_Minh',
+        COALESCE(cs.Room, N'TBA'),
+        cs.OnlineUrl,
+        cs.TeacherId,
+        N'PUBLISHED',
+        rm.RecurrenceId,
+        cs.TeacherId,   -- CreatedBy
+        cs.TeacherId,   -- UpdatedBy
+        SYSUTCDATETIME(),
+        NULL
+    FROM #TargetClassSections t
+    JOIN dbo.ClassSections cs ON cs.ClassSectionId = t.ClassSectionId
+    JOIN #RecurrenceMap rm ON rm.ClassSectionId = t.ClassSectionId;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+    THROW;
+END CATCH;
 GO
 
 -- =====================================================
