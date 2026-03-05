@@ -2609,3 +2609,54 @@ BEGIN CATCH
     THROW;
 END CATCH;
 GO
+CREATE TABLE #PrereqSeed
+(
+    SemesterCode NVARCHAR(50) NOT NULL,
+    CourseCode NVARCHAR(50) NOT NULL,
+    PrereqCourseCode NVARCHAR(50) NOT NULL
+);
+
+INSERT INTO #PrereqSeed (SemesterCode, CourseCode, PrereqCourseCode) VALUES
+-- SU26
+(N'SU26', N'PRN223', N'PRN222'),
+(N'SU26', N'API301', N'PRN231'),
+
+-- FA26
+(N'FA26', N'PRN224', N'PRN223'),
+(N'FA26', N'API302', N'API301'),
+
+-- SP27
+(N'SP27', N'PRN225', N'PRN224'),
+(N'SP27', N'API303', N'API302'),
+
+-- SU27
+(N'SU27', N'PRN226', N'PRN225'),
+(N'SU27', N'API304', N'API303'),
+
+-- FA27
+(N'FA27', N'CLD302', N'CLD301'),
+(N'FA27', N'AI302',  N'AI301');
+
+;WITH Resolved AS
+(
+    SELECT
+        s.SemesterCode,
+        c.CourseId,
+        p.CourseId AS PrerequisiteCourseId
+    FROM #PrereqSeed s
+    JOIN dbo.Courses c ON c.CourseCode = s.CourseCode
+    JOIN dbo.Courses p ON p.CourseCode = s.PrereqCourseCode
+    WHERE c.CourseId <> p.CourseId
+)
+MERGE dbo.CoursePrerequisites AS tgt
+USING Resolved AS src
+ON  tgt.CourseId = src.CourseId
+AND tgt.PrerequisiteCourseId = src.PrerequisiteCourseId
+WHEN NOT MATCHED THEN
+    INSERT (CourseId, PrerequisiteCourseId)
+    VALUES (src.CourseId, src.PrerequisiteCourseId);
+
+-- Validate exactly 10 inserted for this seed definition
+SELECT
+    SeedCount = COUNT(*)
+FROM #PrereqSeed;
